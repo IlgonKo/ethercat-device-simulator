@@ -1,0 +1,3 @@
+[submodule "third_party/KickCAT"]
+	path = third_party/KickCAT
+	url = https://github.com/leducp/KickCAT.git
