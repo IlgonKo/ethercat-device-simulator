@@ -1,0 +1,53 @@
+{
+  "files": [],
+  "packages": [
+    {
+      "name": "eXpat",
+      "SPDXID": "SPDXRef-RootPackage",
+      "downloadLocation": "NOASSERTION",
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+      },
+      "filesAnalyzed": true,
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoFromFiles": [
+        "NOASSERTION"
+      ],
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper\nCopyright (c) 2001-2025 Expat maintainers",
+      "versionInfo": "2.7.1",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:swid/eXpat%20community/github.com/eXpat@2.7.1?tag_id=b0f03bbf-8979-4ab8-91e8-ff4442d63188"
+        }
+      ],
+      "supplier": "Organization: eXpat community",
+      "hasFiles": []
+    }
+  ],
+  "externalDocumentRefs": [],
+  "relationships": [
+    {
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-RootPackage",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    }
+  ],
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "eXpat 2.7.1",
+  "documentNamespace": "https://github.com/libexpat/eXpat/2.7.1/f9a3eeb",
+  "creationInfo": {
+    "created": "2026-07-24T00:12:38Z",
+    "creators": [
+      "Organization: eXpat community",
+      "Tool: Microsoft.SBOMTool-4.1.5"
+    ]
+  },
+  "documentDescribes": [
+    "SPDXRef-RootPackage"
+  ]
+}

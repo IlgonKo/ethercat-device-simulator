@@ -1,0 +1,78 @@
+{
+  "files": [],
+  "packages": [
+    {
+      "name": "eXpat",
+      "SPDXID": "SPDXRef-Package-0A2927C22A7DA6F272AC9D54C0C3640733D33046696BC58F0B99669440C88B5C",
+      "downloadLocation": "NOASSERTION",
+      "filesAnalyzed": true,
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoFromFiles": [
+        "NOASSERTION"
+      ],
+      "licenseDeclared": "MIT",
+      "copyrightText": "Copyright (c) 1998-2000 Thai Open Source Software Center Ltd and Clark Cooper\nCopyright (c) 2001-2025 Expat maintainers",
+      "versionInfo": "2.7.1",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:swid/eXpat%20community/github.com/eXpat@2.7.1?tag_id=b0f03bbf-8979-4ab8-91e8-ff4442d63188"
+        }
+      ],
+      "supplier": "Organization: eXpat community"
+    },
+    {
+      "name": "EC-Simulator-HiL-Linux-x86_64Bit-Eval",
+      "SPDXID": "SPDXRef-RootPackage",
+      "downloadLocation": "NOASSERTION",
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "da39a3ee5e6b4b0d3255bfef95601890afd80709"
+      },
+      "filesAnalyzed": true,
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoFromFiles": [
+        "NOASSERTION"
+      ],
+      "licenseDeclared": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "versionInfo": "V3.3.2.01",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:swid/acontis%20technologies%20GmbH/spdx.org/EC-Simulator-HiL-Linux-x86_64Bit-Eval@V3.3.2.01?tag_id=bed2cb2c-37e2-499d-baa2-412a7e193c23"
+        }
+      ],
+      "supplier": "Organization: acontis technologies GmbH",
+      "hasFiles": []
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "DEPENDS_ON",
+      "relatedSpdxElement": "SPDXRef-Package-0A2927C22A7DA6F272AC9D54C0C3640733D33046696BC58F0B99669440C88B5C",
+      "spdxElementId": "SPDXRef-RootPackage"
+    },
+    {
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-RootPackage",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    }
+  ],
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "EC-Simulator-HiL-Linux-x86_64Bit-Eval V3.3.2.01",
+  "documentNamespace": "https://spdx.org/spdxdocs/sbom-tool-4.1.5-41879665-10ad-4805-b551-a74ba3a1b16a/EC-Simulator-HiL-Linux-x86_64Bit-Eval/V3.3.2.01/2houSXfMPkS8ljBIKdVQtA",
+  "creationInfo": {
+    "created": "2026-07-24T01:12:53Z",
+    "creators": [
+      "Organization: acontis technologies GmbH",
+      "Tool: Microsoft.SBOMTool-4.1.5"
+    ]
+  },
+  "documentDescribes": [
+    "SPDXRef-RootPackage"
+  ]
+}

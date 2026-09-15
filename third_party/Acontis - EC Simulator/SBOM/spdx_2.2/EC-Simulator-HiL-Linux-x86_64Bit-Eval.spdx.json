@@ -1,0 +1,1861 @@
+{
+  "files": [
+    {
+      "fileName": "./Bin/Linux/x64/libEcSimulator.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libEcSimulator.so-A8B42142B05D56744E4769D27C6EA0BEF90A34AA",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "72e779899226f6160abdd41f3aca2b3528c121515508727aa2f066a4b99bdca6"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a8b42142b05d56744e4769d27c6ea0bef90a34aa"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/EcSimulatorHilDemoMotion",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-EcSimulatorHilDemoMotion-74C2E5767C93685E2629B919BD0A40EA691C8C47",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5f89e8c1be6fb6b18df9c7f5d821379bd5c79ae0af141c0cff760368c34a2dc1"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "74c2e5767c93685e2629b919bd0a40ea691c8c47"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllDW3504.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllDW3504.so-649CCAF9BF0E1A90A5E7ADDF800BD3C303D3A047",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4444440e576f7cfec27a365b4cc0cf8b87380234028f2275b97a9c665de210bb"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "649ccaf9bf0e1a90a5e7addf800bd3c303d3a047"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllIntelGbe.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllIntelGbe.so-1B43C688EF1859889AC6B1D8B8913C463E7AD9BA",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5cf2d40d2e86349187a25613798414224ff2a52419a6e3e24e5e5acb4dfde68b"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "1b43c688ef1859889ac6b1d8b8913c463e7ad9ba"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Doc/EC-Simulator-HiL_QuickStart_Guide.pdf",
+      "SPDXID": "SPDXRef-File--Doc-EC-Simulator-HiL-QuickStart-Guide.pdf-28908EE7DD61485C8C13993C0E863DF7503EBA9C",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "9833764a762aa3aac465aadd4aa417a33afcb8f83518b088dee1c66761f333f3"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "28908ee7dd61485c8c13993c0e863df7503eba9c"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcNotification.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcNotification.cpp-70004641BD7C63049671910A992CA88329CDFD51",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "ac36174679b1d2f4b21b89b2b3f27e586b34f25699c09ff459a84cf2d0eaff13"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "70004641bd7c63049671910a992ca88329cdfd51"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libEcSimulatorRasServer.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libEcSimulatorRasServer.so-CA276516667B8E1BF114C069212232F5A3E4B283",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "05ba7b9c6840f2ed5ffd359947f3582935574ee4914dcfed22054f1382089538"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "ca276516667b8e1bf114c069212232f5a3e4b283"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/Linux/EcDemoMain.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-Linux-EcDemoMain.cpp-7AB6FB1DAADC07D113FC4F011F8CD85C79E7D478",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0f06daf4022f2c0d4004f418319f68ab5f0df5f7c9f36f27a315fcc7817ef192"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7ab6fb1daadc07d113fc4f011f8cd85c79e7d478"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./EcVersion.txt",
+      "SPDXID": "SPDXRef-File--EcVersion.txt-1B58AF96D27FE67B2D0B148F00236B2DD9C996CC",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "99aa8103f94c047bfef87263967909e4f7ed6f0a5046f0e15ab80bda471acf69"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "1b58af96d27fe67b2d0b148f00236b2dd9c996cc"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllLAN743x.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllLAN743x.so-639C41C70A085E11E0BF8D407EB58A8B6CE33A5E",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "99a68a76a2ea68a80465b86195043de8b2a9e406199ee1a7a31601b1160d82c1"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "639c41c70a085e11e0bf8d407eb58a8b6ce33a5e"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcDemoParms.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcDemoParms.cpp-6A3A3039708E7CE34954DC688FC981F6A2304932",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8a243bc60937b90c733f7498b6de13be184804b4daad04f675f00078558a49f0"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "6a3a3039708e7ce34954dc688fc981f6a2304932"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcSelectLinkLayer.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcSelectLinkLayer.cpp-BB8DC1FECE16826CCDBAC67102B1EA0CD567E677",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c75ac130ebf68262b898f1a3674def54d8f8084bdf137170e7521651e9030ea3"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "bb8dc1fece16826ccdbac67102b1ea0cd567e677"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/Linux/EcDemoTimingTaskPlatform.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-Linux-EcDemoTimingTaskPlatform.cpp-9D493B08912AD1A74E667BF91266B467885AA03D",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c9a598e57e924a8348c4c6eefaff93b896eb77003d4c1cfcfa27fad7a55d948b"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9d493b08912ad1a74e667bf91266b467885aa03d"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllBcmNetXtreme.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllBcmNetXtreme.so-C48558F7F1BC826062EB07AB3E4F591815973556",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a28b21f42ee0ee073b17ef3c2ab7e49d5627f81d1973f361eba8f2c5effa6df3"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "c48558f7f1bc826062eb07ab3e4f591815973556"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcEscReg.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcEscReg.h-6FE4C370B791F85268915EDAB3A27DD39C4EC856",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "619bb604058bad8d9ffb69041e3ed287bdcf69454fe0c3302596e264f222cdc5"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "6fe4c370b791f85268915edab3a27dd39c4ec856"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllSockRaw.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllSockRaw.so-9A1BB3044A4AFD228DEC55FCD2CC5B4B214170C7",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a7186977017642806d8405a8e446740670d95e0faa6c4b1f04c2d1f74c5f8c10"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9a1bb3044a4afd228dec55fcd2cc5b4b214170c7"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcOs.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcOs.h-E46CD72D5420655F725212F89423EADF1EA4EDC7",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0852bfa6546c03c9e92d0050e2f589c85edb0416ac7398a3ed5ad441a0782aca"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e46cd72d5420655f725212f89423eadf1ea4edc7"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcDemoTimingTask.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcDemoTimingTask.h-8D1C2BACDF3D9611FBD19B852ACFAC8E3E493121",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a48f84e02420568713489ffcec0f0699f556a93644bc59261e3f023c1e7883b2"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "8d1c2bacdf3d9611fbd19b852acfac8e3e493121"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/OsCommon.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-OsCommon.h-27056F934CC6A943E27F7AF031EC992889BFE2FF",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a7117f88fc6884fcf9eb238967a175818c86836fb0728ee04280b83c8b82ad37"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "27056f934cc6a943e27f7af031ec992889bfe2ff"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcSimulatorDs402.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcSimulatorDs402.h-965D288F789BD561A1B9A6356AE73035CDB38E18",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "83a20d01967639c77a6f5ca0e377020c0250ba28733cfad7a1787c37c7613d53"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "965d288f789bd561a1b9a6356ae73035cdb38e18"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcTimer.cpp",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcTimer.cpp-2A9925FC32160DB107413740F267C6F587F6E993",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a699b06be7a08a091a25b2ee84b9403ceb9624d0effad7ba10c0e29b3d8fa578"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "2a9925fc32160db107413740f267c6f587f6e993"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/EcSimulatorHilDemo/EcDemoApp.h",
+      "SPDXID": "SPDXRef-File--Examples-EcSimulatorHilDemo-EcDemoApp.h-C0EB5DA2CA3D4218F41AF7665415FED24CA648D7",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4c420df2990663380a232b056abdbb39bafa21991c0d975f5d2bc2849fd79491"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "c0eb5da2ca3d4218f41af7665415fed24ca648d7"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcIoCtl.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcIoCtl.h-6FBAD7F97BBC7C5E0950FDDEECDEF5B80985463E",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b31ec0771f0389fefcbbcc2a9c9718ea37406044052a8c3028709402d49d248d"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "6fbad7f97bbc7c5e0950fddeecdef5b80985463e"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcSimulator.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcSimulator.h-2FA6A9F911DEB70930F929FE7E1E1E8FCAB6A8CF",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "01da2865d3bb667e6ef70de2f2a1dad00a760f1012294b95a759b87884fe60c5"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "2fa6a9f911deb70930f929fe7e1e1e8fcab6a8cf"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcFiFo.h",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcFiFo.h-D78F4698AA8A89B6FD929E57EDA4CE2BBE1DDC24",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "84b3233984ff3cff68302ccf131296883984157d1a9a7e8fd7ec0cbbb424ec17"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "d78f4698aa8a89b6fd929e57eda4ce2bbe1ddc24"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./CMakeLists.txt",
+      "SPDXID": "SPDXRef-File--CMakeLists.txt-754BC618DBA489BD21220FC5FECCF30C18C9C89D",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "ef5dbc70e9c1bcf1e4e19e0aeb9004e2c77ffdd3aa5dbfa0711feea0ba8de778"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "754bc618dba489bd21220fc5feccf30c18c9c89d"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllAlteraTSE.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllAlteraTSE.so-45A9A148442FC6747F17D1A66C845C10FD90EBBF",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bed920089a7ed038eff3747cd0fc967b9bdf5d902d3519bf79da71743578fad5"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "45a9a148442fc6747f17d1a66c845c10fd90ebbf"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllRTL8169.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllRTL8169.so-E037D6BA1D0D18BCFAA7C85BE2099EB8B982403E",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "0e4ba540c8adc9859b762ec5c2c7ced3517261fc92ba6360b20ceeeb9222123c"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e037d6ba1d0d18bcfaa7c85be2099eb8b982403e"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcDemoTimingTask.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcDemoTimingTask.cpp-9DF7049E169D2331FDF182EB75FD5089722406D5",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "830990e63476ee56d16de07991e0b9c55d11bc7a33c9e2bd8895a57fcaea1b91"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9df7049e169d2331fdf182eb75fd5089722406d5"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcSimulatorDs402.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcSimulatorDs402.cpp-FDB77FAF1D7251A352C5C1A0D98F94A76BEB4D95",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a7b0037402ff6ca106cbecf0af429356423c71edb34f961c8a75de01732bd60d"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "fdb77faf1d7251a352c5c1a0d98f94a76beb4d95"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/EcSimulatorHilDemo/EcDemoApp.cpp",
+      "SPDXID": "SPDXRef-File--Examples-EcSimulatorHilDemo-EcDemoApp.cpp-7E06E02E03DACE8F708134A4C1071849A251CE5A",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4a275537d634e319447e9c46b273a754b01f9b3665b6af3a9abef640da17f4c2"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7e06e02e03dace8f708134a4c1071849a251ce5a"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcInterfaceCommon.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcInterfaceCommon.h-E8D28794CBA59E3D77EAC8393F009BBDD3DE02B4",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a3af95754b1f3cd9a007d6f0128ec27bd7ec222c7b8df06c9494ac76ac6fd98c"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e8d28794cba59e3d77eac8393f009bbdd3de02b4"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcRasType.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcRasType.h-E384293BAE97B35D2881E926E8C0A528FFDD77E4",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b51b6fd26c6701d113455809e2d0b15706b3dcc388e21d29f32e45100b148cef"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e384293bae97b35d2881e926e8c0a528ffdd77e4"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/LIB/Linux/x64/libEcSimulatorRasServerStatic.a",
+      "SPDXID": "SPDXRef-File--SDK-LIB-Linux-x64-libEcSimulatorRasServerStatic.a-3605F6BDEF8540E2F86A9A8B6741FB34E297FF42",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c0293e05caffc18b08c2c06a432eba246062ece4e10a7148c628e6a5e005ce83"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3605f6bdef8540e2f86a9a8b6741fb34e297ff42"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/LinkOsLayer/Linux/atemsys/atemsys.c",
+      "SPDXID": "SPDXRef-File--Sources-LinkOsLayer-Linux-atemsys-atemsys.c-4E84202EE56A8F15B0B2A2B986DBC95178E08B59",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cb14375e66541bd82858dbafca93fab0f9ddd961f39ae9cdb00983e3ed0bc7f2"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "4e84202ee56a8f15b0b2a2b986dbc95178e08b59"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/Linux/EcSimulatorHilDemo/.cproject",
+      "SPDXID": "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemo-.cproject-A93EF5272D951660C173F9F86A5CC030B0587126",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "b5d480cc2453a37cb0ae711b3281a05c52e0da1e230c51a68226b6accd7f3d40"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a93ef5272d951660c173f9f86a5cc030b0587126"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./yocto-acontis/meta-acontis/recipes-kernel/atemsys/files/Makefile",
+      "SPDXID": "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-Makefile-EFE0F55ABE69B55F4FA7A995349761B7AB68B988",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "daa2be877779ef84a5fb7378bd7988676f227e4d8127e9401d54b2ebd66f30b0"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "efe0f55abe69b55f4fa7a995349761b7ab68b988"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./License.txt",
+      "SPDXID": "SPDXRef-File--License.txt-4D211B34C77A7C559F9B5DF02E51B7CAD9A2C380",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d6c74e67e47f8410ed5c3de9e42036071de6c7388a06319167772af88ebabcfe"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "4d211b34c77a7c559f9b5df02e51b7cad9a2c380"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllCCAT.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllCCAT.so-B48C87E6E6131F86C642051B08C68A85EE1D4AEF",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "d68e850edde5ac53e95b98db366c84cc3286a13cf85e74582a37ccd4885ddcfe"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "b48c87e6e6131f86c642051b08c68a85ee1d4aef"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllSockXdp.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllSockXdp.so-D8916F6EECA24DAE2F6D403059C0F5A4BD389257",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "34e9db577420f298edc7cddbebe2412275691cf943573f5c1b3ad08878e4c4d2"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "d8916f6eeca24dae2f6d403059c0f5a4bd389257"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcLogging.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcLogging.cpp-45B0337098D57A201BD7F7564042B812A1FE64E2",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "762fbe4fb333b75895b9979de29b91ce8bf21e0987b14a31f50341c98b90750e"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "45b0337098d57a201bd7f7564042b812a1fe64e2"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcSlaveInfo.cpp",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcSlaveInfo.cpp-7D048D676760E2D5CCF1C72DCEF2C00F8C61AA91",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "6485e6a73914d3d2c42a74172bd331d57c0073c88eb2bf75f4f79fa542661e7b"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7d048d676760e2d5ccf1c72dcef2c00f8c61aa91"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/EcSimulatorHilDemoMotion/EcDemoApp.cpp",
+      "SPDXID": "SPDXRef-File--Examples-EcSimulatorHilDemoMotion-EcDemoApp.cpp-96DCB6FDCB370A98732AE4079AD139EF8ADD7F0B",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "f760a458480ae82d7998915aca0d8d7f9a7bc9aa40f40fb96cc727324f902156"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "96dcb6fdcb370a98732ae4079ad139ef8add7f0b"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcLink.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcLink.h-148D30B060D5C87951E08358ABC9679A112AD12B",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "38b28a083f2831105227efad54fe9b213ab059474964f7e495e617af7067469d"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "148d30b060d5c87951e08358abc9679a112ad12b"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcSimulatorRasServer.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcSimulatorRasServer.h-83526B282E9D3A5FACE6C6987FA990BA3218947E",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "1c6eb8029b7287372fee44e09fa19598e9726dcaaf485f48efebf84dd03ad6b4"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "83526b282e9d3a5face6c6987fa990ba3218947e"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcList.h",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcList.h-5358764BD683DC6EA41D1789828018D50906657C",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e56e485b7f8cf60fa8b88b8b1541179e170fce030480bd100d53aa7e9122c3c1"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "5358764bd683dc6ea41d1789828018d50906657c"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/LinkOsLayer/Linux/atemsys/Makefile",
+      "SPDXID": "SPDXRef-File--Sources-LinkOsLayer-Linux-atemsys-Makefile-EFE0F55ABE69B55F4FA7A995349761B7AB68B988",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "daa2be877779ef84a5fb7378bd7988676f227e4d8127e9401d54b2ebd66f30b0"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "efe0f55abe69b55f4fa7a995349761b7ab68b988"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/Linux/EcSimulatorHilDemoMotion/.cproject",
+      "SPDXID": "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemoMotion-.cproject-E8A40EAB36663A1FCD0103F54432DDEB5BE89E34",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "bdeb3e311a4295aa259616707a203d53368a298c394d571a17fff53adbdcf36e"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e8a40eab36663a1fcd0103f54432ddeb5be89e34"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/EcSimulatorHilDemo",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-EcSimulatorHilDemo-6A9FC846EFB4DCE21E936021DB5552ADC757AB3B",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "c240d73e67d1e979a7536fbd0c6d880bf14560c27fb91765ecd669b0d275c5fe"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "6a9fc846efb4dce21e936021db5552adc757ab3b"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllDpdk.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllDpdk.so-46D07130A66AE64FC63E32AA4F6F59E34C41D789",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5e61d8060a4c21f70eef7fc297efa537b69dea014abfe5620dc29e7f75b995dc"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "46d07130a66ae64fc63e32aa4f6f59e34c41d789"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllVlan.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllVlan.so-D3669E2382B77C27BD68AD7DCCA315EE06303C06",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "948dbba9d4cb2a210d4edf05b11642d4ccceceb3649598fd83b658125ffe7222"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "d3669e2382b77c27bd68ad7dcca315ee06303c06"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcLogging.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcLogging.h-5492282BCF3669CCD3354BC245323C0C31BDF464",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "5bd0c743f70d2212cc5c75991dcb5149123dbcff52d8a3a08bf0d854dde7ac43"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "5492282bcf3669ccd3354bc245323c0c31bdf464"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcSlaveInfo.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcSlaveInfo.h-3D556FCBFC3F677C773B969E449195AB38C33D61",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8863a69fb41d6be47310242b29f52c634e823c7551d09c9577bd54d3405958bb"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "3d556fcbfc3f677c773b969e449195ab38c33d61"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/EcSimulatorHilDemoMotion/EcDemoApp.h",
+      "SPDXID": "SPDXRef-File--Examples-EcSimulatorHilDemoMotion-EcDemoApp.h-392377BB0AC1DFA5E0C56D6A3987D7B4B7AE17F1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "4f00779c7552658892c0e42347601edd9c158ca5126aa9380effebd085cc43fd"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "392377bb0ac1dfa5e0c56d6a3987d7b4b7ae17f1"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcLog.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcLog.h-7CA32AD08E44B84B8E92A5228A35B70D82F955F3",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "764a56a257d7df87859ab47dfaefd684cf6abe7c31de974b30ff4125266c658c"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7ca32ad08e44b84b8e92a5228a35b70d82f955f3"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcType.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcType.h-F8AD1EE289B84BB733B8698B173EEBC914A51B9A",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "7ecb19eebbd600ad2cfeea39a4032e0478a97755ec152b23eff447b759f95bc7"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "f8ad1ee289b84bb733b8698b173eebc914a51b9a"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcMemoryLog.h",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcMemoryLog.h-2E5AB96EF6FCA40B7FA8195638C2F973CECCBC1C",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "60a78a6021bdb6653a3336c6d4aae1a8ed3ece4d12bbf5f91eacc158bc282d30"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "2e5ab96ef6fca40b7fa8195638c2f973ceccbc1c"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/cmake/EcSupport.cmake",
+      "SPDXID": "SPDXRef-File--Workspace-cmake-EcSupport.cmake-BA87A51546E5A1187FCCD2398932079059768930",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "68b4b523f7a5e91e102810757f9ce38727e90a7fd0ba4c46e90099007277c202"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "ba87a51546e5a1187fccd2398932079059768930"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/Linux/EcSimulatorHilDemoMotion/.project",
+      "SPDXID": "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemoMotion-.project-A3244DE4FB50B634A00BFDEBBD3DF4C800D51F57",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e395b37bf141d664664323bcf2467a8f34b54eed1616baa379f1be7e0195da7a"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a3244de4fb50b634a00bfdebbd3df4c800d51f57"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libEcWrapper.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libEcWrapper.so-30EF5964AB8410C1B6FE4C3B5A1C163453D81EAB",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cab2b9371b7ea9547b27cceb38885f271ea1c739eb23e02a5de659a0902b8ef7"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "30ef5964ab8410c1b6fe4c3b5a1c163453d81eab"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Bin/Linux/x64/libemllRemote.so",
+      "SPDXID": "SPDXRef-File--Bin-Linux-x64-libemllRemote.so-1C564DC915356CED9124EB16903FE13089EF4157",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "17b64826866bd2ef596ba7b38f4550022ab0b4ba4e14d55be84a16e5030380f0"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "1c564dc915356ced9124eb16903fe13089ef4157"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcDemoParms.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcDemoParms.h-7B2DE38BF5B839E7B4A02ACA06092B3F707E54FA",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "192f9574fdd0622ffdbb8d3fe0309e50a5a72101d56dd6668e2eccc7f0adbd1f"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7b2de38bf5b839e7b4a02aca06092b3f707e54fa"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcSelectLinkLayer.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcSelectLinkLayer.h-B8B1005CA14D0917762E94F19C6B8EA8E0356439",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "852d136eb21a9f8d36790fa9c19b2e29b03251490911c6d19ca7386da9816d7c"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "b8b1005ca14d0917762e94f19c6b8ea8e0356439"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/Linux/EcDemoTimingTaskPlatform.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-Linux-EcDemoTimingTaskPlatform.h-03F76AFC98477DE294F00F4981237574A0FFDFDD",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "63a6cc75d6f0ed3c18b64bb1008cb4168cfc68b4b8d943c444ffb19d5f360314"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "03f76afc98477de294f00f4981237574a0ffdfdd"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcFeatures.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcFeatures.h-8AC6802DCAFF9300AB7D3C03D3379D081F890626",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "953c6ba95b257894ee9e0c2427792a36c876098c0f049477f6ad1607601e8e5d"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "8ac6802dcaff9300ab7d3c03d3379d081f890626"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcRasError.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcRasError.h-AA718505AD33B60E86033557B0A5EB8700D0035C",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "227173cf1d6cd7c67c560dfd976bfcc1321ff2fb4b60536ad0fa19bfaded387a"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "aa718505ad33b60e86033557b0a5eb8700d0035c"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/Linux/EcOsPlatform.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-Linux-EcOsPlatform.h-82B3E166C27F06233512114F62897CBFF0B816AA",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "25857ca40a41622d04dbf3987240aa252b9b81d63eca8f85f0db634c7c651ea2"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "82b3e166c27f06233512114f62897cbff0b816aa"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcTimer.h",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcTimer.h-BCECB64DF1698A700276221F3CDCE92E171CF8F6",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "07458c80d444b7cc0ad07b90ad82e58451be4590c78fddf5d39eff36e529a9f8"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "bcecb64df1698a700276221f3cdce92e171cf8f6"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/Linux/Toolchain.cmake",
+      "SPDXID": "SPDXRef-File--Workspace-Linux-Toolchain.cmake-9FC16A559F20B8849FD4FE8DC95C74C01459EB48",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "a377d84686c05fede5c81c76db64ea384bb3b789dc3b3eb0570a6090638afb62"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9fc16a559f20b8849fd4fe8dc95c74c01459eb48"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./yocto-acontis/meta-acontis/recipes-kernel/atemsys/files/COPYING",
+      "SPDXID": "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-COPYING-B6D8AE177F05E389B1248528647BC096FF9A298B",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "1e49d4a7eb43d3a82af73d3da4b170ee9905f82be74b6263a2eb91543efc4af1"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "b6d8ae177f05e389b1248528647bc096ff9a298b"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcCommon.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcCommon.h-E17000ABD435ADFEDE7057526B654D91AA1C15B1",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3a20f7b6d34099873e2bb3eb54b212ddd0be91bc0a719711e1d001b037810c4b"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "e17000abd435adfede7057526b654d91aa1c15b1"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcMaster.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcMaster.h-57CCE8686506C9C0205C18675F4EE9B1C23D28D4",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "01496498307abdd41065d367711add0f3f19e56d8bfb9e4ce660db349402e5fa"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "57cce8686506c9c0205c18675f4ee9b1c23d28d4"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcVersion.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcVersion.h-1B58AF96D27FE67B2D0B148F00236B2DD9C996CC",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "99aa8103f94c047bfef87263967909e4f7ed6f0a5046f0e15ab80bda471acf69"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "1b58af96d27fe67b2d0b148f00236b2dd9c996cc"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcThread.cpp",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcThread.cpp-720C0A68BB551D4778F28D13366A6BE4F7BC76E2",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e00fda3959b2042eba07cb9ee488e3eb8955020573a08710d9104176b9d158c7"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "720c0a68bb551d4778f28d13366a6be4f7bc76e2"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/cmake/EcSimulatorHilDemo/CMakeLists.txt",
+      "SPDXID": "SPDXRef-File--Workspace-cmake-EcSimulatorHilDemo-CMakeLists.txt-FFF5DC4CA5544B0F7918A5C9C7C86E072D0811FE",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "24484e7cf62f9664d849df928edbc071881aee09207d91a2e4fe1db2aab32f4b"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "fff5dc4ca5544b0f7918a5c9c7c86e072d0811fe"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./yocto-acontis/meta-acontis/conf/layer.conf",
+      "SPDXID": "SPDXRef-File--yocto-acontis-meta-acontis-conf-layer.conf-93AFDC8E513CE039C0564717CD515C7A05854F5D",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cac3b5373ef578079c135fdc7fa565ddc1c7e3704cf302eac49e449631570660"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "93afdc8e513ce039c0564717cd515c7a05854f5d"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/Linux/CMakeLists.txt",
+      "SPDXID": "SPDXRef-File--Workspace-Linux-CMakeLists.txt-319708A45AA1D3F489B3203B83CCE1EEC7902E0C",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8b597f032ee5840462520cab0609cd10c359055de09e992dcbc535c15b0941dd"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "319708a45aa1d3f489b3203b83cce1eec7902e0c"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./yocto-acontis/meta-acontis/recipes-kernel/atemsys/files/atemsys.h",
+      "SPDXID": "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-atemsys.h-35493A3C73D34E574D224037522DB72C150A0588",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "fc378313224f79df6fa6d238b74367e88a358f9ab2d629085e7cdb5d100922e8"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "35493a3c73d34e574d224037522db72c150a0588"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/LinkOsLayer/Linux/atemsys/atemsys.h",
+      "SPDXID": "SPDXRef-File--Sources-LinkOsLayer-Linux-atemsys-atemsys.h-35493A3C73D34E574D224037522DB72C150A0588",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "fc378313224f79df6fa6d238b74367e88a358f9ab2d629085e7cdb5d100922e8"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "35493a3c73d34e574d224037522db72c150a0588"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/Linux/EcSimulatorHilDemo/.project",
+      "SPDXID": "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemo-.project-A348AD37071ECEF7119B6B1A7E0591F1ECAC1C43",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "213ce21395a4a95bb98018e1e2218923c09e3cede82952ea38950c6acd4f556a"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "a348ad37071ecef7119b6b1a7e0591f1ecac1c43"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./yocto-acontis/meta-acontis/recipes-kernel/kernel-module-atemsys/kernel-module-atemsys.bb",
+      "SPDXID": "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-kernel-module-atemsys-kernel-module-atemsys.bb-26B42A1B6253EC29747C7899CFD8C47B38FDC9B5",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "294b975bba3c55bb9d700a10909205ad98496c3eb84eb1ecbdde987d4db024dc"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "26b42a1b6253ec29747c7899cfd8c47b38fdc9b5"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Doc/EC-Simulator-HiL_UserManual.pdf",
+      "SPDXID": "SPDXRef-File--Doc-EC-Simulator-HiL-UserManual.pdf-7C1AD40506AE05C6B0E8F003B6730CCCDE997B82",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "619f4a9418aef3a1f4fb2b12f350c3f35ec23d3060abcb3a72a9456497c66452"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "7c1ad40506ae05c6b0e8f003b6730cccde997b82"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/EcNotification.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-EcNotification.h-B40954F7AC960DD729BD225FF577C2E950561B6F",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8d2efd5277fe7e3a4229996f1ab3480564af09644fd8fbee74def3e41d20636a"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "b40954f7ac960dd729bd225ff577c2e950561b6f"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Examples/Common/Linux/EcDemoPlatform.h",
+      "SPDXID": "SPDXRef-File--Examples-Common-Linux-EcDemoPlatform.h-71799F4F8FFC7A7068F49F0B441950CEF11685CF",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "58c4f832bed662c9f2aec1a729a36a0e9b433922146d9d2f19401b1b3fef98e6"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "71799f4f8ffc7a7068f49f0b441950cef11685cf"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcError.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcError.h-138B0CF4EF19B4578D0E51BA6F44532B44D8B10A",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "851803efd98b0a367f68aef7e6b834397ed07aca2bb17088996a56253c994bb7"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "138b0cf4ef19b4578d0e51ba6f44532b44d8b10a"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EcObjDef.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EcObjDef.h-F552C81F01051ECF02F45F742EC8FFEB390C2C01",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "8411a7c6f14b48371ea1dc7cf3e6c2c5be30290c1a0e0addaed55cba97f1fc9e"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "f552c81f01051ecf02f45f742ec8ffeb390c2c01"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./SDK/INC/EthernetServices.h",
+      "SPDXID": "SPDXRef-File--SDK-INC-EthernetServices.h-C0A1CA51427FE93E3CB381E59E2C8E823B8DAA9B",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "fb9300617eec8e81236a36bc49ee6374470eaa367548e7bc97b8376a26c83964"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "c0a1ca51427fe93e3cb381e59e2c8e823b8daa9b"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Sources/Common/EcThread.h",
+      "SPDXID": "SPDXRef-File--Sources-Common-EcThread.h-464A706C41AA31C15CA1EAFE3F702A66B48FCECE",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "31d84a43e73057c8c18e26b3d28554bd45611750b11f7257957770e09cee719c"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "464a706c41aa31c15ca1eafe3f702a66b48fcece"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./Workspace/cmake/EcSimulatorHilDemoMotion/CMakeLists.txt",
+      "SPDXID": "SPDXRef-File--Workspace-cmake-EcSimulatorHilDemoMotion-CMakeLists.txt-9B456D012D97B23C712BB6659529251A4782800B",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "e0ec1ff7474419deecc6fa7afaa6d1635087c9e0e9a06db2c44722f8b81ccc4d"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "9b456d012d97b23c712bb6659529251a4782800b"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    },
+    {
+      "fileName": "./yocto-acontis/meta-acontis/recipes-kernel/atemsys/files/atemsys.c",
+      "SPDXID": "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-atemsys.c-4E84202EE56A8F15B0B2A2B986DBC95178E08B59",
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "cb14375e66541bd82858dbafca93fab0f9ddd961f39ae9cdb00983e3ed0bc7f2"
+        },
+        {
+          "algorithm": "SHA1",
+          "checksumValue": "4e84202ee56a8f15b0b2a2b986dbc95178e08b59"
+        }
+      ],
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoInFiles": [
+        "NOASSERTION"
+      ],
+      "copyrightText": "NOASSERTION"
+    }
+  ],
+  "packages": [
+    {
+      "name": "EC-Simulator-HiL-Linux-x86_64Bit-Eval",
+      "SPDXID": "SPDXRef-RootPackage",
+      "downloadLocation": "NOASSERTION",
+      "packageVerificationCode": {
+        "packageVerificationCodeValue": "375c34030c6937b5a6a3840d8bc99b21799015e9"
+      },
+      "filesAnalyzed": true,
+      "licenseConcluded": "NOASSERTION",
+      "licenseInfoFromFiles": [
+        "NOASSERTION"
+      ],
+      "licenseDeclared": "LicenseRef-acontis-commercial",
+      "copyrightText": "Copyright (c) acontis technologies GmbH",
+      "versionInfo": "V3.3.2.01",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceType": "purl",
+          "referenceLocator": "pkg:swid/acontis%20technologies%20GmbH/www.acontis.com/EC-Simulator-HiL-Linux-x86_64Bit-Eval@V3.3.2.01?tag_id=2f7344a9-3e8b-4c8a-86ae-c1034aa4456f"
+        }
+      ],
+      "supplier": "Organization: acontis technologies GmbH",
+      "hasFiles": [
+        "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-atemsys.c-4E84202EE56A8F15B0B2A2B986DBC95178E08B59",
+        "SPDXRef-File--Sources-Common-EcThread.h-464A706C41AA31C15CA1EAFE3F702A66B48FCECE",
+        "SPDXRef-File--Workspace-cmake-EcSimulatorHilDemoMotion-CMakeLists.txt-9B456D012D97B23C712BB6659529251A4782800B",
+        "SPDXRef-File--SDK-INC-EthernetServices.h-C0A1CA51427FE93E3CB381E59E2C8E823B8DAA9B",
+        "SPDXRef-File--Examples-Common-Linux-EcDemoPlatform.h-71799F4F8FFC7A7068F49F0B441950CEF11685CF",
+        "SPDXRef-File--Examples-Common-EcNotification.h-B40954F7AC960DD729BD225FF577C2E950561B6F",
+        "SPDXRef-File--SDK-INC-EcObjDef.h-F552C81F01051ECF02F45F742EC8FFEB390C2C01",
+        "SPDXRef-File--SDK-INC-EcError.h-138B0CF4EF19B4578D0E51BA6F44532B44D8B10A",
+        "SPDXRef-File--Doc-EC-Simulator-HiL-UserManual.pdf-7C1AD40506AE05C6B0E8F003B6730CCCDE997B82",
+        "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-kernel-module-atemsys-kernel-module-atemsys.bb-26B42A1B6253EC29747C7899CFD8C47B38FDC9B5",
+        "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemo-.project-A348AD37071ECEF7119B6B1A7E0591F1ECAC1C43",
+        "SPDXRef-File--Sources-LinkOsLayer-Linux-atemsys-atemsys.h-35493A3C73D34E574D224037522DB72C150A0588",
+        "SPDXRef-File--Sources-Common-EcFiFo.h-D78F4698AA8A89B6FD929E57EDA4CE2BBE1DDC24",
+        "SPDXRef-File--SDK-INC-EcSimulator.h-2FA6A9F911DEB70930F929FE7E1E1E8FCAB6A8CF",
+        "SPDXRef-File--SDK-INC-EcIoCtl.h-6FBAD7F97BBC7C5E0950FDDEECDEF5B80985463E",
+        "SPDXRef-File--Examples-EcSimulatorHilDemo-EcDemoApp.h-C0EB5DA2CA3D4218F41AF7665415FED24CA648D7",
+        "SPDXRef-File--Examples-Common-EcSimulatorDs402.h-965D288F789BD561A1B9A6356AE73035CDB38E18",
+        "SPDXRef-File--Examples-Common-EcDemoTimingTask.h-8D1C2BACDF3D9611FBD19B852ACFAC8E3E493121",
+        "SPDXRef-File--Bin-Linux-x64-libemllSockRaw.so-9A1BB3044A4AFD228DEC55FCD2CC5B4B214170C7",
+        "SPDXRef-File--Bin-Linux-x64-libemllBcmNetXtreme.so-C48558F7F1BC826062EB07AB3E4F591815973556",
+        "SPDXRef-File--EcVersion.txt-1B58AF96D27FE67B2D0B148F00236B2DD9C996CC",
+        "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-Makefile-EFE0F55ABE69B55F4FA7A995349761B7AB68B988",
+        "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemo-.cproject-A93EF5272D951660C173F9F86A5CC030B0587126",
+        "SPDXRef-File--Sources-LinkOsLayer-Linux-atemsys-atemsys.c-4E84202EE56A8F15B0B2A2B986DBC95178E08B59",
+        "SPDXRef-File--SDK-LIB-Linux-x64-libEcSimulatorRasServerStatic.a-3605F6BDEF8540E2F86A9A8B6741FB34E297FF42",
+        "SPDXRef-File--SDK-INC-EcRasType.h-E384293BAE97B35D2881E926E8C0A528FFDD77E4",
+        "SPDXRef-File--SDK-INC-EcInterfaceCommon.h-E8D28794CBA59E3D77EAC8393F009BBDD3DE02B4",
+        "SPDXRef-File--Examples-EcSimulatorHilDemo-EcDemoApp.cpp-7E06E02E03DACE8F708134A4C1071849A251CE5A",
+        "SPDXRef-File--Examples-Common-EcSimulatorDs402.cpp-FDB77FAF1D7251A352C5C1A0D98F94A76BEB4D95",
+        "SPDXRef-File--Examples-Common-EcDemoTimingTask.cpp-9DF7049E169D2331FDF182EB75FD5089722406D5",
+        "SPDXRef-File--Bin-Linux-x64-libemllRTL8169.so-E037D6BA1D0D18BCFAA7C85BE2099EB8B982403E",
+        "SPDXRef-File--Bin-Linux-x64-libemllAlteraTSE.so-45A9A148442FC6747F17D1A66C845C10FD90EBBF",
+        "SPDXRef-File--CMakeLists.txt-754BC618DBA489BD21220FC5FECCF30C18C9C89D",
+        "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemoMotion-.cproject-E8A40EAB36663A1FCD0103F54432DDEB5BE89E34",
+        "SPDXRef-File--Sources-LinkOsLayer-Linux-atemsys-Makefile-EFE0F55ABE69B55F4FA7A995349761B7AB68B988",
+        "SPDXRef-File--Sources-Common-EcList.h-5358764BD683DC6EA41D1789828018D50906657C",
+        "SPDXRef-File--SDK-INC-EcSimulatorRasServer.h-83526B282E9D3A5FACE6C6987FA990BA3218947E",
+        "SPDXRef-File--SDK-INC-EcLink.h-148D30B060D5C87951E08358ABC9679A112AD12B",
+        "SPDXRef-File--Examples-EcSimulatorHilDemoMotion-EcDemoApp.cpp-96DCB6FDCB370A98732AE4079AD139EF8ADD7F0B",
+        "SPDXRef-File--Examples-Common-EcSlaveInfo.cpp-7D048D676760E2D5CCF1C72DCEF2C00F8C61AA91",
+        "SPDXRef-File--Examples-Common-EcLogging.cpp-45B0337098D57A201BD7F7564042B812A1FE64E2",
+        "SPDXRef-File--Bin-Linux-x64-libemllSockXdp.so-D8916F6EECA24DAE2F6D403059C0F5A4BD389257",
+        "SPDXRef-File--Bin-Linux-x64-libemllCCAT.so-B48C87E6E6131F86C642051B08C68A85EE1D4AEF",
+        "SPDXRef-File--License.txt-4D211B34C77A7C559F9B5DF02E51B7CAD9A2C380",
+        "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-atemsys.h-35493A3C73D34E574D224037522DB72C150A0588",
+        "SPDXRef-File--Workspace-Linux-CMakeLists.txt-319708A45AA1D3F489B3203B83CCE1EEC7902E0C",
+        "SPDXRef-File--Sources-Common-EcTimer.cpp-2A9925FC32160DB107413740F267C6F587F6E993",
+        "SPDXRef-File--SDK-INC-OsCommon.h-27056F934CC6A943E27F7AF031EC992889BFE2FF",
+        "SPDXRef-File--SDK-INC-EcOs.h-E46CD72D5420655F725212F89423EADF1EA4EDC7",
+        "SPDXRef-File--SDK-INC-EcEscReg.h-6FE4C370B791F85268915EDAB3A27DD39C4EC856",
+        "SPDXRef-File--Examples-Common-Linux-EcDemoTimingTaskPlatform.cpp-9D493B08912AD1A74E667BF91266B467885AA03D",
+        "SPDXRef-File--Examples-Common-EcSelectLinkLayer.cpp-BB8DC1FECE16826CCDBAC67102B1EA0CD567E677",
+        "SPDXRef-File--Examples-Common-EcDemoParms.cpp-6A3A3039708E7CE34954DC688FC981F6A2304932",
+        "SPDXRef-File--Bin-Linux-x64-libemllLAN743x.so-639C41C70A085E11E0BF8D407EB58A8B6CE33A5E",
+        "SPDXRef-File--Bin-Linux-x64-libEcSimulatorRasServer.so-CA276516667B8E1BF114C069212232F5A3E4B283",
+        "SPDXRef-File--yocto-acontis-meta-acontis-recipes-kernel-atemsys-files-COPYING-B6D8AE177F05E389B1248528647BC096FF9A298B",
+        "SPDXRef-File--Workspace-Linux-Toolchain.cmake-9FC16A559F20B8849FD4FE8DC95C74C01459EB48",
+        "SPDXRef-File--Sources-Common-EcTimer.h-BCECB64DF1698A700276221F3CDCE92E171CF8F6",
+        "SPDXRef-File--SDK-INC-Linux-EcOsPlatform.h-82B3E166C27F06233512114F62897CBFF0B816AA",
+        "SPDXRef-File--SDK-INC-EcRasError.h-AA718505AD33B60E86033557B0A5EB8700D0035C",
+        "SPDXRef-File--SDK-INC-EcFeatures.h-8AC6802DCAFF9300AB7D3C03D3379D081F890626",
+        "SPDXRef-File--Examples-Common-Linux-EcDemoTimingTaskPlatform.h-03F76AFC98477DE294F00F4981237574A0FFDFDD",
+        "SPDXRef-File--Examples-Common-EcSelectLinkLayer.h-B8B1005CA14D0917762E94F19C6B8EA8E0356439",
+        "SPDXRef-File--Examples-Common-EcDemoParms.h-7B2DE38BF5B839E7B4A02ACA06092B3F707E54FA",
+        "SPDXRef-File--Bin-Linux-x64-libemllRemote.so-1C564DC915356CED9124EB16903FE13089EF4157",
+        "SPDXRef-File--Bin-Linux-x64-libEcWrapper.so-30EF5964AB8410C1B6FE4C3B5A1C163453D81EAB",
+        "SPDXRef-File--yocto-acontis-meta-acontis-conf-layer.conf-93AFDC8E513CE039C0564717CD515C7A05854F5D",
+        "SPDXRef-File--Workspace-cmake-EcSimulatorHilDemo-CMakeLists.txt-FFF5DC4CA5544B0F7918A5C9C7C86E072D0811FE",
+        "SPDXRef-File--Sources-Common-EcThread.cpp-720C0A68BB551D4778F28D13366A6BE4F7BC76E2",
+        "SPDXRef-File--SDK-INC-EcVersion.h-1B58AF96D27FE67B2D0B148F00236B2DD9C996CC",
+        "SPDXRef-File--SDK-INC-EcMaster.h-57CCE8686506C9C0205C18675F4EE9B1C23D28D4",
+        "SPDXRef-File--SDK-INC-EcCommon.h-E17000ABD435ADFEDE7057526B654D91AA1C15B1",
+        "SPDXRef-File--Examples-Common-Linux-EcDemoMain.cpp-7AB6FB1DAADC07D113FC4F011F8CD85C79E7D478",
+        "SPDXRef-File--Examples-Common-EcNotification.cpp-70004641BD7C63049671910A992CA88329CDFD51",
+        "SPDXRef-File--Doc-EC-Simulator-HiL-QuickStart-Guide.pdf-28908EE7DD61485C8C13993C0E863DF7503EBA9C",
+        "SPDXRef-File--Bin-Linux-x64-libemllDW3504.so-649CCAF9BF0E1A90A5E7ADDF800BD3C303D3A047",
+        "SPDXRef-File--Bin-Linux-x64-EcSimulatorHilDemoMotion-74C2E5767C93685E2629B919BD0A40EA691C8C47",
+        "SPDXRef-File--Bin-Linux-x64-libemllIntelGbe.so-1B43C688EF1859889AC6B1D8B8913C463E7AD9BA",
+        "SPDXRef-File--Bin-Linux-x64-libEcSimulator.so-A8B42142B05D56744E4769D27C6EA0BEF90A34AA",
+        "SPDXRef-File--Workspace-Linux-EcSimulatorHilDemoMotion-.project-A3244DE4FB50B634A00BFDEBBD3DF4C800D51F57",
+        "SPDXRef-File--Workspace-cmake-EcSupport.cmake-BA87A51546E5A1187FCCD2398932079059768930",
+        "SPDXRef-File--Sources-Common-EcMemoryLog.h-2E5AB96EF6FCA40B7FA8195638C2F973CECCBC1C",
+        "SPDXRef-File--SDK-INC-EcType.h-F8AD1EE289B84BB733B8698B173EEBC914A51B9A",
+        "SPDXRef-File--SDK-INC-EcLog.h-7CA32AD08E44B84B8E92A5228A35B70D82F955F3",
+        "SPDXRef-File--Examples-EcSimulatorHilDemoMotion-EcDemoApp.h-392377BB0AC1DFA5E0C56D6A3987D7B4B7AE17F1",
+        "SPDXRef-File--Examples-Common-EcSlaveInfo.h-3D556FCBFC3F677C773B969E449195AB38C33D61",
+        "SPDXRef-File--Examples-Common-EcLogging.h-5492282BCF3669CCD3354BC245323C0C31BDF464",
+        "SPDXRef-File--Bin-Linux-x64-libemllVlan.so-D3669E2382B77C27BD68AD7DCCA315EE06303C06",
+        "SPDXRef-File--Bin-Linux-x64-libemllDpdk.so-46D07130A66AE64FC63E32AA4F6F59E34C41D789",
+        "SPDXRef-File--Bin-Linux-x64-EcSimulatorHilDemo-6A9FC846EFB4DCE21E936021DB5552ADC757AB3B"
+      ]
+    }
+  ],
+  "externalDocumentRefs": [],
+  "relationships": [
+    {
+      "relationshipType": "DESCRIBES",
+      "relatedSpdxElement": "SPDXRef-RootPackage",
+      "spdxElementId": "SPDXRef-DOCUMENT"
+    }
+  ],
+  "spdxVersion": "SPDX-2.2",
+  "dataLicense": "CC0-1.0",
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "name": "EC-Simulator-HiL-Linux-x86_64Bit-Eval V3.3.2.01",
+  "documentNamespace": "https://www.acontis.com/EC-Simulator-HiL-Linux-x86_64Bit-Eval/V3.3.2.01/40f7c25ac",
+  "creationInfo": {
+    "created": "2026-07-24T01:12:50Z",
+    "creators": [
+      "Organization: acontis technologies GmbH",
+      "Tool: Microsoft.SBOMTool-4.1.5"
+    ]
+  },
+  "documentDescribes": [
+    "SPDXRef-RootPackage"
+  ],
+  "licenses": [
+    {
+      "licenseId": "LicenseRef-acontis-commercial",
+      "name": "acontis technologies GmbH Commercial Software License Agreement"
+    }
+  ]
+}
