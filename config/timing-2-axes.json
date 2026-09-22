@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "ethercat": {
+    "interface": "enp1s0"
+  },
+  "storage": {
+    "directory": "../state/parameters"
+  },
+  "devices": [
+    {
+      "slave_index": 0,
+      "id": "virtual-axis-0",
+      "type": "cmmt-as",
+      "model": {
+        "type": "virtual_axis",
+        "mode": "linear"
+      },
+      "parameter_set": "axis-0"
+    },
+    {
+      "slave_index": 1,
+      "id": "virtual-axis-1",
+      "type": "cmmt-as",
+      "model": {
+        "type": "virtual_axis",
+        "mode": "linear"
+      },
+      "parameter_set": "axis-1"
+    }
+  ]
+}

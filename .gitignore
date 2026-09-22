@@ -1,0 +1,7 @@
+/build/
+/.venv-kickcat/
+/EC-Simulator-*/
+__pycache__/
+*.pyc
+
+/state/
