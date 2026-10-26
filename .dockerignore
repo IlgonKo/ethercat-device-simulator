@@ -1,0 +1,17 @@
+**
+!docker/
+!docker/**
+!simulator/
+!simulator/**
+!build/
+!build/timing/
+!build/timing/cmmt_simulator
+!build/cmmt/
+!build/cmmt/cmmt_simulator
+!build/rf011/
+!build/rf011/cmmt_simulator
+!build/model-source-*/
+!build/model-source-*/**
+**/.git
+**/__pycache__
+**/*.pyc

@@ -7,7 +7,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from simulator.configuration import load_config
+from simulator.configuration import load_config, validate_config, read_json, read_env, load_environment
 from simulator.model_service import ModelFleet
 from simulator.parameter_store import ParameterStore
 
@@ -19,18 +19,52 @@ class ConfigurationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / 'config.json'
-        self.data = json.loads((ROOT/'tests/fixtures/four-axes.json').read_text())
+        self.data = load_config(ROOT/'tests/fixtures/four-axes.env')
         self.data['storage']['directory'] = 'parameters'
 
     def load(self, data=None):
-        self.path.write_text(json.dumps(self.data if data is None else data))
-        return load_config(self.path)
+        return validate_config(self.data if data is None else data, self.path.parent)
 
     def test_order_and_relative_storage(self):
         self.data['devices'].reverse()
         config = self.load()
         self.assertEqual([d['slave_index'] for d in config['devices']], [0, 1, 2, 3])
         self.assertEqual(config['storage']['directory'], str(self.path.parent/'parameters'))
+
+    def test_env_round_trip_and_relative_storage(self):
+        source = ROOT/'tests/fixtures/four-axes.env'
+        env = read_env(source)
+        env['DEVICE_SIMULATOR_BUS'] = '3:axis:cmmt-as,1:axis:cmmt-as,0:axis:cmmt-as,2:axis:cmmt-as'
+        env['DEVICE_SIMULATOR_STATE_DIR'] = 'state'
+        config = load_environment(env, self.path.parent)
+        self.assertEqual([d['slave_index'] for d in config['devices']], [0, 1, 2, 3])
+        self.assertEqual([d['model']['mode'] for d in config['devices']], ['linear', 'linear', 'rotary', 'rotary'])
+        self.assertEqual(config['storage']['directory'], str(self.path.parent/'state'))
+
+    def test_env_rejects_missing_extra_and_legacy_configuration(self):
+        base = read_env(ROOT/'tests/fixtures/four-axes.env')
+        for key, value in [('DEVICE_SIMULATOR_AXIS_MODES', ''),
+                           ('DEVICE_SIMULATOR_AXIS_MODES', '0:unknown,1:linear,2:rotary,3:rotary'),
+                           ('DEVICE_SIMULATOR_AXIS_IDS', '0:duplicate,1:duplicate,2:axis2,3:axis3'),
+                           ('DEVICE_SIMULATOR_AXIS_PARAMETER_SETS', '0:same,1:same,2:p2,3:p3'),
+                           ('DEVICE_SIMULATOR_AXIS_MODELS', '0:f_kr_internal'),
+                           ('DEVICE_SIMULATOR_AXIS_MODES', '0:linear,0:rotary'),
+                           ('DEVICE_SIMULATOR_AXIS_MODES', '0:linear,1:linear,2:rotary,3:rotary,4:linear'),
+                           ('DEVICE_SIMULATOR_AXIS_0_MODE', 'linear'),
+                           ('DEVICE_SIMULATOR_CONFIG_FILE', 'old.json'),
+                           ('DEVICE_SIMULATOR_BUS', 'cmmt-as'),
+                           ('DEVICE_SIMULATOR_BUS', '0:axis:cmmt-as,0:axis:cmmt-as')]:
+            with self.subTest(key=key, value=value), self.assertRaises(ValueError):
+                load_environment({**base, key: value})
+
+    def test_env_parser_literals_duplicates_and_no_json(self):
+        path = self.path.with_suffix('.env')
+        path.write_text('KEY="literal value" # comment\nBUS=0:axis:cmmt-as,\\\n  1:axis:cmmt-as\n')
+        self.assertEqual(read_env(path), {'KEY': 'literal value', 'BUS': '0:axis:cmmt-as, 1:axis:cmmt-as'})
+        for text in ['KEY=1\nKEY=2', 'KEY=${OTHER}', '{"schema_version":1}', 'KEY=value\\']:
+            path.write_text(text)
+            with self.assertRaises(ValueError):
+                read_env(path)
 
     def test_reject_invalid_indices_ids_types_and_unknown_fields(self):
         for key, value in [('slave_index', True), ('slave_index', -1), ('slave_index', 1),
@@ -45,7 +79,7 @@ class ConfigurationTests(unittest.TestCase):
     def test_strict_json_and_version(self):
         for text in ['{"schema_version":1,"schema_version":1}', '{"x":NaN}']:
             self.path.write_text(text)
-            with self.assertRaises(ValueError): load_config(self.path)
+            with self.assertRaises(ValueError): read_json(self.path)
         for version in [True, 1.0, 2]:
             self.data['schema_version'] = version
             with self.assertRaises(ValueError): self.load()

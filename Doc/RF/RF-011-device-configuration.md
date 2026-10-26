@@ -1,4 +1,8 @@
-# RF-011 — 독립 JSON 구성 및 다중 가상축
+# RF-011 — 독립 장치 구성 및 다중 가상축
+
+2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
+
+2026-10-26 갱신: 현재 구성은 .env 단일 형식이며 DT-005를 따른다. 아래 JSON 관련 설계·시험 기록은 당시 이력이다. 수동 실행 명령은 현재 --env-file 경로로 갱신했다.
 
 - 등록일: 2026-09-15
 - 상태: 구현 진행 / OD role 조회 최적화 완료, 2축·4축 8 ms/120초 정지 상태 재검증 통과, 2026-10-26 사용자 4축 동작 정상 확인. 상세 완료 기준은 계속 관리
@@ -73,10 +77,10 @@ cd /home/festo/Documents/ethercat-device-simulator
 sudo setcap cap_net_raw,cap_net_admin=ep build/rf011/cmmt_simulator
 python3 scripts/linux/cmmt-session.py --run-id fouraxis01 \
   --model-root build/model-source-da0b0a3 \
-  --config config/four-axes.json --binary build/rf011/cmmt_simulator
+  --env-file config/four-axes.env --binary build/rf011/cmmt_simulator
 ```
 
-run-id는 영문/숫자로 지정한다. 같은 이름의 로그 폴더가 있으면 -2, -3 등의 접미사를 붙여 새 폴더를 만들고 시작 출력에 실제 경로를 표시한다. 이전 로그는 유지한다. 기본 실행 시간 제한은 없고 stop 입력 또는 Ctrl+C로 종료한다. 저장 파일은 예제 기준 state/parameters에 생성된다. --config 사용 시 NIC는 JSON에서 읽고 --nic 중복 지정을 거부한다. Master의 실제 장치 수에 따라 전체 버스 번호는 달라지며 JSON slave_index는 가상 구간의 0~3이다.
+run-id는 영문/숫자로 지정한다. 같은 이름의 로그 폴더가 있으면 -2, -3 등의 접미사를 붙여 새 폴더를 만들고 시작 출력에 실제 경로를 표시한다. 이전 로그는 유지한다. 기본 실행 시간 제한은 없고 stop 입력 또는 Ctrl+C로 종료한다. 저장 파일은 예제 기준 state/parameters에 생성된다. --env-file 사용 시 NIC는 .env에서 읽고 --nic 중복 지정을 거부한다. Master의 실제 장치 수에 따라 전체 버스 번호는 달라지며 BUS의 명시적 Slave 번호는 가상 구간의 0~3이다.
 
 NIC 없이 계약을 검증하려면:
 
@@ -114,7 +118,7 @@ cd /home/festo/Documents/ethercat-device-simulator
 python3 scripts/linux/cmmt-session.py \
   --run-id fouraxis01 \
   --model-root build/model-source-da0b0a3 \
-  --config config/timing-4-axes.json \
+  --env-file config/timing-4-axes.env \
   --binary build/timing/cmmt_simulator \
   --timing
 ```

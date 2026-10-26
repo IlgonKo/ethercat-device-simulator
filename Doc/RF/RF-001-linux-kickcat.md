@@ -1,5 +1,7 @@
 # RF-001 — Linux KickCAT 빌드 및 기본 Slave 실행
 
+2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
+
 - 단계: 1
 - 상태: 완료 (2026-09-14)
 - 다음 항목: [RF-002 — 물리 PDO 검증](RF-002-windows-pdo-diagnostic.md)
@@ -57,7 +59,7 @@ bash scripts/linux/run-simulator.sh
 ```
 
 기본 NIC는 enp1s0이다. IPv4/IPv6 주소 유무나 종류로 실행을 차단하지 않는다. 현재 SSH 연결에 쓰이는 NIC와 링크가 없는 NIC는 거부하며 네트워크를 자동 재설정하지 않는다. SSH NIC 검사는 SSH_CONNECTION 환경 변수가 있을 때 적용된다.
-기본 Slave 설정은 configs/kickcat/basic-slave.json이며 upstream Board ESI를 참조한다.
+초기 기본 Slave 시험에서는 upstream Board ESI를 참조하는 configs/kickcat/basic-slave.json을 사용했다. 현재 Docker/CMMT 실행에서는 사용하지 않아 2026-10-26에 해당 파일과 configs 폴더를 제거했다.
 이 장치는 CMMT가 아니다. 기본 입력 패턴을 사용하는 통신 검증용 장치이다.
 Ctrl+C 또는 SIGTERM으로 정상 종료한다. upstream Socket은 NIC를 UP/PROMISC로 설정하며, 종료 시 PROMISC 플래그를 자동 복원하지 않는다.
 다른 raw socket 사용자가 없고 필요할 경우 수동으로 `sudo ip link set enp1s0 promisc off` 한다.

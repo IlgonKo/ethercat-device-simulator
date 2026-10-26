@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Validate configured C++/Python contracts without opening a physical NIC."""
 import argparse
-import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -13,20 +13,22 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--model-root', required=True)
     parser.add_argument('--binary', required=True)
-    parser.add_argument('--config', help='Config template; storage is always replaced by a temporary directory')
+    parser.add_argument('--env-file', help='Environment file (default: project .env); storage is always replaced by a temporary directory')
     parser.add_argument('--timing', action='store_true')
     args = parser.parse_args()
     root = Path(__file__).resolve().parents[2]
+    sys.path.insert(0, str(root))
+    from simulator.configuration import read_env, load_environment
     with tempfile.TemporaryDirectory(prefix='cmmt-check-') as private:
         folder = Path(private)
-        config = json.loads((Path(args.config) if args.config else root/'config/four-axes.json').read_text())
-        config['storage']['directory'] = str(folder/'parameters')
-        path = folder/'config.json'; path.write_text(json.dumps(config))
+        env = read_env(Path(args.env_file) if args.env_file else root/'.env')
+        env['DEVICE_SIMULATOR_STATE_DIR'] = str(folder)
+        config = load_environment(env)
         socket = folder/'model.sock'; fixture = folder/'fixture'
         with (folder/'model.log').open('w+') as log:
             model = subprocess.Popen([sys.executable, str(root/'simulator/model_service.py'),
-                '--model-root', args.model_root, '--config', str(path),
-                '--fixture-dir', str(fixture), '--socket', str(socket)], stdout=log, stderr=log)
+                '--model-root', args.model_root, '--environment',
+                '--fixture-dir', str(fixture), '--socket', str(socket)], stdout=log, stderr=log, env={**os.environ, **env})
             try:
                 deadline = time.monotonic()+30
                 while not socket.exists():

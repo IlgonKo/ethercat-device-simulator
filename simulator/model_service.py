@@ -11,7 +11,7 @@ import time
 import xml.etree.ElementTree as ET
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from simulator.configuration import load_config
+from simulator.configuration import load_config, load_environment
 from simulator.parameter_store import ParameterStore
 from simulator.python_timing import PythonTiming, stamp
 from simulator.od_role_index import install_role_index
@@ -24,7 +24,7 @@ TYPES = {'uint8': 'USINT', 'int8': 'SINT', 'uint16': 'UINT', 'int16': 'INT',
 class Model:
     def __init__(self, model_root, device=None):
         self.device = device or dict(slave_index=0, id="axis-0", type="cmmt-as",
-                                     model=dict(type="virtual_axis", mode="linear"), parameter_set="axis-0")
+                                     model=dict(type="f_kr_internal", mode="linear"), parameter_set="axis-0")
         self.store = None
         self.timing = None
         self.preset = "linear_mm" if self.device["model"]["mode"] == "linear" else "rotary_deg"
@@ -330,15 +330,17 @@ def serve(model, path, timing=None):
 def main():
     p=argparse.ArgumentParser()
     p.add_argument('--model-root',required=True)
-    p.add_argument('--config')
+    source = p.add_mutually_exclusive_group()
+    source.add_argument('--env-file')
+    source.add_argument('--environment', action='store_true')
     p.add_argument('--fixture-dir')
     p.add_argument('--socket')
     p.add_argument('--timing', action='store_true')
     args=p.parse_args()
     if not args.fixture_dir and not args.socket:p.error('Specify --fixture-dir or --socket')
     with ExitStack() as stack:
-        if args.config:
-            config = load_config(args.config)
+        if args.env_file or args.environment:
+            config = load_config(args.env_file) if args.env_file else load_environment(os.environ)
             store = stack.enter_context(ParameterStore(config['storage']['directory']))
             model = ModelFleet(args.model_root, config, store)
             if args.fixture_dir: model.generate_fixture(args.fixture_dir)

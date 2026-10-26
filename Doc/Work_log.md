@@ -217,3 +217,76 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 - 수동 시험을 10월 20일의 8 ms/120초 자동 계측과 구분하며, 보고되지 않은 시험 시간·운전 모드·동시 이동 범위·WKC 수치를 추정하지 않는다. RF-011 전체 완료 처리는 하지 않았다.
 - OD role 인덱스 구현, 회귀 테스트, 테스트 전용 4축 fixture, 오프라인 벤치마크와 계측 보고서를 함께 커밋 대상으로 정리했다. 빌드/원본 로그/영구 상태는 제외한다.
 - 커밋 전 재검증: Windows Python 테스트 33개 통과, 문서 내부 링크 및 diff 공백 검사 통과.
+
+## 2026-10-26 — FMI 실행 구조 및 모델 장애 격리 결정
+
+- 사용자 합의로 Co-Simulation을 채택했다. KickCAT Slave와 Model Host를 별도 프로세스로 유지하고 어댑터는 재사용 라이브러리, FMU는 Host 내부에서 로드하는 라이브러리로 정의했다. 별도 FMU Runner와 추가 IPC는 초기 범위에서 제외한다.
+- 모델 코드·어댑터·FMU 충돌 또는 응답 중단에도 Slave 프로세스를 유지하는 것이 목적이다. IPC 시간 제한, 오래된 피드백의 정상 표시 금지, 장애 노출 및 명시적 복구·자동 운전 재개 금지를 설계 원칙으로 기록했다. 구체적 오류 코드·timeout·복구 계약과 구현은 후속이다.
+- DT-003에 책임 경계, CiA402 상태 머신 중복 실행 금지, SDO 적용 결과 반영 및 기존 자체 모델의 대체 경로를 기록했다. DT-001·DT-006·전체 계획·README에 연결했다. 단일 컨테이너와 Motion Server 독립 패키지 원칙은 유지한다.
+- 앞선 CopleyDriveSim Linux 단독 검증(원본 자체 검사 14개, Python FMI 호출 4인스턴스·8 ms 계산 간격·PP 이동·Fault 입력/복구)을 DT-003에 기록했다. 실제 EtherCAT 연동·실시간 성능·Host 장애 격리 검증으로 확대 해석하지 않는다.
+- 이번 변경은 문서만 수정했으며 통합 코드나 실행 중인 장비·프로세스는 변경하지 않았다.
+
+## 2026-10-26 — Docker 및 .env 기반 실행 초기 구현
+
+- FMU 도입 전에 실행 구조부터 정리하라는 요청에 따라 compose.yaml, Dockerfile, .env.example 및 비대화형 docker/service.py를 추가했다. 기존 수동/진단 런처는 유지한다.
+- 실행 설정은 .env, 장치 정의는 JSON, 영구 파라미터는 /state/parameters로 분리했다. NIC와 저장 경로는 Docker 실행에서만 원본 JSON을 수정하지 않고 유효 구성에 반영한다.
+- 기존 Linux 바이너리와 모델 스냅샷을 이미지에 포함해 실행 중 Motion Server 체크아웃 마운트를 제거했다. 소스 빌드 및 모델 패키지 독립 배포 완료로 해석하지 않는다.
+- Edge-ubuntu에서 이미지 빌드·NIC 없는 4축 초기화, 물리 버스와 분리된 네트워크에서 4축 Slave 시작·healthcheck·점유 NIC 거부·docker stop 종료 코드 0, 관리 NIC 거부를 확인했다. 실제 enp1s0 시작·정상 종료도 관측했으나 Master/PDO/WKC 시험은 하지 않았다. 테스트 컨테이너는 종료·제거했다.
+- 설정 및 healthcheck 관련 단위 테스트 5개 통과. 기존 장치 JSON·영구 파라미터는 보존하고 별도 build/docker-validation 저장소에서 시험했다.
+- DT-003의 모델 장애 격리는 부분 설계 상태다. 실행 관리자는 모델 종료만으로 살아 있는 Slave를 즉시 종료하지 않지만 기존 C++는 IPC 오류 시 종료한다. 완전한 Slave 유지·Fault/AL 노출·명시적 복구와 물리 회귀는 RF-012 후속으로 기록했다. 커밋·푸시는 하지 않았다.
+
+## 2026-10-26 — Motion Server와 환경 변수 명명 규칙 통일
+
+- Motion Server의 .env/.env.example 및 Compose를 확인했다. 일반 설정의 MOTION_SERVER_*와 구현별 PYSOEM_* 구분을 따라 Simulator 일반 설정은 DEVICE_SIMULATOR_*, EtherCAT NIC는 KICKCAT_INTERFACE로 변경했다. 계측 이름은 DEVICE_SIMULATOR_CYCLE_STATS_LOGS로 맞췄다.
+- 예제·Compose·Dockerfile·서비스 코드·테스트·문서를 함께 변경했다. Linux의 기존 .env는 값과 사용자 경로를 보존하면서 키만 이관하고 이전 파일을 build/env-before-device-names.env에 백업했다. 파일명은 .env/.env.example을 유지한다.
+- 단위 테스트 5개, Compose 구성 검사, Linux 이미지 재빌드 및 NIC를 열지 않는 모델 초기화 검증을 통과했다. 실행 중 서비스 재시작이나 물리 통신 시험은 하지 않았다. Motion Server 파일은 수정하지 않았다.
+
+## 2026-10-26 — 장치 구성까지 .env 단일 설정으로 통합
+
+- 사용자 요청으로 JSON 장치 구성과 DEVICE_SIMULATOR_CONFIG_FILE을 제거했다. DEVICE_SIMULATOR_BUS의 명시적 Slave 번호와 AXIS_<번호>_ID/MODEL/MODE/PARAMETER_SET을 도입했다. 예제 4축은 linear 2축·rotary 2축이다.
+- Compose env_file로 모든 장치 설정을 전달하고 모델 서비스가 환경 변수에서 직접 구성 객체를 만든다. 임시 구성 JSON도 제거했다. native 런처/검증 도구는 --env-file로 전환했다. 파라미터 저장 및 KickCAT 내부 JSON은 유지한다.
+- Linux에서 설정·다중 축·저장/복원 22개 및 서비스 검사 4개 통과. 환경 변수만으로 이미지 빌드·4축 초기화 통과. 잘못된 .env와 미지원 JSON은 자동 fallback하지 않는다.
+- Linux 기존 .env가 가리키던 사용자 JSON을 읽어 현재 2축의 ID·모드·저장 공간과 실행 설정값을 보존해 이관했다. 이관 후 2축 모델 초기화도 NIC 접근 없이 통과했다. 이전 .env는 build/env-before-all-settings.env에 백업했다. 사용자 영구 파라미터는 변경하지 않았다.
+- DT-005·DT-006·RF-011·RF-012·README·계획과 목록을 갱신했다. 기존 JSON 예제는 .env 예제로 교체했다. 물리 통신 재시험·서비스 재시작 및 커밋·푸시는 하지 않았다.
+
+## 2026-10-26 — 축 설정을 Motion Server 방식의 목록으로 구조화
+
+- 사용자 요청으로 DEVICE_SIMULATOR_MANAGEMENT_INTERFACE와 해당 시작 검사를 제거했다. 기본 경로/캐리어/점유 NIC 확인은 유지한다.
+- Motion Server의 device/cmmt/.env.example을 참조해 축별 반복 키를 DEVICE_SIMULATOR_AXIS_IDS/MODELS/MODES/PARAMETER_SETS의 번호:값 목록으로 교체했다. BUS와 각 목록의 번호 집합 일치·중복·누락 검사를 추가했다.
+- Linux의 기존 2축 구성 객체가 변경 전후 동일함을 확인하고 .env를 이관했다. 이전 파일은 build/env-before-structured-axes.env에 백업했다. 예제·Compose·로더·서비스·테스트·문서를 함께 갱신했다.
+- Linux 모델 포함 22개 및 서비스 3개 테스트 통과. 이미지 재빌드와 NIC 없는 환경 설정 초기화 검증을 수행했다. 실행 중 서비스 재시작·물리 통신 시험·커밋·푸시는 하지 않았다.
+
+## 2026-10-26 — 저장 경로를 ./state로 통일
+
+- Linux .env, .env.example 및 Compose 기본값을 ./state로 변경했다. 기존 4개 파라미터 파일은 이미 state/parameters에 있었고 state/docker는 존재하지 않아 이동/덮어쓰기는 하지 않았다.
+- 기존 설정·파라미터를 build/state-path-change-20261026T063744에 백업했다. 일반 사용자 소유 저장값을 읽기 위한 컨테이너 DAC_OVERRIDE를 추가해 소유권·파일 모드는 유지했다.
+- 새 경로에서 NIC 없는 2축 모델 초기화·파라미터 복원을 통과했고 모든 파라미터 파일의 SHA-256이 변경 전과 같음을 확인했다. 서비스 자동 시작 및 커밋·푸시는 하지 않았다.
+
+## 2026-10-26 — parameters 하위 폴더 제거
+
+- 사용자 요청으로 STATE_DIR 자체를 파라미터 저장 루트로 변경했다. Linux의 기존 axis-0~3.json 및 저장소 잠금 파일을 state/parameters에서 state로 이동하고 빈 parameters 폴더를 삭제했다.
+- 원본은 build/flatten-state-20261026T064113에 백업했다. 최초 이동 시 root 소유 서비스 잠금 파일 권한 때문에 이동이 실패했다. 이후 검증 중 루트에 생성된 임시 기본값 파일은 별도 백업하고 기존 parameters의 원본을 최종 위치에 이동했다.
+- 최종 state/axis-0~3.json 모두 이전 백업과 SHA-256이 같음을 확인했다. Docker 이미지 재빌드 및 최종 경로의 2축 모델 초기화·복원 통과. parameters 폴더가 재생성되지 않음을 확인했다.
+
+## 2026-10-26 — Docker 운영 스크립트 추가 및 이전 런처 정리
+
+- Motion Server scripts/host/start.sh [--build], stop.sh를 참조해 scripts/docker의 start/stop/build/validate/status/logs와 공통 설정·환경 정규화 진입점을 추가했다. start는 빌드 성공 후 컨테이너를 재생성하고 healthcheck를 기다리며 실패 시 로그와 오류 코드를 반환한다.
+- native CMMT/Board 런처와 이에 의존하는 Windows 진단·통합 런처 11개를 삭제했다. 빌드 산출물 생성, 모델 스냅샷 내보내기, 오프라인 검증/성능 분석 및 SDO 복원 테스트 라이브러리는 유지한다. 상세 판단은 scripts/README.md에 기록했다.
+- Linux에도 동일하게 배포하고 삭제 파일은 build/removed-native-scripts-*에 백업했다. 사용자 .env의 여러 줄 구성을 지원하며 PARAMETER_SETS 첫 줄에 누락된 역슬래시만 보완했다. 값 변경 없이 이전 파일을 build/env-before-script-normalization.env에 백업했다.
+- Linux에서 셸 구문 검사, 가짜 Docker CLI를 이용한 진입점 테스트 6개, 실제 Docker의 NIC 없는 설정·기존 파라미터 복원 검증을 통과했다. 물리 Slave start/stop은 실행하지 않았으며 Motion Server·실제 장비는 조작하지 않았다. 커밋·푸시는 하지 않았다.
+
+### 2026-10-26 중복 config 폴더 제거
+
+- Docker가 사용하지 않는 config/*.env 예제를 제거하고 개발용 validate-fleet 기본 입력을 루트 .env로 통일했다. tests/fixtures와 과거 계측 기록은 유지했다.
+
+### 2026-10-26 CiA402 프로파일·모델 어댑터 방향 정리
+
+- 공통 CiA402 Drive 프로파일과 F-KR Internal 어댑터를 첫 구현 범위로 확정했다.
+- FMI 실행 표준과 모델 의미 매핑을 구분하고 향후 공통 FMU 어댑터·모델별 매핑 방향을 기록했다.
+- DT-007에 Copley 제약, identity 호환성 및 전체 폴더 구조 제안을 작성하고 RF-016을 등록했다. 코드/설정/폴더의 실제 이관과 물리 시험은 수행하지 않았다.
+
+### 2026-10-26 가상 디바이스·기능 모델 폴더 구조 확정
+
+- 가상 디바이스 = EtherCAT Slave + 기능 모델, 기능 모델 = CiA402 Drive + 모델별 어댑터 + 동작 모델로 합의했다.
+- src/ethercat_slave와 src/functional_model, 루트 device_descriptions·protocols/ipc를 확정하고 DT-007·DT-003·RF-016·전체 계획을 갱신했다.
+- 기존 simulator/model_coupler 목표 구조 제안을 대체한다. 두 프로세스 실행 및 기존 CMMT identity 호환성은 유지한다. 이번 작업은 문서만 변경했으며 실제 폴더 이동·코드 구현·서버 재시작은 수행하지 않았다.

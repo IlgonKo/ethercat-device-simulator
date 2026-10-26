@@ -1,0 +1,47 @@
+services:
+  simulator:
+    image: ethercat-device-simulator:dev
+    container_name: ${DEVICE_SIMULATOR_CONTAINER_NAME:-ethercat-device-simulator}
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+      args:
+        BASE_IMAGE: python:3.12-slim
+        DEVICE_SIMULATOR_BINARY: build/timing/cmmt_simulator
+        MODEL_SOURCE: build/model-source-da0b0a3
+    network_mode: host
+    init: true
+    restart: "no"
+    read_only: true
+    cap_drop: [ALL]
+    # Parameter files created by the native user are mode 0600. Permit the
+    # container root to use the mounted store without changing file ownership.
+    cap_add: [NET_RAW, NET_ADMIN, DAC_OVERRIDE]
+    security_opt: [no-new-privileges:true]
+    stop_grace_period: 15s
+    logging:
+      driver: json-file
+      options:
+        max-size: 10m
+        max-file: "3"
+    env_file:
+      - ${DEVICE_SIMULATOR_ENV_FILE:-.env}
+    environment:
+      DEVICE_SIMULATOR_STATE_DIR: /state
+      KICKCAT_INTERFACE: ${KICKCAT_INTERFACE:?Set KICKCAT_INTERFACE in .env}
+      DEVICE_SIMULATOR_CYCLE_STATS_LOGS: ${DEVICE_SIMULATOR_CYCLE_STATS_LOGS:-0}
+      DEVICE_SIMULATOR_SESSION_TIMEOUT: ${DEVICE_SIMULATOR_SESSION_TIMEOUT:-0}
+      DEVICE_SIMULATOR_RUN_ID: ${DEVICE_SIMULATOR_RUN_ID:-}
+    volumes:
+      - type: bind
+        source: ${DEVICE_SIMULATOR_STATE_DIR:-./state}
+        target: /state
+    tmpfs:
+      - /tmp:mode=1777
+      - /run/simulator:mode=0700
+    healthcheck:
+      test: [CMD, python3, /opt/simulator/docker/service.py, --healthcheck]
+      interval: 5s
+      timeout: 2s
+      start_period: 20s
+      retries: 3

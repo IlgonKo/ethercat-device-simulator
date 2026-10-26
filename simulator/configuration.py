@@ -1,7 +1,9 @@
-"""Simulator-owned JSON configuration. No Motion Server configuration imports."""
+"""Simulator-owned environment configuration and persistent-data validation."""
+import copy
 import json
 from pathlib import Path
 import re
+import shlex
 
 
 def unique_object(pairs):
@@ -30,9 +32,8 @@ def name(value, location):
         raise ValueError(f'{location}: use 1-64 letters, digits, underscores or hyphens')
 
 
-def load_config(path):
-    path = Path(path).resolve(strict=True)
-    data = read_json(path)
+def validate_config(data, base_directory):
+    data = copy.deepcopy(data)
     fields(data, ('schema_version', 'ethercat', 'storage', 'devices'), '$')
     if type(data['schema_version']) is not int or data['schema_version'] != 1:
         raise ValueError('schema_version: only integer 1 is supported')
@@ -45,7 +46,7 @@ def load_config(path):
     if not isinstance(directory, str) or not directory.strip():
         raise ValueError('storage.directory: nonempty path required')
     root = Path(directory)
-    data['storage']['directory'] = str((path.parent / root).resolve())
+    data['storage']['directory'] = str((Path(base_directory) / root).resolve())
     devices = data['devices']
     if not isinstance(devices, list) or not devices:
         raise ValueError('devices: nonempty array required')
@@ -65,9 +66,93 @@ def load_config(path):
         if device['type'] != 'cmmt-as':
             raise ValueError(f'{loc}.type: only cmmt-as axes are supported; IO is deferred')
         fields(device['model'], ('type', 'mode'), f'{loc}.model')
-        if device['model']['type'] != 'virtual_axis' or device['model']['mode'] not in ('linear', 'rotary'):
-            raise ValueError(f'{loc}.model: expected virtual_axis with linear or rotary mode')
+        if device['model']['type'] != 'f_kr_internal' or device['model']['mode'] not in ('linear', 'rotary'):
+            raise ValueError(f'{loc}.model: expected f_kr_internal with linear or rotary mode')
     if indices != set(range(len(devices))):
         raise ValueError('devices.slave_index: must be contiguous from 0 to N-1')
     data['devices'] = sorted(devices, key=lambda d: d['slave_index'])
     return data
+
+
+def read_env(path):
+    """Read literal dotenv assignments (quoted values, comments, continuations).
+
+    No shell execution or variable expansion. Docker Compose handles its own
+    env_file parsing; keep device configuration values literal in both paths.
+    """
+    result = {}
+    pending = ''
+    for line in Path(path).read_text(encoding='utf-8-sig').splitlines():
+        if line.rstrip().endswith('\\'):
+            pending += line.rstrip()[:-1]
+            continue
+        line = (pending + line).strip()
+        pending = ''
+        if not line or line.startswith('#'):
+            continue
+        match = re.fullmatch(r'([A-Za-z_][A-Za-z0-9_]*)\s*=\s*(.*)', line)
+        if not match:
+            raise ValueError('Expected KEY=value in environment file')
+        key, raw = match.groups()
+        if key in result:
+            raise ValueError(f'Duplicate environment key: {key}')
+        parts = shlex.split(raw, comments=True, posix=True)
+        value = ' '.join(parts)
+        if '$' in value or '`' in value:
+            raise ValueError(f'{key}: use literal values, not shell expansion')
+        result[key] = value
+    if pending:
+        raise ValueError('Unfinished environment continuation')
+    return result
+
+
+def load_environment(env, base_directory=None):
+    if 'DEVICE_SIMULATOR_CONFIG_FILE' in env:
+        raise ValueError('DEVICE_SIMULATOR_CONFIG_FILE removed; configure DEVICE_SIMULATOR_BUS in .env')
+    def required(key):
+        value = env.get(key, '')
+        if not value.strip():
+            raise ValueError(f'{key}: required')
+        return value.strip()
+    mappings = {}
+    keys = ('IDS', 'MODELS', 'MODES', 'PARAMETER_SETS')
+    for suffix in keys:
+        key = 'DEVICE_SIMULATOR_AXIS_' + suffix
+        values = {}
+        for entry in required(key).split(','):
+            match = re.fullmatch(r'\s*(0|[1-9][0-9]*)\s*:\s*([^:,]+?)\s*', entry)
+            if not match or int(match[1]) in values:
+                raise ValueError(f'{key}: expected unique index:value entries')
+            values[int(match[1])] = match[2].strip()
+        mappings[suffix] = values
+    devices = []
+    indices = set()
+    for entry in required('DEVICE_SIMULATOR_BUS').split(','):
+        match = re.fullmatch(r'\s*(0|[1-9][0-9]*)\s*:\s*axis\s*:\s*(cmmt-as)\s*', entry)
+        if not match:
+            raise ValueError('DEVICE_SIMULATOR_BUS: expected explicit index:axis:cmmt-as entries')
+        index = int(match[1])
+        if index in indices:
+            raise ValueError('DEVICE_SIMULATOR_BUS: duplicate slave index')
+        indices.add(index)
+        if any(index not in values for values in mappings.values()):
+            raise ValueError(f'Missing axis mapping for slave {index}')
+        devices.append(dict(slave_index=index, id=mappings['IDS'][index], type=match[2],
+                            model=dict(type=mappings['MODELS'][index], mode=mappings['MODES'][index]),
+                            parameter_set=mappings['PARAMETER_SETS'][index]))
+    if any(set(values) != indices for values in mappings.values()):
+        raise ValueError('Axis mapping indices must exactly match DEVICE_SIMULATOR_BUS')
+    allowed = {'DEVICE_SIMULATOR_AXIS_' + key for key in keys}
+    unused = {key for key in env if key.startswith('DEVICE_SIMULATOR_AXIS_')} - allowed
+    if unused:
+        raise ValueError(f'Unknown axis settings: {sorted(unused)}')
+    state = required('DEVICE_SIMULATOR_STATE_DIR')
+    data = dict(schema_version=1, ethercat=dict(interface=required('KICKCAT_INTERFACE')),
+                storage=dict(directory=str(Path(state))), devices=devices)
+    return validate_config(data, base_directory or Path.cwd())
+
+
+def load_config(path):
+    """Load device configuration exclusively from a literal .env file."""
+    path = Path(path).resolve(strict=True)
+    return load_environment(read_env(path), path.parent)

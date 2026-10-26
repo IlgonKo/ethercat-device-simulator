@@ -18,7 +18,7 @@ Motion Server 1개 (기존 독립 패키지)
           ↕
 EtherCAT 버스 (물리 배선은 RF-005에서 검증)
     ├─ 실제 드라이브·IO
-    └─ KickCAT → 장치 계층 → 가상축·가상 IO / 향후 FMI 모델
+    └─ KickCAT Slave 프로세스 ↔ IPC ↔ Model Host (어댑터 + 자체 모델 / FMU)
 
 라우터의 선택된 리드백 → Omniverse 연결부 → Omniverse DT
 라우터의 전환 제어 → 시뮬레이터 관리 인터페이스 (모델 초기화)
@@ -54,6 +54,8 @@ EtherCAT 버스 (물리 배선은 RF-005에서 검증)
 
 ## 관련 설계
 
+2026-10-26 결정: 어댑터를 라이브러리로 분리하고 별도 Model Host에서 FMU를 로드한다. FMU 호출 방식은 Co-Simulation이며 별도 FMU Runner는 초기 범위에서 제외한다. 모델 오류·충돌·응답 중단 시 Slave 프로세스를 유지하되 오래된 피드백을 정상으로 노출하지 않고 장애를 표시한다. 상세 책임·복구 원칙 및 구현 전 미결정 항목은 DT-003을 따른다. 현재 구현 대상은 가상축이며 IO는 RF-013 보류다.
+
 - [모드 전환 및 동기화](DT-002-mode-switching.md)
 - [모델 인터페이스와 FMI 방향](DT-003-model-interface.md)
 - [명령·리드백 라우터 구현](../RF/RF-006-command-feedback-router.md)
@@ -63,6 +65,8 @@ EtherCAT 버스 (물리 배선은 RF-005에서 검증)
 연동 패키지에 양방향 파라미터 동기화 관리자를 두고, 시뮬레이터에 장치별 영구 저장소를 둔다. Motion Server는 기존 공개 API로 접근한다. 라우터가 저장 파일을 직접 변경하지 않는다. [DT-004](DT-004-parameter-sync-persistence.md)를 따른다.
 
 ## 독립 구성과 장치 번호
+
+2026-10-26 최종 설정 변경: 실행·장치 구성을 Simulator 자체 .env에 통합했다. DT-005의 DEVICE_SIMULATOR_BUS 및 AXIS_<번호>_* 계약을 따른다. 아래 JSON 결정은 이전 이력이며 현재 JSON 구성 파일을 읽지 않는다. 패키지 독립성과 번호 매핑 원칙은 유지한다.
 
 [DT-005](DT-005-device-configuration.md)에 독립 JSON 구성과 12 Slave 예시를 확정했다. Motion Server는 실제/가상을 구분하지 않고 각 Slave를 일반 장치로 관리한다. Simulator 자체를 추가 Slave로 등록하지 않는다. 실제 축 Slave 0~4·IO 5, 가상 축 6~10·IO 11을 예시로 사용하며 서버 축 번호는 별도 매핑한다. 2026-09-22 결정으로 Simulator는 JSON, Motion Server는 기존 .env를 사용한다. 설정 파일/로더를 공유하지 않는다.
 

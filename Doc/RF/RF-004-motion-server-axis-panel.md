@@ -1,5 +1,7 @@
 # RF-004 — Motion Server 및 Axis Panel 통합 테스트
 
+2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
+
 - 단계: 4
 - 상태: 기본 통합 경로 검증 완료 (2026-09-14)
 - 선행 항목: [RF-003](RF-003-cmmt-model-integration.md)

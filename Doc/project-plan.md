@@ -1,5 +1,7 @@
 # EtherCAT Device Simulator 설계 및 진행 계획
 
+현재 설정 계약 (2026-10-26): 실행·장치 구성을 Simulator 자체 .env 하나로 통합했다. 이전 JSON 및 .env+JSON 병행 결정은 DT-005의 최신 결정으로 대체한다. DEVICE_SIMULATOR_BUS와 AXIS_<번호>_*를 사용하며 JSON 구성 파일/CONFIG_FILE 옵션은 제거했다. 영구 파라미터 데이터 및 내부 ESI/IPC JSON은 유지한다. 아래 날짜별 이전 결정은 이력이다.
+
 정리 기준: 2026-09-15
 
 상태: KickCAT 기본 타당성 검증(RF-001~004 및 RF-002-1)을 완료하고 Omniverse DT 연동 설계를 합의했다. 혼합 버스·라우터·모드 전환·DT 연동은 RF-005~008의 신규 계획이며 미검증이다. TD-001, 실제 Fault 주입·복구와 성능 검증은 계속 후속 범위다.
@@ -26,7 +28,7 @@ Windows 로컬 경로: `C:\Users\Festo\Documents\ethercat-device-simulator`
 | 마스터 | 기존 PySOEMMaster를 유지한다. KickCAT 마스터로 교체하지 않는다. |
 | 통신 | 실제 NIC와 EtherCAT 케이블을 통해 마스터와 시뮬레이터를 연결한다. |
 | 시뮬레이션 엔진 | KickCAT으로 진행한다. acontis 검토는 보류하며, 기본 빌드·PDO 및 정상 SDO 경로는 검증했고, Abort 호환성은 TD-001로 보류한다. |
-| 장치 동작 | 기존 OD·CiA 402 모듈을 연결한다. 외부 제품의 내장 드라이브 모델로 대체하지 않는다. |
+| 장치 동작 | 기존 OD·CiA 402 모듈을 기본 경로로 유지한다. 2026-10-26 결정으로 별도 Model Host에서 Co-Simulation FMU를 대체 모델로 연결하는 방향을 채택했다. DT-003 참조. |
 | 최종 마스터 구성 | 충분한 검증 후 PySOEMMaster 하나로 통일하는 것을 목표로 한다. |
 | 전환 기간 | MockMaster를 유지해 개발과 회귀 테스트에 사용한다. 지금 제거하거나 축소하지 않는다. |
 | 운영체제 | Windows PC가 Motion Server/PySOEM 마스터 역할을 하고, 별도 Linux PC에서 KickCAT 시뮬레이터를 실행한다. |
@@ -199,7 +201,7 @@ RF-004 기본 통합을 완료했다. [수동 런처와 검증 결과](RF/RF-004
 | [RF-007](RF/RF-007-mode-switching.md) | 모델 초기화 및 정지 상태 전환·실패 처리 |
 | [RF-008](RF/RF-008-omniverse-sync.md) | Omniverse 축·IO 표시와 전환 동기화 |
 
-RF-005 기본 검증은 완료했으며 RF-006~008은 계획/미착수다. FMI 버전·실행 방식, Omniverse 전송 방식, 상세 상태 스키마는 미결정이며 임의로 확정하지 않는다. MockMaster 유지 및 TD-001 보류 방침은 변경하지 않는다. 독립 패키징의 후속 Docker 결정은 13절을 참조한다.
+RF-005 기본 검증은 완료했으며 RF-006~008은 계획/미착수다. FMI 실행 방식은 2026-10-26에 Co-Simulation 및 별도 Model Host로 결정했다(DT-003). 제품의 FMI 지원 버전 범위, Omniverse 전송 방식, 상세 상태 스키마는 미결정이다. MockMaster 유지 및 TD-001 보류 방침은 변경하지 않는다. 독립 패키징의 후속 Docker 결정은 13절을 참조한다.
 
 ## 11. 파라미터 동기화 및 영구 저장 (2026-09-15)
 
@@ -242,3 +244,13 @@ RF-005 기본 검증은 완료했으며 RF-006~008은 계획/미착수다. FMI �
 ## 사용자 4축 동작 확인 (2026-10-26)
 
 OD 조회 최적화 이후 사용자가 4축 동작 테스트 정상을 확인했다. 10월 20일 자동 정지 상태 계측과 별도 근거로 RF-011에 반영했다. 상세 시간·주기·모드/동시 이동 범위는 제공되지 않았으므로 RF-011의 나머지 완료 기준은 유지한다.
+
+## Docker/.env 실행 전환 (2026-10-26)
+
+FMU 연결 전에 RF-012의 실행 구조를 우선 구현한다. compose.yaml·docker/Dockerfile·비대화형 서비스 실행 관리자를 추가하고 NIC, JSON 경로, 영구 저장 위치, 계측 및 진단 시간 제한을 .env에서 설정한다. 장치 정의 JSON과 영구 파라미터 저장 형식은 유지한다. Docker 경로의 NIC·저장 위치는 환경 설정이 우선하며 원본 JSON은 변경하지 않는다.
+
+Linux 이미지 빌드, 4축 모델 초기화, 분리된 네트워크에서 Slave 시작·healthcheck·docker stop, 관리/점유 NIC 거부와 설정 단위 테스트를 확인했다. 런타임 이미지에는 기존 빌드 바이너리·모델 스냅샷을 포함한다. 소스부터의 이미지 빌드, 물리 PDO/WKC·재생성 후 저장 복원 및 DT-003 모델 장애 시 Slave 유지의 완전한 구현은 후속이다. RF-012 전체 완료는 아니다.
+
+## 다음 구현: CiA402 프로파일과 자체 모델 어댑터 (2026-10-26)
+
+[DT-007](Design/DT-007-cia402-profile-adapters.md)과 [RF-016](RF/RF-016-cia402-profile-adapter.md)을 따른다. 공통 프로파일 및 F-KR Internal 어댑터부터 분리하며 CMMT 호환 identity와 기존 모델 동작을 유지한다. FMU 연결은 후속이다. 폴더 구조는 src/ethercat_slave + src/functional_model로 확정했다. 기능 모델 내부에 CiA402 프로파일·어댑터·동작 모델을 두며 코드 이관은 아직 수행하지 않았다. 현재 운영 설정은 루트 .env 단일 형식이며 과거 JSON 계획을 대체한다.

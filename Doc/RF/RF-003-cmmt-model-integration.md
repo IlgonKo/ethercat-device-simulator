@@ -1,5 +1,7 @@
 # RF-003 — VirtualOdBridge 및 CMMT 가상 서보 모델 연결
 
+2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
+
 - 단계: 3
 - 상태: 기본 1축 SDO/PDO·모델 연결 검증 완료 (2026-09-14). 오류 응답은 TD-001로 보류
 - 등록일: 2026-09-14
@@ -63,8 +65,8 @@ Windows PySOEM → 물리 EtherCAT → cmmt_simulator (KickCAT)
 
 - [C++ 시뮬레이터](../../simulator/cmmt_simulator.cc): upstream 라이브러리 조합, SDO 콜백, PDO 및 IPC 연결.
 - [Python 모델 서비스·ESI 생성](../../simulator/model_service.py): 기존 모델 로딩, 객체 계약 및 fixture 생성, 모델 갱신.
-- [빌드](../../scripts/linux/build-cmmt.sh), [Linux 세션 관리자](../../scripts/linux/cmmt-session.py): 두 프로세스 시작·종료, NIC/SSH 보호와 로그 관리.
-- [Windows 물리 진단](../../scripts/windows/diagnose-cmmt.py): 검색·SDO·OP·CiA 402·Homing·이동·피드백 검증.
+- [빌드](../../scripts/linux/build-cmmt.sh), [Linux 세션 관리자](../../scripts/README.md): 두 프로세스 시작·종료, NIC/SSH 보호와 로그 관리.
+- [Windows 물리 진단](../../scripts/README.md): 검색·SDO·OP·CiA 402·Homing·이동·피드백 검증.
 - [모델 연결 테스트](../../tests/test_model_service.py), [의존 소스 내보내기](../../scripts/windows/export-model-source.py).
 
 KickCAT submodule은 `43ad3e9ce390f0f6d9548118098bcaafc0d4f1f1` 그대로이며 원본 수정 없음. `readFrame()`은 Master용으로 EtherCAT 길이 필드를 초기화하므로 시뮬레이터는 원본을 보존하는 raw read + network.route 경로를 사용한다.
