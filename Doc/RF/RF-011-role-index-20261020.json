@@ -1,0 +1,106 @@
+{
+  "date": "2026-10-20",
+  "warmup_excluded_s": 10,
+  "runs": [
+    {
+      "run_id": "timing220261020103853",
+      "started_at": "2026-10-20T10:39:02.066211+09:00",
+      "axes": 2,
+      "elapsed_s": 120.03756309999153,
+      "samples": 120,
+      "wkc_pairs": {
+        "(12, 12)": 120
+      },
+      "faults": {},
+      "feedback": 2145,
+      "invalid_feedback": 0,
+      "exit_codes": [
+        0,
+        0
+      ],
+      "pdo_frame_busy": {
+        "count": 14127,
+        "min_ms": 0.155112,
+        "max_ms": 0.5958,
+        "over_2ms": 0,
+        "over_8ms": 0,
+        "avg_ms": 0.22344349904438307
+      },
+      "ipc_all": {
+        "count": 28254,
+        "min_ms": 0.069002,
+        "max_ms": 0.377119,
+        "over_2ms": 0,
+        "over_8ms": 0,
+        "avg_ms": 0.1056221502796064
+      },
+      "model_avg_ms": 0.013989327254630124,
+      "ipc_failures": 0
+    },
+    {
+      "run_id": "timing420261020104106",
+      "started_at": "2026-10-20T10:41:15.965182+09:00",
+      "axes": 4,
+      "elapsed_s": 120.04432720001205,
+      "samples": 120,
+      "wkc_pairs": {
+        "(18, 18)": 120
+      },
+      "faults": {},
+      "feedback": 2145,
+      "invalid_feedback": 0,
+      "exit_codes": [
+        0,
+        0
+      ],
+      "pdo_frame_busy": {
+        "count": 14180,
+        "min_ms": 0.308431,
+        "max_ms": 0.853114,
+        "over_2ms": 0,
+        "over_8ms": 0,
+        "avg_ms": 0.39507825458392104
+      },
+      "ipc_all": {
+        "count": 56720,
+        "min_ms": 0.068065,
+        "max_ms": 0.309573,
+        "over_2ms": 0,
+        "over_8ms": 0,
+        "avg_ms": 0.09453456142454165
+      },
+      "model_avg_ms": 0.012939407100969122,
+      "ipc_failures": 0
+    }
+  ],
+  "offline": {
+    "iterations": 2000,
+    "scope": "Offline PP enabled at rest; no NIC",
+    "runs": {
+      "original": {
+        "elapsed_s": 2.2995995290000337,
+        "cpu_s": 2.2925300429999997,
+        "avg_ms": 1.1497997645000169,
+        "od_entries": 7400,
+        "model_source_hash": "573b99bfa57732245c07179636bd7ea0d84d5803874b691428ebf578339903f3"
+      },
+      "indexed": {
+        "elapsed_s": 0.014333863999809182,
+        "cpu_s": 0.014297661000000073,
+        "avg_ms": 0.007166931999904591,
+        "od_entries": 7400,
+        "model_source_hash": "573b99bfa57732245c07179636bd7ea0d84d5803874b691428ebf578339903f3"
+      }
+    },
+    "final_od_values_equal": true
+  },
+  "fingerprints": {
+    "simulator/model_service.py": "9f7eb93116c3761a9216a1a86204931779424cbf2053c7424b867cec85025dbd",
+    "simulator/od_role_index.py": "16a9af86936c1c753b18bcbb7055441af2ed4b2b60022fa1198cb95d9491be5a",
+    "config/timing-2-axes.json": "e3ecbe59367da2c15db7c5c26dc1bce835f0331955c00567fd4aae914960f18a",
+    "config/timing-4-axes.json": "c31b24b2fbd6c217e85403b8804251a9bc400c54d8247cf16b4326498909c211",
+    "build/timing-bench/master.py": "8cb3c7819a34525ebb14f4773b3e42f5be2b2f75b2cbad998a298fd953df4e40",
+    "build/timing-bench/run.py": "643e58e0586ece838db9eb5c842ad3ca2aca7759796d485858ee9b3d573f9e10",
+    "remote_binary": "2a5c9a7918d84bb3745225e957b909b12a7037ead1a7f282564a37af6537d8db  /home/festo/Documents/ethercat-device-simulator/build/timing/cmmt_simulator"
+  }
+}

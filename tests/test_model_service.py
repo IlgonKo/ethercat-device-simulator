@@ -68,6 +68,21 @@ class ModelServiceTests(unittest.TestCase):
             with self.assertRaises(RuntimeError):self.model.dispatch(dict(op='cycle',data='00'*24))
         self.assertEqual(self.model.cycles,1)
 
+    def test_role_index_preserves_pdo_and_sdo_behavior(self):
+        with patch.object(service, 'install_role_index'):
+            reference = service.Model(os.environ['CMMT_MODEL_ROOT'])
+        for mode in (1, 3, 8):
+            for n, cw in enumerate((6, 7, 15, 15)):
+                request = dict(op='cycle', data=struct.pack('<HbiIihihB', cw, mode, 0, 100, 0, 0, 0, 0, 0).hex())
+                with patch.object(service.time, 'monotonic', return_value=10+mode+n*.01):
+                    # Reset the wall-clock origin between independent mode sequences.
+                    if n == 0:
+                        self.model.last_cycle = reference.last_cycle = None
+                    self.assertEqual(self.model.dispatch(request), reference.dispatch(request))
+        for model in (self.model, reference):
+            model.dispatch(dict(op='write', index=0x6081, subindex=0, data='7b000000'))
+        self.assertEqual(self.model.parameter_values(), reference.parameter_values())
+
     def test_python_timing_preserves_pdo_response_and_splits_model_work(self):
         from simulator.python_timing import PythonTiming
         measured = service.Model(os.environ['CMMT_MODEL_ROOT'])

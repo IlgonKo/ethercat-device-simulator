@@ -1,6 +1,6 @@
 # RF 항목 목록
 
-KickCAT 기본 타당성 검증과 후속 DT 연동 개발을 관리한다. 기준일: 2026-09-22.
+KickCAT 기본 타당성 검증과 후속 DT 연동 개발을 관리한다. 기준일: 2026-10-26.
 
 | 항목 | 단계 | 내용 | 상태 |
 | --- | --- | --- | --- |
@@ -24,7 +24,7 @@ DT 설계 결정은 [전체 구조](../Design/DT-001-system-architecture.md), [�
 
 관련 설계: [DT-004](../Design/DT-004-parameter-sync-persistence.md).
 
-- [RF-011 — 시뮬레이터 독립 장치 구성](RF-011-device-configuration.md): 초기 구현·4축 기본 동작 확인. 8 ms 안정성 문제 재현, OD role 조회 병목 개선 및 재측정 필요.
+- [RF-011 — 시뮬레이터 독립 장치 구성](RF-011-device-configuration.md): OD role 조회 최적화 및 2축/4축 8 ms·120초 정지 상태 재검증 통과. 2026-10-26 사용자 4축 동작 정상 확인. 상세 시험 범위 및 잔여 기준 확인 필요.
 
 관련 설계: [DT-005 독립 설정·혼합 버스 매핑](../Design/DT-005-device-configuration.md).
 
@@ -42,4 +42,6 @@ DT 설계 결정은 [전체 구조](../Design/DT-001-system-architecture.md), [�
 
 - [RF-015 — 가상축 위치 제한 및 회전 경로 동작 정리](RF-015-axis-model-semantics.md): 계획 / 상세 정책 미결정, RF-011과 분리.
 
-RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모델 시간 분리 및 OD 프로파일](RF-011-python-timing-20260922.md). 최적화는 미적용이다.
+RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모델 시간 분리 및 OD 프로파일](RF-011-python-timing-20260922.md). 9월 계측 당시에는 최적화 미적용 상태였다.
+
+최신 결과: [2026-10-20 OD 조회 최적화 재검증](RF-011-role-index-20261020.md). 9월 계측 시점의 미적용 상태를 대체한다.

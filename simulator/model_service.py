@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from simulator.configuration import load_config
 from simulator.parameter_store import ParameterStore
 from simulator.python_timing import PythonTiming, stamp
+from simulator.od_role_index import install_role_index
 
 MAX_MESSAGE = 1024 * 1024
 TYPES = {'uint8': 'USINT', 'int8': 'SINT', 'uint16': 'UINT', 'int16': 'INT',
@@ -40,6 +41,7 @@ class Model:
         # Explicit existing model preset; physical drive parameters are not changed.
         self.profile.non_pdo_configuration = get_non_pdo_configuration(self.preset)
         self.servo = VirtualCiA402Servo(cycle_time=0.01, device_profile=self.profile)
+        install_role_index(self.servo.od)
         self.bridge = VirtualOdBridge(self.servo.od, self.profile.pdo_configuration)
         self.rx = self.profile.pdo_configuration.rxpdo_objects()
         self.tx = self.profile.pdo_configuration.txpdo_objects()

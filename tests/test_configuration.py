@@ -19,7 +19,7 @@ class ConfigurationTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.path = Path(self.temp.name) / 'config.json'
-        self.data = json.loads((ROOT/'config/four-axes.json').read_text())
+        self.data = json.loads((ROOT/'tests/fixtures/four-axes.json').read_text())
         self.data['storage']['directory'] = 'parameters'
 
     def load(self, data=None):

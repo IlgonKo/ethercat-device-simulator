@@ -51,7 +51,7 @@ Linux 시뮬레이터, Windows Motion Server와 Axis Panel을 함께 실행합�
 
 양방향 파라미터 동기화와 가상장치 재시작 시 설정 유지 요구를 [DT-004](Doc/Design/DT-004-parameter-sync-persistence.md)에 추가했습니다. RF-009 동기화는 계획 단계이며 RF-010은 기본 저장·복원을 구현하고 후속 검증 중입니다.
 
-[DT-005 독립 장치 구성](Doc/Design/DT-005-device-configuration.md)에 독립 JSON 단일 형식(2026-09-22 변경), 별도 설정 소유권, 실제·가상 Slave 배치 및 번호 매핑을 기록했습니다. Motion Server 설정 자동 읽기는 채택하지 않습니다. 구성 로더와 4축 생성의 초기 구현·오프라인 검증을 완료했습니다. [RF-011](Doc/RF/RF-011-device-configuration.md)의 4축 기본 동작을 확인했으나 8 ms 주기 안정성 문제가 재현되어 개선 중입니다.
+[DT-005 독립 장치 구성](Doc/Design/DT-005-device-configuration.md)에 독립 JSON 단일 형식(2026-09-22 변경), 별도 설정 소유권, 실제·가상 Slave 배치 및 번호 매핑을 기록했습니다. Motion Server 설정 자동 읽기는 채택하지 않습니다. 구성 로더와 4축 생성의 초기 구현·오프라인 검증을 완료했습니다. [RF-011](Doc/RF/RF-011-device-configuration.md)의 OD 조회 최적화 후 2축·4축 8 ms/120초 정지 상태 재검증을 통과했으며, 2026-10-26 사용자가 4축 동작 정상도 확인했습니다.
 
 [DT-006 Docker 배포](Doc/Design/DT-006-docker-deployment.md): Linux Edge PC의 단일 Simulator 컨테이너, host 네트워크, 외부 설정·영구 저장소를 초기 방향으로 정했습니다. Edge NIC 3개는 Master / Simulator / 엔지니어링·외부 Omniverse 연결에 각각 사용합니다. [RF-012](Doc/RF/RF-012-docker-deployment.md)는 계획/미착수입니다.
 
@@ -67,4 +67,6 @@ Linux 시뮬레이터, Windows Motion Server와 Axis Panel을 함께 실행합�
 
 2축은 120초 관측에서 정상 동작했으나 4축은 PDO 처리 지연 및 버스 Fault가 재현됐습니다. [프레임·IPC 계측](Doc/RF/RF-011-timing-20260922.md)과 [Python 세부 계측](Doc/RF/RF-011-python-timing-20260922.md)에 시험 조건과 한계를 기록했습니다. IPC 시간의 약 90%가 모델 계산이며, 별도 오프라인 프로파일에서는 OD role 전체 검색이 모델 시간의 약 97.57%를 차지했습니다.
 
-다음 작업은 OD role 조회 인덱스의 일관성과 축별 독립성을 유지하는 최적화 후 동일 2축/4축 조건 재측정입니다. 최적화 및 IPC 묶음 처리는 아직 적용하지 않았으며 RF-011은 완료 상태가 아닙니다.
+2026-10-20 OD role 조회 인덱스 최적화를 적용했습니다. [2축/4축 재검증](Doc/RF/RF-011-role-index-20261020.md)은 각각 8 ms·120초 정지 상태에서 Fault 없이 통과했습니다. PDO 처리 평균은 0.223/0.395 ms입니다. 장시간·이동 부하와 나머지 RF-011 기준은 후속이며 IPC 묶음 처리는 미적용입니다.
+
+2026-10-26 사용자가 **최적화 적용 후 4축 동작 테스트 정상**을 확인했습니다. 수동 시험의 상세 시간·모드·WKC 수치는 별도 보고되지 않았으며, RF-011 잔여 완료 기준은 계속 관리합니다.
