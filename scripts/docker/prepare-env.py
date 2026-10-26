@@ -7,8 +7,8 @@ import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(root))
-from simulator.configuration import read_env, load_environment
+sys.path.insert(0, str(root / 'src'))
+from functional_model.configuration import read_env, load_environment
 
 
 def main():

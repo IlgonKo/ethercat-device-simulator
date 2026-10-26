@@ -76,11 +76,11 @@ docker compose down
 
 기반 이미지도 Compose의 build.args.BASE_IMAGE에 `python:3.12-slim`으로 고정하며 DEVICE_SIMULATOR_BASE_IMAGE는 .env에서 제거했다. 기반 이미지 변경은 Compose에서 관리한다.
 
-바이너리와 모델 스냅샷 경로도 Compose의 build.args에서 관리한다. DEVICE_SIMULATOR_BINARY는 `build/timing/cmmt_simulator`, MODEL_SOURCE는 `build/model-source-da0b0a3`이며 .env의 DEVICE_SIMULATOR_BINARY/DEVICE_SIMULATOR_MODEL_SOURCE는 제거했다. 실행 NIC인 KICKCAT_INTERFACE는 .env에 유지한다.
+바이너리 경로는 Compose build.args.DEVICE_SIMULATOR_BINARY의 `build/timing/cmmt_simulator`다. RF-016 이후 MODEL_SOURCE는 제거했고 src/functional_model 및 device_descriptions를 이미지에 포함한다. 실행 NIC인 KICKCAT_INTERFACE는 .env에 유지한다.
 
 - docker/Dockerfile은 기존 Linux 바이너리와 모델 스냅샷을 이미지에 포함하는 런타임 패키징이다. C++를 이미지 안에서 소스부터 빌드하는 단계는 아직 제공하지 않는다. 기존 build-kickcat.sh/build-cmmt.sh 경로를 사용하고 Compose의 build.args.DEVICE_SIMULATOR_BINARY를 실제 최신 산출물에 맞춘다.
-- .dockerignore는 build/timing, build/cmmt, build/rf011의 cmmt_simulator 및 build/model-source-* 스냅샷만 빌드 입력으로 허용한다. 임의의 외부 경로를 COPY할 수 없다.
-- 실행 중에는 Motion Server 체크아웃/설정 마운트가 필요 없다. 다만 현재 모델 스냅샷에는 기존 export-model-source.py가 추출한 의존 모듈이 포함된다. 독립 모델 패키지 배포·라이선스 정리는 완료된 것으로 보지 않는다.
+- .dockerignore는 지정된 빌드 바이너리와 src/functional_model·device_descriptions·docker 파일을 허용한다. 외부 모델 스냅샷은 빌드 입력에서 제거했다.
+- RF-016 이후 Motion Server 체크아웃/설정/모델 스냅샷이 필요 없다. 필요한 기존 코드만 출처를 기록하여 자체 패키지에 이관했다. 제품 배포 라이선스의 법적 검토 완료를 의미하지 않는다.
 - docker/service.py는 표준입력 EOF와 무관하게 지속 실행하고 SIGTERM/SIGINT로 종료한다. 두 자식 프로세스 로그는 docker logs로 수집하며 회전 한도는 10 MB × 3이다. run-id는 로그 라벨이며 이전 cmmt-session의 진단 폴더와 같은 의미는 아니다.
 - 호스트 네트워크, NET_RAW/NET_ADMIN/DAC_OVERRIDE, 읽기 전용 루트, 임시 /run/simulator·/tmp를 사용한다. setcap 수동 재실행은 Docker 경로에서 필요 없다. 기본 경로 NIC, carrier 및 기존 EtherCAT 소켓을 확인한다. 사용자 요청으로 관리 NIC 변수와 그 검사는 제거했다. 호스트 전체에 대한 원자적 NIC 예약을 보장하는 기능은 아니다.
 - healthcheck는 실행 관리자 heartbeat와 자식 생존을 확인한다. Master 연결·OP·WKC 정상이나 모델의 진행 상태까지 보증하지 않는다.

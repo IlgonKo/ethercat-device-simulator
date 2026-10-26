@@ -254,3 +254,9 @@ Linux 이미지 빌드, 4축 모델 초기화, 분리된 네트워크에서 Slav
 ## 다음 구현: CiA402 프로파일과 자체 모델 어댑터 (2026-10-26)
 
 [DT-007](Design/DT-007-cia402-profile-adapters.md)과 [RF-016](RF/RF-016-cia402-profile-adapter.md)을 따른다. 공통 프로파일 및 F-KR Internal 어댑터부터 분리하며 CMMT 호환 identity와 기존 모델 동작을 유지한다. FMU 연결은 후속이다. 폴더 구조는 src/ethercat_slave + src/functional_model로 확정했다. 기능 모델 내부에 CiA402 프로파일·어댑터·동작 모델을 두며 코드 이관은 아직 수행하지 않았다. 현재 운영 설정은 루트 .env 단일 형식이며 과거 JSON 계획을 대체한다.
+
+### 2026-10-26 RF-016 최초 구조 구현
+
+- src/ethercat_slave 및 src/functional_model로 이관하고 CiA402 프로파일·F-KR Internal 어댑터·동작 모델을 분리했다. CMMT identity·ESI·확장 정보는 device_descriptions에 둔다.
+- 외부 Motion Server 모델 스냅샷 런타임 의존과 --model-root를 제거했다. 운영 .env와 저장 파라미터는 유지했다.
+- Windows/Linux Python 회귀, 800-cycle 이전 출력 비교, CTest 2개, 4축 IPC, Docker 저장값 검증·분리 network 시작/정상 종료를 통과했다. 실제 EtherCAT 혼합 라인·WKC·이동 시험은 미수행이며 RF-016을 완료로 표시하지 않는다.

@@ -3,7 +3,10 @@ from pathlib import Path
 import sys
 import unittest
 
-sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts/windows'))
+sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'scripts/windows'))
+import importlib.util
+if importlib.util.find_spec('pysoem') is None:
+    raise unittest.SkipTest('Windows SDO diagnostic requires pysoem')
 from sdo_checks import verify_assignment_write
 
 

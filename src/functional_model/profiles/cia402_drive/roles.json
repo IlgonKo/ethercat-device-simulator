@@ -1,0 +1,114 @@
+[
+  {
+    "role": "software_position_limit_negative",
+    "index": 24701,
+    "subindex": 1,
+    "name": "Minimum position limit",
+    "data_type": "int32",
+    "access": "rw"
+  },
+  {
+    "role": "software_position_limit_positive",
+    "index": 24701,
+    "subindex": 2,
+    "name": "Maximum position limit",
+    "data_type": "int32",
+    "access": "rw"
+  },
+  {
+    "role": "position_window",
+    "index": 24679,
+    "subindex": 0,
+    "name": "Position window",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "position_window_time",
+    "index": 24680,
+    "subindex": 0,
+    "name": "Position window time",
+    "data_type": "uint16",
+    "access": "rw"
+  },
+  {
+    "role": "max_profile_velocity",
+    "index": 24703,
+    "subindex": 0,
+    "name": "Max profile velocity",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "profile_acceleration",
+    "index": 24707,
+    "subindex": 0,
+    "name": "Profile acceleration",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "profile_deceleration",
+    "index": 24708,
+    "subindex": 0,
+    "name": "Profile deceleration",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "homing_method",
+    "index": 24728,
+    "subindex": 0,
+    "name": "Homing method",
+    "data_type": "int8",
+    "access": "rw"
+  },
+  {
+    "role": "homing_speed_search_switch",
+    "index": 24729,
+    "subindex": 1,
+    "name": "Speed during search for switch",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "homing_speed_search_zero",
+    "index": 24729,
+    "subindex": 2,
+    "name": "Speed during search for zero",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "homing_acceleration",
+    "index": 24730,
+    "subindex": 0,
+    "name": "Homing acceleration",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "max_acceleration",
+    "index": 24773,
+    "subindex": 0,
+    "name": "Max acceleration",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "max_deceleration",
+    "index": 24774,
+    "subindex": 0,
+    "name": "Max deceleration",
+    "data_type": "uint32",
+    "access": "rw"
+  },
+  {
+    "role": "pp_jerk",
+    "index": 24740,
+    "subindex": 1,
+    "name": "Jerk",
+    "data_type": "uint32",
+    "access": "rw"
+  }
+]

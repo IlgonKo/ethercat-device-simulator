@@ -15,10 +15,10 @@ class DockerScriptTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / 'project with spaces'
-        shutil.copytree(Path(__file__).resolve().parents[1] / 'scripts/docker', self.root / 'scripts/docker')
-        repository = Path(__file__).resolve().parents[1]
-        (self.root / 'simulator').mkdir()
-        shutil.copy2(repository / 'simulator/configuration.py', self.root / 'simulator/configuration.py')
+        shutil.copytree(Path(__file__).resolve().parents[2] / 'scripts/docker', self.root / 'scripts/docker')
+        repository = Path(__file__).resolve().parents[2]
+        (self.root / 'src/functional_model').mkdir(parents=True)
+        shutil.copy2(repository / 'src/functional_model/configuration.py', self.root / 'src/functional_model/configuration.py')
         shutil.copy2(repository / '.env.example', self.root / '.env')
         self.bin = Path(self.temp.name) / 'bin'
         self.bin.mkdir()

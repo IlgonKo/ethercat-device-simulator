@@ -81,7 +81,7 @@ Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트
 ## 초기 구현과 운영
 
 - 구성 예시는 [.env.example](../../.env.example). 기존 단일 축 시험 도구의 명시적 무설정 경로는 유지하지만 잘못된 .env에서 이 경로로 fallback하지 않는다.
-- 현재 모델 재사용은 --model-root로 지정된 기존 소스 스냅샷에 의존한다. 구성 로더는 Motion Server와 독립이지만, 모델 자체를 독립 배포 패키지로 분리하는 작업은 완료되지 않았다.
+- RF-016에서 자체 모델을 src/functional_model/models/f_kr_internal로 이관했다. --model-root와 외부 Motion Server 스냅샷 런타임 의존은 제거했고, 기존 .env 및 영구 파라미터 identity는 유지한다.
 - 파라미터 저장 대상은 현재 모델의 NON_PDO_CONFIGURATION_OD_ROLES 20개다. PDO 목표값·운전 상태·명령/상태 객체는 저장하지 않는다. 전체 OD 영구화와 동일하지 않다.
 - 저장은 기존 CMMT SDO 0x2005:03=1, 0x2005:01=1 요청으로 수행하고 완료 후 명령을 0으로 해제한다. 선택값 1만 지원한다. PRE-OP에서도 PDO 진행 없이 저장한다. 파일 fsync·원자적 교체 후 성공 상태를 반환한다. 실패는 성공으로 응답하지 않으며 기존 fail-closed IPC 정책을 따른다. 정상 SDO Abort 오류 응답은 TD-001에서 해결한다.
 - 저장 루트에 프로세스 단독 잠금을 걸고, 각 parameter_set.json에 스키마·호환 메타데이터·값·체크섬을 기록한다. 백업/이관/관리 API 및 실제↔가상 동기화의 완료 검증은 RF-010/009에 남긴다.

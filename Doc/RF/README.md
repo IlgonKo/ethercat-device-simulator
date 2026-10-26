@@ -48,4 +48,4 @@ RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모�
 
 최신 결과: [2026-10-20 OD 조회 최적화 재검증](RF-011-role-index-20261020.md). 9월 계측 시점의 미적용 상태를 대체한다.
 
-- [RF-016 — CiA402 Drive 프로파일 및 F-KR Internal 어댑터](RF-016-cia402-profile-adapter.md): 범위·폴더 구조 확정 / 구현 미착수. FMU 연결 이전의 다음 작업.
+- [RF-016 — CiA402 Drive 프로파일 및 F-KR Internal 어댑터](RF-016-cia402-profile-adapter.md): 구조 이관·오프라인 검증 완료 / 물리 버스 회귀 대기.

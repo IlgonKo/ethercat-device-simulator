@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ethercat-device-simulator"
+version = "0.1.0"
+requires-python = ">=3.10"
+description = "EtherCAT Slave functional models and adapters"
+
+[project.scripts]
+functional-model = "functional_model.runtime.service:main"
+
+[tool.setuptools]
+package-dir = {"" = "src", "device_descriptions" = "device_descriptions"}
+packages = ["functional_model", "functional_model.profiles", "functional_model.profiles.cia402_drive", "functional_model.adapters", "functional_model.models", "functional_model.models.f_kr_internal", "functional_model.runtime", "functional_model.ipc", "functional_model.storage", "functional_model.diagnostics", "device_descriptions", "device_descriptions.cmmt_as"]
+
+[tool.setuptools.package-data]
+"functional_model.profiles.cia402_drive" = ["*.json"]
+"device_descriptions.cmmt_as" = ["*.json", "esi/*.xml"]

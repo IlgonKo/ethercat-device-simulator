@@ -290,3 +290,9 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 - 가상 디바이스 = EtherCAT Slave + 기능 모델, 기능 모델 = CiA402 Drive + 모델별 어댑터 + 동작 모델로 합의했다.
 - src/ethercat_slave와 src/functional_model, 루트 device_descriptions·protocols/ipc를 확정하고 DT-007·DT-003·RF-016·전체 계획을 갱신했다.
 - 기존 simulator/model_coupler 목표 구조 제안을 대체한다. 두 프로세스 실행 및 기존 CMMT identity 호환성은 유지한다. 이번 작업은 문서만 변경했으며 실제 폴더 이동·코드 구현·서버 재시작은 수행하지 않았다.
+
+### 2026-10-26 RF-016 최초 구조 구현
+
+- src/ethercat_slave 및 src/functional_model로 이관하고 CiA402 프로파일·F-KR Internal 어댑터·동작 모델을 분리했다. CMMT identity·ESI·확장 정보는 device_descriptions에 둔다.
+- 외부 Motion Server 모델 스냅샷 런타임 의존과 --model-root를 제거했다. 운영 .env와 저장 파라미터는 유지했다.
+- Windows/Linux Python 회귀, 800-cycle 이전 출력 비교, CTest 2개, 4축 IPC, Docker 저장값 검증·분리 network 시작/정상 종료를 통과했다. 실제 EtherCAT 혼합 라인·WKC·이동 시험은 미수행이며 RF-016을 완료로 표시하지 않는다.

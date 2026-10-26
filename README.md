@@ -32,7 +32,7 @@ RF-003 기본 1축 연결을 검증했습니다: CMMT-AS / 기본 PDO, 별도 Py
 
 ### Linux Docker 실행 (2026-10-26)
 
-실행 인자는 [.env.example](.env.example)을 복사한 `.env`에서 지정합니다. 축 목록·모드·parameter_set까지 모두 같은 `.env`에서 지정합니다. Linux 바이너리와 모델 스냅샷을 이미지에 포함하므로 이미지 실행 시에는 별도 `--model-root` 인자가 필요 없습니다.
+실행 인자는 [.env.example](.env.example)을 복사한 `.env`에서 지정합니다. 축 목록·모드·parameter_set까지 모두 같은 `.env`에서 지정합니다. Linux 바이너리와 저장소의 `src/functional_model`·`device_descriptions`를 이미지에 포함합니다. 외부 Motion Server 모델 스냅샷이나 `--model-root`는 사용하지 않습니다.
 
 ```bash
 test -e .env || cp .env.example .env
@@ -80,13 +80,13 @@ bash scripts/docker/stop.sh
 
 [DT-006 Docker 배포](Doc/Design/DT-006-docker-deployment.md): Linux Edge PC의 단일 Simulator 컨테이너, host 네트워크, 외부 설정·영구 저장소를 사용합니다. Edge NIC 3개는 Master / Simulator / 엔지니어링·외부 Omniverse 연결에 각각 사용합니다. [RF-012](Doc/RF/RF-012-docker-deployment.md)는 Docker/.env 초기 실행을 구현하고 물리 통신·저장 회귀 및 장애 격리 검증을 남겨둔 상태입니다.
 
-현재 구현 범위는 **가상축**입니다. RF-011은 독립 JSON과 다중 CMMT 축을 담당하며 가상 IO·IO-Link는 [RF-013](Doc/RF/RF-013-virtual-io.md)에 Pending으로 분리했습니다. 기존 IO 설계 예시는 현재 구현 계약이 아니며 별도 재논의합니다.
+현재 구현 범위는 **가상축**입니다. RF-011은 독립 .env 설정과 다중 CMMT 축을 담당하며 가상 IO·IO-Link는 [RF-013](Doc/RF/RF-013-virtual-io.md)에 Pending으로 분리했습니다. 기존 IO 설계 예시는 현재 구현 계약이 아니며 별도 재논의합니다.
 
 ## .env 4축 구성
 
 장치 구성은 루트 `.env`에서 설정하며 [.env.example](.env.example)을 참고합니다. 개발용 검증 도구도 기본적으로 루트 `.env`를 읽습니다. 별도 파일은 `--env-file`로 지정할 수 있습니다. `config/` 예제 폴더는 제거했습니다.
 
-[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#수동-실행과-다음-물리-시험)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 모델 소스는 명시적 `--model-root`로 재사용하며 독립 모델 패키지 배포는 후속입니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 위치 제한/회전 동작 개선을 별도 관리합니다.
+[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#수동-실행과-다음-물리-시험)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/models/f_kr_internal`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 위치 제한/회전 동작 개선을 별도 관리합니다.
 
 ## 2026-09-22 성능 계측 결과와 다음 작업
 
@@ -95,3 +95,26 @@ bash scripts/docker/stop.sh
 2026-10-20 OD role 조회 인덱스 최적화를 적용했습니다. [2축/4축 재검증](Doc/RF/RF-011-role-index-20261020.md)은 각각 8 ms·120초 정지 상태에서 Fault 없이 통과했습니다. PDO 처리 평균은 0.223/0.395 ms입니다. 장시간·이동 부하와 나머지 RF-011 기준은 후속이며 IPC 묶음 처리는 미적용입니다.
 
 2026-10-26 사용자가 **최적화 적용 후 4축 동작 테스트 정상**을 확인했습니다. 수동 시험의 상세 시간·모드·WKC 수치는 별도 보고되지 않았으며, RF-011 잔여 완료 기준은 계속 관리합니다.
+
+## RF-016 구현 구조 (2026-10-26)
+
+```text
+src/ethercat_slave/                 # C++: EtherCAT Slave + IPC
+src/functional_model/
+  profiles/cia402_drive/            # 공통 OD·PDO 정의
+  adapters/                        # F-KR Internal 연결·계약·등록
+  models/f_kr_internal/             # 상태 전이·운동 계산
+  runtime/                         # 축 인스턴스와 서비스
+  ipc/ storage/ diagnostics/
+device_descriptions/cmmt_as/        # 기존 identity·ESI·확장·저장 명령
+protocols/ipc/                      # 메시지 계약
+```
+
+기존 `.env`, `f_kr_internal` 모델 ID 및 저장 파라미터 형식은 유지한다. 내부 프로파일은 cia402-drive지만 외부 BUS는 cmmt-as, identity/PDO는 기존 CMMT 호환 값이다. 어댑터는 미지원 운전 모드를 거부한다. 실제 모델 알고리즘은 유지했다. [RF-016](Doc/RF/RF-016-cia402-profile-adapter.md)에 오프라인 검증과 남은 물리 시험을 구분한다.
+
+```bash
+bash scripts/linux/build-cmmt.sh     # C++ 변경 시
+bash scripts/docker/build.sh
+bash scripts/docker/validate.sh
+bash scripts/docker/start.sh
+```

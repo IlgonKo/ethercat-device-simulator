@@ -7,11 +7,11 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from simulator.configuration import load_config, validate_config, read_json, read_env, load_environment
-from simulator.model_service import ModelFleet
-from simulator.parameter_store import ParameterStore
+from functional_model.configuration import load_config, validate_config, read_json, read_env, load_environment
+from functional_model.runtime.fleet import ModelFleet
+from functional_model.storage.parameter_store import ParameterStore
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 class ConfigurationTests(unittest.TestCase):
@@ -88,46 +88,44 @@ class ConfigurationTests(unittest.TestCase):
 class FleetTests(ConfigurationTests):
     def setUp(self):
         super().setUp()
-        self.model_root = os.environ.get('CMMT_MODEL_ROOT')
-        if not self.model_root: self.skipTest('Set CMMT_MODEL_ROOT')
         self.config = self.load()
         self.store = ParameterStore(self.config['storage']['directory'])
         self.store.__enter__()
         self.addCleanup(self.store.__exit__, None, None, None)
-        self.fleet = ModelFleet(self.model_root, self.config, self.store)
+        self.fleet = ModelFleet(self.config, self.store)
 
     def write(self, index, obj, sub, fmt, value):
         return self.fleet.dispatch(dict(op='write', slave_index=index, index=obj,
                                       subindex=sub, data=struct.pack(fmt, value).hex()))
 
     def test_four_distinct_models_od_and_pdo(self):
-        self.assertEqual(len({id(m.servo.od) for m in self.fleet.models}), 4)
+        self.assertEqual(len({id(m.adapter.model.od) for m in self.fleet.models}), 4)
         self.assertEqual([m.preset for m in self.fleet.models],
                          ['linear_mm', 'linear_mm', 'rotary_deg', 'rotary_deg'])
         for i in range(4): self.write(i, 0x607D, 2, '<i', 1000+i)
-        self.assertEqual([m.servo.od.read(0x607D, 2) for m in self.fleet.models], list(range(1000, 1004)))
+        self.assertEqual([m.adapter.model.od.read(0x607D, 2) for m in self.fleet.models], list(range(1000, 1004)))
         for i, cw in enumerate([6, 7, 15, 0]):
             # Each slave sees its own controlword and independent cycle counter.
             payload = struct.pack('<HbiIihihB', cw, 3, 0, 100, 0, 0, 0, 0, 0)
             self.fleet.dispatch(dict(op='cycle', slave_index=i, data=payload.hex()))
-        self.assertEqual([m.servo.od.read(0x6040) for m in self.fleet.models], [6, 7, 15, 0])
+        self.assertEqual([m.adapter.model.od.read(0x6040) for m in self.fleet.models], [6, 7, 15, 0])
         self.assertEqual([m.cycles for m in self.fleet.models], [1]*4)
         self.fleet.dispatch(dict(op='cycle', slave_index=2, data='00'*24))
         self.assertEqual([m.cycles for m in self.fleet.models], [1, 1, 2, 1])
 
     def test_unsaved_changes_discarded_saved_parameters_restored_not_state(self):
         self.write(0, 0x607D, 2, '<i', 777)
-        fresh = ModelFleet(self.model_root, self.config, self.store)
-        self.assertEqual(fresh.models[0].servo.od.read(0x607D, 2), 1000000)
+        fresh = ModelFleet(self.config, self.store)
+        self.assertEqual(fresh.models[0].adapter.model.od.read(0x607D, 2), 1000000)
         self.write(0, 0x2005, 3, '<H', 1)
         self.write(0, 0x2005, 1, '<B', 1)
-        self.fleet.models[0].servo.actual_position = 99
-        fresh = ModelFleet(self.model_root, self.config, self.store)
-        self.assertEqual(fresh.models[0].servo.od.read(0x607D, 2), 777)
-        self.assertEqual(fresh.models[0].servo.actual_position, 0)
-        self.assertEqual(fresh.models[0].servo.actual_velocity, 0)
-        self.assertEqual(fresh.models[0].servo.od.read(0x6041), 0x40)
-        self.assertFalse(fresh.models[0].servo.homing_referenced)
+        self.fleet.models[0].adapter.model.actual_position = 99
+        fresh = ModelFleet(self.config, self.store)
+        self.assertEqual(fresh.models[0].adapter.model.od.read(0x607D, 2), 777)
+        self.assertEqual(fresh.models[0].adapter.model.actual_position, 0)
+        self.assertEqual(fresh.models[0].adapter.model.actual_velocity, 0)
+        self.assertEqual(fresh.models[0].adapter.model.od.read(0x6041), 0x40)
+        self.assertFalse(fresh.models[0].adapter.model.homing_referenced)
 
     def test_index_reorder_keeps_parameter_space(self):
         self.write(0, 0x607D, 2, '<i', 777)
@@ -135,29 +133,29 @@ class FleetTests(ConfigurationTests):
         cfg = copy.deepcopy(self.config)
         cfg['devices'][0], cfg['devices'][1] = cfg['devices'][1], cfg['devices'][0]
         for i, d in enumerate(cfg['devices']): d['slave_index'] = i
-        fresh = ModelFleet(self.model_root, cfg, self.store)
-        self.assertEqual(fresh.models[1].servo.od.read(0x607D, 2), 777)
-        self.assertEqual(fresh.models[0].servo.od.read(0x607D, 2), 1000000)
+        fresh = ModelFleet(cfg, self.store)
+        self.assertEqual(fresh.models[1].adapter.model.od.read(0x607D, 2), 777)
+        self.assertEqual(fresh.models[0].adapter.model.od.read(0x607D, 2), 1000000)
 
     def test_incompatible_mode_rejected_without_overwrite(self):
         path = self.store.path(self.fleet.models[0]); before = path.read_bytes()
         cfg = copy.deepcopy(self.config); cfg['devices'][0]['model']['mode'] = 'rotary'
-        with self.assertRaisesRegex(ValueError, 'incompatible'): ModelFleet(self.model_root, cfg, self.store)
+        with self.assertRaisesRegex(ValueError, 'incompatible'): ModelFleet(cfg, self.store)
         self.assertEqual(path.read_bytes(), before)
 
     def test_corrupt_snapshot_and_missing_catalog_rejected(self):
         path = self.store.path(self.fleet.models[0]); path.write_text('{}')
-        with self.assertRaises(ValueError): ModelFleet(self.model_root, self.config, self.store)
+        with self.assertRaises(ValueError): ModelFleet(self.config, self.store)
         self.assertEqual(path.read_text(), '{}')
 
     def test_atomic_save_failure_keeps_previous_snapshot(self):
         path = self.store.path(self.fleet.models[0]); before = path.read_bytes()
         self.write(0, 0x607D, 2, '<i', 777)
         self.write(0, 0x2005, 3, '<H', 1)
-        with patch('simulator.parameter_store.os.replace', side_effect=OSError('disk failure')):
+        with patch('functional_model.storage.parameter_store.os.replace', side_effect=OSError('disk failure')):
             with self.assertRaises(OSError): self.write(0, 0x2005, 1, '<B', 1)
         self.assertEqual(path.read_bytes(), before)
-        self.assertEqual(self.fleet.models[0].servo.od.read(0x2005, 1), 0)
+        self.assertEqual(self.fleet.models[0].adapter.model.od.read(0x2005, 1), 0)
 
     def test_single_writer(self):
         with self.assertRaises(RuntimeError):
@@ -177,26 +175,26 @@ class FleetTests(ConfigurationTests):
 
     def test_each_axis_moves_independently_in_existing_modes(self):
         for mode in (1, 3, 8, -3):
-            fleet = ModelFleet(self.model_root, self.config, self.store)
+            fleet = ModelFleet(self.config, self.store)
             now = 10.0
             def tick(axis, cw, operation, target=0, velocity=0):
                 nonlocal now
                 now += .01
                 payload = struct.pack('<HbiIihihB', cw, operation, target, 100, velocity, 0, 0, 0, 0)
-                with patch('simulator.model_service.time.monotonic', return_value=now):
+                with patch('functional_model.runtime.axis.time.monotonic', return_value=now):
                     return fleet.dispatch(dict(op='cycle', slave_index=axis, data=payload.hex()))
             # Drive each selected model through Enable and its existing Homing path.
             for selected in range(4):
                 for cw in (6, 7, 15): tick(selected, cw, 6)
                 for _ in range(15): tick(selected, 31, 6)
-                self.assertTrue(fleet.models[selected].servo.homing_referenced)
-                before = [m.servo.actual_position for m in fleet.models]
+                self.assertTrue(fleet.models[selected].adapter.model.homing_referenced)
+                before = [m.adapter.model.actual_position for m in fleet.models]
                 tick(selected, 15, mode, 10000, 100)
                 for _ in range(40): tick(selected, 31 if mode in (1, -3) else 15, mode, 10000, 100)
-                self.assertGreater(fleet.models[selected].servo.actual_position, before[selected], (mode, selected))
+                self.assertGreater(fleet.models[selected].adapter.model.actual_position, before[selected], (mode, selected))
                 for other in range(4):
                     if other != selected:
-                        self.assertEqual(fleet.models[other].servo.actual_position, before[other])
+                        self.assertEqual(fleet.models[other].adapter.model.actual_position, before[other])
 
 
 if __name__ == '__main__': unittest.main()

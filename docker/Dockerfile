@@ -3,16 +3,12 @@
 ARG BASE_IMAGE=python:3.12-slim
 FROM ${BASE_IMAGE}
 ARG DEVICE_SIMULATOR_BINARY=build/timing/cmmt_simulator
-ARG MODEL_SOURCE=build/model-source-da0b0a3
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1
 WORKDIR /opt/simulator
 COPY --chmod=755 ${DEVICE_SIMULATOR_BINARY} /opt/simulator/bin/cmmt_simulator
-COPY ${MODEL_SOURCE}/device /opt/model/device
-COPY ${MODEL_SOURCE}/configuration /opt/model/configuration
-COPY ${MODEL_SOURCE}/motion_server /opt/model/motion_server
-COPY ${MODEL_SOURCE}/ethercat /opt/model/ethercat
-COPY ${MODEL_SOURCE}/Reference/cmmt_error_catalog.json /opt/model/Reference/cmmt_error_catalog.json
-COPY simulator /opt/simulator/simulator
+COPY src/functional_model /opt/simulator/src/functional_model
+COPY device_descriptions /opt/simulator/device_descriptions
+ENV PYTHONPATH=/opt/simulator/src:/opt/simulator
 COPY docker/service.py /opt/simulator/docker/service.py
 RUN python3 -c "import ctypes; ctypes.CDLL('libstdc++.so.6')" \
     && ldd /opt/simulator/bin/cmmt_simulator \

@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 
-from simulator.configuration import read_json, fields
+from functional_model.configuration import read_json, fields
 
 
 class ParameterStore:
@@ -63,14 +63,14 @@ class ParameterStore:
         if not isinstance(values, dict) or set(values) != set(expected):
             raise ValueError(f'{path}: parameter catalog mismatch')
         # Decode and validate everything before mutating the fresh model.
-        from device.od_value_codec import decode_od_value, encode_od_value
+        from functional_model.profiles.cia402_drive.codec import decode_od_value, encode_od_value
         decoded = []
         for key, original in expected.items():
             raw = values[key]
             if not isinstance(raw, str) or len(raw) != len(original):
                 raise ValueError(f'{path}: invalid parameter length {key}')
             index, sub = (int(x, 16) for x in key.split(':'))
-            definition = model.servo.od.definition(index, sub)
+            definition = model.adapter.od.definition(index, sub)
             value = decode_od_value(definition.data_type, bytes.fromhex(raw))
             if isinstance(value, float) and not math.isfinite(value):
                 raise ValueError(f'{path}: nonfinite parameter {key}')
@@ -80,7 +80,7 @@ class ParameterStore:
                 raise ValueError(f'{path}: incompatible unit/scale {key}')
             decoded.append((index, sub, value))
         for index, sub, value in decoded:
-            model.servo.od.write(index, value, sub)
+            model.adapter.od.write(index, value, sub)
         return True
 
     def save(self, model):

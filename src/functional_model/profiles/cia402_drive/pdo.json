@@ -1,0 +1,127 @@
+{
+  "name": "motion_server_default",
+  "rx": [
+    {
+      "index": 24640,
+      "subindex": 0,
+      "name": "Controlword",
+      "data_type": "uint16",
+      "field": "controlword",
+      "default": 0
+    },
+    {
+      "index": 24672,
+      "subindex": 0,
+      "name": "Modes of operation",
+      "data_type": "int8",
+      "field": "mode_of_operation",
+      "default": 8
+    },
+    {
+      "index": 24698,
+      "subindex": 0,
+      "name": "Target position",
+      "data_type": "int32",
+      "field": "target_position",
+      "default": 0
+    },
+    {
+      "index": 24705,
+      "subindex": 0,
+      "name": "Profile velocity",
+      "data_type": "uint32",
+      "field": "profile_velocity",
+      "default": 0
+    },
+    {
+      "index": 24831,
+      "subindex": 0,
+      "name": "Target velocity",
+      "data_type": "int32",
+      "field": "target_velocity",
+      "default": 0
+    },
+    {
+      "index": 24689,
+      "subindex": 0,
+      "name": "Target torque",
+      "data_type": "int16",
+      "field": "target_torque",
+      "default": 0
+    },
+    {
+      "index": 24753,
+      "subindex": 0,
+      "name": "Velocity offset",
+      "data_type": "int32",
+      "field": "velocity_offset",
+      "default": 0
+    },
+    {
+      "index": 24754,
+      "subindex": 0,
+      "name": "Torque offset",
+      "data_type": "int16",
+      "field": "torque_offset",
+      "default": 0
+    },
+    {
+      "index": 0,
+      "subindex": 0,
+      "name": "Padding 8",
+      "data_type": "padding8",
+      "field": null,
+      "default": 0
+    }
+  ],
+  "tx": [
+    {
+      "index": 24641,
+      "subindex": 0,
+      "name": "Statusword",
+      "data_type": "uint16",
+      "field": "statusword",
+      "default": 64
+    },
+    {
+      "index": 24673,
+      "subindex": 0,
+      "name": "Modes of operation display",
+      "data_type": "int8",
+      "field": "mode_of_operation_display",
+      "default": 8
+    },
+    {
+      "index": 24676,
+      "subindex": 0,
+      "name": "Position actual value",
+      "data_type": "int32",
+      "field": "actual_position",
+      "default": 0
+    },
+    {
+      "index": 24684,
+      "subindex": 0,
+      "name": "Velocity actual value",
+      "data_type": "int32",
+      "field": "actual_velocity",
+      "default": 0
+    },
+    {
+      "index": 24695,
+      "subindex": 0,
+      "name": "Torque actual value",
+      "data_type": "int16",
+      "field": "actual_torque",
+      "default": 0
+    },
+    {
+      "index": 0,
+      "subindex": 0,
+      "name": "Padding 8",
+      "data_type": "padding8",
+      "field": null,
+      "default": 0
+    }
+  ]
+}

@@ -1,0 +1,425 @@
+{
+  "roles": [
+    {
+      "role": "user_position_unit",
+      "index": 8558,
+      "subindex": 1,
+      "name": "User unit position",
+      "data_type": "uint16",
+      "access": "ro"
+    },
+    {
+      "role": "converting_unit_position",
+      "index": 8596,
+      "subindex": 1,
+      "name": "Resolution position",
+      "data_type": "int8",
+      "access": "ro"
+    },
+    {
+      "role": "converting_unit_velocity",
+      "index": 8596,
+      "subindex": 2,
+      "name": "Resolution velocity",
+      "data_type": "int8",
+      "access": "ro"
+    },
+    {
+      "role": "converting_unit_acceleration",
+      "index": 8596,
+      "subindex": 3,
+      "name": "Resolution acceleration",
+      "data_type": "int8",
+      "access": "ro"
+    },
+    {
+      "role": "converting_unit_jerk",
+      "index": 8596,
+      "subindex": 4,
+      "name": "Resolution jerk",
+      "data_type": "int8",
+      "access": "ro"
+    },
+    {
+      "role": "negative_velocity_limit",
+      "index": 8579,
+      "subindex": 12,
+      "name": "Limit value velocity limit negative direction of movement",
+      "data_type": "float32",
+      "access": "rw"
+    },
+    {
+      "role": "csp_interpolation_mode",
+      "index": 8571,
+      "subindex": 13,
+      "name": "CSP interpolation mode",
+      "data_type": "uint32",
+      "access": "rw"
+    },
+    {
+      "role": "sync_mode",
+      "index": 8494,
+      "subindex": 1,
+      "name": "Synchronisation mode",
+      "data_type": "uint16",
+      "access": "rw"
+    },
+    {
+      "role": "sync_cycle_time",
+      "index": 8494,
+      "subindex": 2,
+      "name": "Cycle time",
+      "data_type": "float32",
+      "access": "rw"
+    },
+    {
+      "role": "sync_interpolation_time",
+      "index": 8494,
+      "subindex": 9,
+      "name": "Interpolation time",
+      "data_type": "float32",
+      "access": "rw"
+    },
+    {
+      "role": "output_sync_manager_synchronization_type",
+      "index": 7218,
+      "subindex": 1,
+      "name": "Output sync manager synchronization type",
+      "data_type": "uint16",
+      "access": "rw"
+    },
+    {
+      "role": "output_sync_manager_cycle_time",
+      "index": 7218,
+      "subindex": 2,
+      "name": "Output sync manager cycle time",
+      "data_type": "uint32",
+      "access": "rw"
+    },
+    {
+      "role": "device_reset_command",
+      "index": 8192,
+      "subindex": 1,
+      "name": "Reset device control",
+      "data_type": "uint8",
+      "access": "rw"
+    },
+    {
+      "role": "parameter_save_command",
+      "index": 8197,
+      "subindex": 1,
+      "name": "Save parameter set control",
+      "data_type": "uint8",
+      "access": "rw"
+    },
+    {
+      "role": "parameter_save_status",
+      "index": 8197,
+      "subindex": 2,
+      "name": "Save parameter set status",
+      "data_type": "uint8",
+      "access": "ro"
+    },
+    {
+      "role": "parameter_save_selection",
+      "index": 8197,
+      "subindex": 3,
+      "name": "Save parameter set selection",
+      "data_type": "uint16",
+      "access": "rw"
+    },
+    {
+      "role": "parameter_save_return_code",
+      "index": 8197,
+      "subindex": 4,
+      "name": "Save parameter set return code",
+      "data_type": "uint16",
+      "access": "ro"
+    },
+    {
+      "role": "parameter_save_return_value",
+      "index": 8197,
+      "subindex": 5,
+      "name": "Save parameter set return value",
+      "data_type": "uint16",
+      "access": "ro"
+    },
+    {
+      "role": "error_code",
+      "index": 8517,
+      "subindex": 12,
+      "name": "CMMT most serious error",
+      "data_type": "uint32",
+      "access": "ro"
+    }
+  ],
+  "role_order": [
+    "user_position_unit",
+    "converting_unit_position",
+    "converting_unit_velocity",
+    "converting_unit_acceleration",
+    "converting_unit_jerk",
+    "software_position_limit_negative",
+    "software_position_limit_positive",
+    "position_window",
+    "position_window_time",
+    "max_profile_velocity",
+    "negative_velocity_limit",
+    "profile_acceleration",
+    "profile_deceleration",
+    "homing_method",
+    "homing_speed_search_switch",
+    "homing_speed_search_zero",
+    "homing_acceleration",
+    "max_acceleration",
+    "max_deceleration",
+    "pp_jerk",
+    "csp_interpolation_mode",
+    "sync_mode",
+    "sync_cycle_time",
+    "sync_interpolation_time",
+    "output_sync_manager_synchronization_type",
+    "output_sync_manager_cycle_time",
+    "device_reset_command",
+    "parameter_save_command",
+    "parameter_save_status",
+    "parameter_save_selection",
+    "parameter_save_return_code",
+    "parameter_save_return_value",
+    "error_code"
+  ],
+  "persistent_roles": [
+    "user_position_unit",
+    "converting_unit_position",
+    "converting_unit_velocity",
+    "converting_unit_acceleration",
+    "converting_unit_jerk",
+    "software_position_limit_negative",
+    "software_position_limit_positive",
+    "position_window",
+    "position_window_time",
+    "max_profile_velocity",
+    "negative_velocity_limit",
+    "profile_acceleration",
+    "profile_deceleration",
+    "homing_method",
+    "homing_speed_search_switch",
+    "homing_speed_search_zero",
+    "homing_acceleration",
+    "max_acceleration",
+    "max_deceleration",
+    "pp_jerk"
+  ],
+  "presets": {
+    "linear_mm": {
+      "name": "linear_mm",
+      "values": [
+        {
+          "index": 8558,
+          "subindex": 1,
+          "value": 256
+        },
+        {
+          "index": 8596,
+          "subindex": 1,
+          "value": 6
+        },
+        {
+          "index": 8596,
+          "subindex": 2,
+          "value": 3
+        },
+        {
+          "index": 8596,
+          "subindex": 3,
+          "value": 3
+        },
+        {
+          "index": 8596,
+          "subindex": 4,
+          "value": 3
+        },
+        {
+          "index": 24701,
+          "subindex": 1,
+          "value": -1000000
+        },
+        {
+          "index": 24701,
+          "subindex": 2,
+          "value": 1000000
+        },
+        {
+          "index": 24679,
+          "subindex": 0,
+          "value": 20
+        },
+        {
+          "index": 24680,
+          "subindex": 0,
+          "value": 20
+        },
+        {
+          "index": 24703,
+          "subindex": 0,
+          "value": 200
+        },
+        {
+          "index": 8579,
+          "subindex": 12,
+          "value": -0.2
+        },
+        {
+          "index": 24707,
+          "subindex": 0,
+          "value": 1000
+        },
+        {
+          "index": 24708,
+          "subindex": 0,
+          "value": 1000
+        },
+        {
+          "index": 24728,
+          "subindex": 0,
+          "value": 37
+        },
+        {
+          "index": 24729,
+          "subindex": 1,
+          "value": 100
+        },
+        {
+          "index": 24729,
+          "subindex": 2,
+          "value": 50
+        },
+        {
+          "index": 24730,
+          "subindex": 0,
+          "value": 100
+        },
+        {
+          "index": 24773,
+          "subindex": 0,
+          "value": 2000
+        },
+        {
+          "index": 24774,
+          "subindex": 0,
+          "value": 2000
+        },
+        {
+          "index": 24740,
+          "subindex": 1,
+          "value": 100000
+        }
+      ]
+    },
+    "rotary_deg": {
+      "name": "rotary_deg",
+      "values": [
+        {
+          "index": 8558,
+          "subindex": 1,
+          "value": 16640
+        },
+        {
+          "index": 8596,
+          "subindex": 1,
+          "value": 6
+        },
+        {
+          "index": 8596,
+          "subindex": 2,
+          "value": 3
+        },
+        {
+          "index": 8596,
+          "subindex": 3,
+          "value": 3
+        },
+        {
+          "index": 8596,
+          "subindex": 4,
+          "value": 3
+        },
+        {
+          "index": 24701,
+          "subindex": 1,
+          "value": -180000000
+        },
+        {
+          "index": 24701,
+          "subindex": 2,
+          "value": 180000000
+        },
+        {
+          "index": 24679,
+          "subindex": 0,
+          "value": 20000
+        },
+        {
+          "index": 24680,
+          "subindex": 0,
+          "value": 20
+        },
+        {
+          "index": 24703,
+          "subindex": 0,
+          "value": 200000
+        },
+        {
+          "index": 8579,
+          "subindex": 12,
+          "value": -200.0
+        },
+        {
+          "index": 24707,
+          "subindex": 0,
+          "value": 1000000
+        },
+        {
+          "index": 24708,
+          "subindex": 0,
+          "value": 1000000
+        },
+        {
+          "index": 24728,
+          "subindex": 0,
+          "value": 37
+        },
+        {
+          "index": 24729,
+          "subindex": 1,
+          "value": 100000
+        },
+        {
+          "index": 24729,
+          "subindex": 2,
+          "value": 50000
+        },
+        {
+          "index": 24730,
+          "subindex": 0,
+          "value": 100000
+        },
+        {
+          "index": 24773,
+          "subindex": 0,
+          "value": 2000000
+        },
+        {
+          "index": 24774,
+          "subindex": 0,
+          "value": 2000000
+        },
+        {
+          "index": 24740,
+          "subindex": 1,
+          "value": 100000000
+        }
+      ]
+    }
+  }
+}

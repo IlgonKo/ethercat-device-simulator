@@ -11,8 +11,8 @@ import sys
 import time
 
 ROOT = Path(__file__).resolve().parents[1]
-sys.path.insert(0, str(ROOT))
-from simulator.configuration import load_environment
+sys.path.insert(0, str(ROOT / 'src'))
+from functional_model.configuration import load_environment
 
 RUN = Path('/run/simulator')
 STATE = Path('/state')
@@ -132,8 +132,8 @@ def main():
         if not args.validate_only:
             check_nic(nic)
         fixture = RUN / 'fixture'
-        model_command = [sys.executable, '-u', str(ROOT / 'simulator/model_service.py'),
-                         '--model-root', '/opt/model', '--environment',
+        model_command = [sys.executable, '-u', '-m', 'functional_model',
+                         '--environment',
                          '--fixture-dir', str(fixture)]
         if timing:
             model_command.append('--timing')

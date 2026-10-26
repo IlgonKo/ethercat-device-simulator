@@ -3,16 +3,12 @@ from pathlib import Path
 import sys
 import unittest
 
-from simulator.od_role_index import install_role_index
+from functional_model.models.f_kr_internal.od_role_index import install_role_index
 
 
 class RoleIndexTests(unittest.TestCase):
     def setUp(self):
-        root = os.environ.get('CMMT_MODEL_ROOT')
-        if not root:
-            self.skipTest('Set CMMT_MODEL_ROOT for model integration tests')
-        sys.path.insert(0, str(Path(root).resolve()))
-        from device.virtual_device.od_model import VirtualOdModel
+        from functional_model.profiles.cia402_drive.object_dictionary import VirtualOdModel
         self.od = VirtualOdModel()
         self.reference = VirtualOdModel()
         install_role_index(self.od)

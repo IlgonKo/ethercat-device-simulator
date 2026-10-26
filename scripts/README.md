@@ -26,10 +26,9 @@ start는 NIC를 실제로 연다. Motion Server를 정지하고 기존 native Si
 | linux/benchmark-role-index.py | 기존 모델 OD 조회 성능 회귀 검사 |
 | linux/summarize-timing.py | Docker 로그의 C++ 계측 분석 |
 | linux/summarize-python-timing.py | Docker 로그의 Python 계측 분석 |
-| windows/export-model-source.py | 현재 모델 스냅샷 빌드 입력 생성. 실행 시 Motion Server checkout 마운트는 필요 없음 |
 | windows/sdo_checks.py | 테스트가 사용하는 SDO 복원 검사 라이브러리. Docker 실행 스크립트는 아님 |
 
-build-cmmt.sh 산출물은 build/cmmt/cmmt_simulator다. Compose의 build.args.DEVICE_SIMULATOR_BINARY를 실제로 패키징할 산출물에 맞춘다. 모델 스냅샷도 Compose의 build.args.MODEL_SOURCE에서 관리한다. 두 경로는 .env 실행 설정이 아니다. start --build는 Docker 이미지를 빌드하며 C++ 소스 컴파일까지 수행하지 않는다.
+build-cmmt.sh 산출물은 build/timing/cmmt_simulator이며 Compose와 동일한 경로를 사용한다. Python 기능 모델은 저장소 src/functional_model에서 이미지에 복사한다. 외부 모델 스냅샷이나 MODEL_SOURCE는 필요 없다. start --build는 이미지를 빌드하며 C++ 컴파일은 build-cmmt.sh로 별도 수행한다.
 
 ## 삭제한 이전 진입점 (2026-10-26)
 
@@ -39,3 +38,14 @@ build-cmmt.sh 산출물은 build/cmmt/cmmt_simulator다. Compose의 build.args.D
 - windows/integration_bench.py, run-integration-bench.py, diagnose-integration.py, run-motion-server.py: native Simulator와 별도 Motion Server/Axis Panel 실행까지 소유하던 통합 벤치.
 
 기존 RF/TD의 해당 명령은 당시 검증 이력이다. 현재 실행에는 위 Docker 스크립트를 사용한다. 삭제된 시험 진입점을 Docker 물리 회귀 시험으로 대체 완료했다는 뜻은 아니며 물리 PDO/WKC와 오류 복구 검증은 RF-012에 남는다. 필요하면 Git 이력에서 당시 코드를 확인할 수 있다.
+
+## RF-016 개발 검증
+
+```bash
+python3 -m pip install -e .
+python3 -m unittest discover -s tests
+bash scripts/linux/build-cmmt.sh
+python3 scripts/linux/validate-fleet.py --binary build/timing/cmmt_simulator
+```
+
+개발 검증에 --model-root는 사용하지 않는다. windows/export-model-source.py는 자체 모델 이관 후 삭제했다. tests/unit/test_sdo_restore.py는 Windows용 pysoem 의존성이 없는 환경에서는 건너뛴다.

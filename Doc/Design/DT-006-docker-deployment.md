@@ -84,3 +84,7 @@ EtherCAT은 포트 publish 또는 일반 bridge/NAT 연결로 대체하지 않�
 Docker 문서는 배포 기술 선택의 근거이며 이 프로젝트의 컨테이너 실행 검증 결과를 대신하지 않는다.
 
 2026-10-26 저장 경로 변경: 기본 DEVICE_SIMULATOR_STATE_DIR는 ./state다. 기존 native 사용자 소유(mode 0600) 파라미터를 소유권 변경 없이 읽고 저장할 수 있도록 컨테이너 root에 DAC_OVERRIDE를 추가했다. 루트 파일시스템은 계속 읽기 전용이고 호스트 데이터 마운트는 state로 제한한다. 이 권한은 특정 파일만의 예외가 아니라 컨테이너가 접근 가능한 파일의 DAC 검사를 우회하는 권한이다. 기존 4개 저장 파일은 이미 state/parameters에 있었고 state/docker는 없어 파일 이동은 불필요했다. 백업 후 현재 2축의 모델 초기화·복원을 검증했고 4개 파일의 SHA-256 불변을 확인했다.
+
+## RF-016 구조 반영 (2026-10-26)
+
+이미지는 src/functional_model과 device_descriptions의 자체 모델을 포함하며 MODEL_SOURCE/외부 Motion Server 스냅샷에 의존하지 않는다. C++ 실행 파일은 기존 cmmt_simulator 이름과 Compose 경로를 유지한다. scripts/linux/build-cmmt.sh는 해당 build/timing 산출물을 갱신한다. 단일 컨테이너·두 프로세스 및 .env/state 계약은 유지한다.

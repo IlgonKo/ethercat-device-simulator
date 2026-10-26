@@ -91,3 +91,7 @@ Motion Server (기존 독립 패키지)
 ## CiA402 공통 프로파일 결정 (2026-10-26)
 
 [DT-007](DT-007-cia402-profile-adapters.md)에 공통 프로파일·EtherCAT 장치 설명·모델 어댑터 분리 및 프로젝트 폴더 구조를 확정했다. 가상 디바이스는 EtherCAT Slave와 기능 모델로 구성하며, 기능 모델은 CiA402 Drive·모델별 어댑터·동작 모델을 포함한다. Python 패키지는 src/functional_model, C++는 src/ethercat_slave로 배치한다. 최초 대상은 자체 모델이며, 향후 FMI 공통 어댑터와 모델별 매핑을 우선하고 동작 차이가 있을 때만 전용 코드를 추가한다. [RF-016](../RF/RF-016-cia402-profile-adapter.md)으로 첫 구현 범위를 관리한다.
+
+## RF-016 구현 반영 (2026-10-26)
+
+기능 모델은 src/functional_model로 이관했고 F-KR Internal 어댑터와 자체 모델을 분리했다. 기존 Motion Server 소스 스냅샷 의존은 제거했다. CMMT identity·SDO/PDO·저장 형식은 유지하며 FMI 실행과 장애 격리 완성은 후속이다. 상세 검증과 물리 시험 잔여 항목은 RF-016을 따른다.
