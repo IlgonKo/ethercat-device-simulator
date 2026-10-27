@@ -1,4 +1,4 @@
-# RF-016 — CiA402 Drive 프로파일 및 F-KR Internal 어댑터
+# RF-016 — CiA402 Drive 프로파일 및 F-KR CMMT 어댑터
 
 - 등록일: 2026-10-26
 - 상태: 구조 이관·오프라인 검증 완료 / 물리 버스 회귀 대기
@@ -6,7 +6,7 @@
 
 ## 범위
 
-공통 CiA402 Drive 프로파일, 기존 CMMT-AS 장치 설명 분리, F-KR Internal 어댑터 및 기존 Model Host 연결. 현재 Motion Server 무수정, CMMT identity와 PDO, 기존 모델 계산·상태 전이·파라미터를 유지한다. 폴더 구조는 DT-007로 확정했다. src/ethercat_slave와 src/functional_model로 분리하며, 기능 모델은 profiles/cia402_drive + adapters + models로 구성한다. 필요한 자체 모델·OD·codec·ESI 파서를 이관했으며 외부 Motion Server 스냅샷 런타임 의존을 제거했다.
+공통 CiA402 Drive 프로파일, 기존 CMMT-AS 장치 설명 분리, F-KR CMMT 어댑터 및 기존 Model Host 연결. 현재 Motion Server 무수정, CMMT identity와 PDO, 기존 모델 계산·상태 전이·파라미터를 유지한다. 폴더 구조는 DT-007로 확정했다. src/ethercat_slave와 src/functional_model로 분리하며, 기능 모델은 cia402_drive/profile + adapter + behaviour_model로 구성한다. 필요한 자체 모델·OD·codec·ESI 파서를 이관했으며 외부 Motion Server 스냅샷 런타임 의존을 제거했다.
 
 ## 완료 기준
 
@@ -20,12 +20,12 @@
 - [ ] 2축/4축 계측 비교 및 실제/가상 혼합 버스 검증. 물리 시험 결과와 오프라인 검증을 구분.
 - [x] Docker 빌드·실행 경로와 사용자 문서 갱신.
 
-FMU 실행·Copley 연결·CMMT FMU는 후속. 범용 EtherCAT identity 및 axis:cia402-drive 설정 전환은 별도 합의. 동적 PDO(RF-014), IO(RF-013), 모델 동작 변경(RF-015)은 포함하지 않는다.
+FMU 실행·Copley 연결·CMMT FMU는 후속. BUS는 axis:cia402-drive로 전환했으며 범용 EtherCAT identity 도입은 별도 합의. 동적 PDO(RF-014), IO(RF-013), 모델 동작 변경(RF-015)은 포함하지 않는다.
 
 ## 2026-10-26 구현 및 검증
 
 - C++ 통신 코드를 src/ethercat_slave로 옮기고 IPC client를 분리했다. 작은 ESC/Mailbox 연결은 main.cc에서 유지하며 빈 폴더를 만들지 않았다.
-- 기능 모델을 profiles/cia402_drive, adapters, models/f_kr_internal, runtime, ipc, storage, diagnostics로 분리했다. 모델 OD가 유일한 값 저장소이며 어댑터는 같은 OD를 사용한다.
+- 기능 모델을 cia402_drive/profile, cia402_drive/adapter, cia402_drive/behaviour_model/f_kr_cmmt, runtime, ipc, storage, diagnostics로 분리했다. 모델 OD가 유일한 값 저장소이며 어댑터는 같은 OD를 사용한다.
 - CMMT identity·원본 ESI·통신/제조사 확장 및 저장 명령 처리는 device_descriptions/cmmt_as로 분리했다. 공통 PDO 매핑 이름 motion_server_default와 외부 cmmt_as contract label은 유지한다.
 - 공통 어댑터는 profile/od/capabilities와 read_sdo, write_sdo, apply_outputs, step, read_inputs를 요구한다. 모델별 model/bridge 내부 속성은 공통 계약에 포함하지 않는다. 현재 F-KR Internal 지원 모드는 1/3/6/8/-3이며 0은 미선택 값으로 허용한다. 미지원 모드는 모델 적용 전에 거부한다. 실제 동작 알고리즘은 변경하지 않았다.
 - 자체 모델 소스와 상태 머신을 저장소로 이관했다. 역할 인덱스 최적화는 유지한다. 출처와 원본 SHA-256은 [source provenance](../Design/RF-016-source-provenance.json)에 기록했다. MODEL_SOURCE와 --model-root 및 기존 snapshot export 도구를 제거했다.
@@ -45,3 +45,11 @@ PP 정지 상태, 50회 warm-up 후 1,000회 fleet PDO dispatch를 계측했다.
 | 4 | 0.1652 / 0.1770 / 0.2017 | 0.1260 / 0.1345 / 0.3417 |
 
 평균은 감소했으나 관측 최대치는 증가했다. 물리 버스 WKC·지연·이동 부하 회귀가 끝나기 전 RF-016 전체 완료로 처리하지 않는다. 실제 Motion Server/Axis Panel을 시작하거나 실제 축 이동을 실행하지 않았다.
+
+### 장치별 묶음 및 단수 이름 적용
+
+CiA402 전용 구현은 src/functional_model/cia402_drive의 profile·adapter·behaviour_model로 이동했다. 공통 runtime·ipc·storage는 유지한다. Python import, 패키지 resource와 provenance 경로를 갱신했다. 기존 모델 동작 및 .env/state 형식은 유지한다.
+
+### BUS 및 자체 모델 이름 변경
+
+BUS는 cia402-drive, 자체 모델 ID·패키지·어댑터는 f_kr_cmmt로 변경했다. 기존 CMMT EtherCAT identity와 PDO는 유지한다. Linux .env 및 저장 파라미터 4개를 백업 후 이관했으며 값·모드는 보존했다. 새 이름만 허용하고 기존 이름 거부 테스트를 추가했다.

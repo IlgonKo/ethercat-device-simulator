@@ -24,16 +24,16 @@ Motion Server는 독립 패키지다. 명명 규칙은 유사하게 사용하지
 ```dotenv
 KICKCAT_INTERFACE=enp1s0
 DEVICE_SIMULATOR_STATE_DIR=./state
-DEVICE_SIMULATOR_BUS=0:axis:cmmt-as,1:axis:cmmt-as
+DEVICE_SIMULATOR_BUS=0:axis:cia402-drive,1:axis:cia402-drive
 DEVICE_SIMULATOR_AXIS_IDS=0:virtual-axis-0,1:virtual-axis-1
-DEVICE_SIMULATOR_AXIS_MODELS=0:f_kr_internal,1:f_kr_internal
+DEVICE_SIMULATOR_AXIS_MODELS=0:f_kr_cmmt,1:f_kr_cmmt
 DEVICE_SIMULATOR_AXIS_MODES=0:linear,1:rotary
 DEVICE_SIMULATOR_AXIS_PARAMETER_SETS=0:axis-0,1:axis-1
 ```
 
 - BUS의 명시적 숫자는 로컬 Slave 번호다. 입력 나열 순서와 무관하게 정렬하고 중복·누락·음수·비정수를 거부한다.
 - AXIS_IDS/MODELS/MODES/PARAMETER_SETS 목록은 필수다. 각 목록의 번호 집합은 BUS와 정확히 같아야 하며 중복 번호와 누락을 거부한다. ID는 순서와 독립적인 영구 식별자다.
-- 현재 타입은 cmmt-as, 모델은 f_kr_internal, 모드는 linear/rotary를 지원한다. FMU는 후속이며 가상 IO는 RF-013 보류다.
+- 현재 타입은 cia402-drive, 모델은 f_kr_cmmt, 모드는 linear/rotary를 지원한다. FMU는 후속이며 가상 IO는 RF-013 보류다.
 - PARAMETER_SET은 저장 공간의 논리 이름이며 파일 경로가 아니다. 공간이 없으면 기본값으로 만들고 있으면 호환성을 검증한다. 기본 모델 preset은 linear_mm/rotary_deg다.
 - PDO 매핑 선택·counts_per_unit·scale은 추가하지 않는다. 단위·스케일은 장치 파라미터 기준이고 동적 PDO는 RF-014다.
 - 값은 한 줄의 리터럴로 작성한다. 따옴표와 주석은 지원한다. 제품 설정에 셸 명령·변수 치환을 사용하지 않는다. native 로더는 중복 키를 거부한다. Compose env_file의 문법 처리는 Compose가 담당한다.
@@ -81,7 +81,7 @@ Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트
 ## 초기 구현과 운영
 
 - 구성 예시는 [.env.example](../../.env.example). 기존 단일 축 시험 도구의 명시적 무설정 경로는 유지하지만 잘못된 .env에서 이 경로로 fallback하지 않는다.
-- RF-016에서 자체 모델을 src/functional_model/models/f_kr_internal로 이관했다. --model-root와 외부 Motion Server 스냅샷 런타임 의존은 제거했고, 기존 .env 및 영구 파라미터 identity는 유지한다.
+- RF-016에서 자체 모델을 src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt로 이관했다. --model-root와 외부 Motion Server 스냅샷 런타임 의존은 제거했고, 기존 .env 및 영구 파라미터 identity는 유지한다.
 - 파라미터 저장 대상은 현재 모델의 NON_PDO_CONFIGURATION_OD_ROLES 20개다. PDO 목표값·운전 상태·명령/상태 객체는 저장하지 않는다. 전체 OD 영구화와 동일하지 않다.
 - 저장은 기존 CMMT SDO 0x2005:03=1, 0x2005:01=1 요청으로 수행하고 완료 후 명령을 0으로 해제한다. 선택값 1만 지원한다. PRE-OP에서도 PDO 진행 없이 저장한다. 파일 fsync·원자적 교체 후 성공 상태를 반환한다. 실패는 성공으로 응답하지 않으며 기존 fail-closed IPC 정책을 따른다. 정상 SDO Abort 오류 응답은 TD-001에서 해결한다.
 - 저장 루트에 프로세스 단독 잠금을 걸고, 각 parameter_set.json에 스키마·호환 메타데이터·값·체크섬을 기록한다. 백업/이관/관리 API 및 실제↔가상 동기화의 완료 검증은 RF-010/009에 남긴다.
@@ -91,6 +91,10 @@ Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트
 
 Motion Server device/cmmt/.env.example의 MOTION_SERVER_CMMT_AXIS_PDO_CONFIGURATIONS처럼 번호:값 목록으로 구조화했다. 축마다 네 개 키를 반복하는 AXIS_0_ID 등의 형식은 제거했다. scripts/docker 진입점은 목록의 역슬래시 줄 연결을 정규화해 Compose에 전달한다. 원본 .env의 값과 순서는 유지한다. ID와 PARAMETER_SET의 값은 유지하며 자동 생성하지 않는다. 관리 NIC 변수와 해당 검사는 제거했다.
 
-- 모델 표시 이름은 **F-KR Internal**, 설정 식별자는 공백 없는 `f_kr_internal`이다. 기존 저장 파라미터의 identity.model.type도 같은 식별자로 변경하며 값은 유지하고 checksum을 재계산한다. 실행 중 저장소는 수정하지 않는다.
+- 모델 표시 이름은 **F-KR Internal**, 설정 식별자는 공백 없는 `f_kr_cmmt`이다. 기존 저장 파라미터의 identity.model.type도 같은 식별자로 변경하며 값은 유지하고 checksum을 재계산한다. 실행 중 저장소는 수정하지 않는다.
 
 - `config/`의 중복 예제는 제거했다. 개발용 `validate-fleet.py`도 기본적으로 루트 `.env`를 읽고 테스트 fixture는 `tests/fixtures`에서 관리한다.
+
+## 프로파일과 모델 이름 분리 (2026-10-26)
+
+BUS의 axis:cia402-drive는 기능 프로파일을 선택하고 AXIS_MODELS의 f_kr_cmmt는 자체 CMMT 동작 모델을 선택한다. 기존 cmmt-as/f_kr_internal 설정 별칭은 지원하지 않는다. EtherCAT identity·기본 PDO·Motion Server 설정은 기존 CMMT 호환 값으로 유지한다. state 파일의 identity.type과 identity.model.type도 새 이름으로 갱신하고 checksum을 재계산한다. 값·모드·parameter_set은 변경하지 않으며 정지 상태에서 백업 후 일회성 이관한다.

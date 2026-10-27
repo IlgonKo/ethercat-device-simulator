@@ -1,8 +1,8 @@
-from functional_model.profiles.cia402_drive.object_dictionary import VirtualOdModel
+from functional_model.cia402_drive.profile.object_dictionary import VirtualOdModel
 
 
-class VirtualObjectDictionary(VirtualOdModel):
-    """CMMT profile-defined virtual Object Dictionary."""
+class ConfiguredObjectDictionary(VirtualOdModel):
+    """Profile-defined Object Dictionary without behaviour-model ownership."""
 
     def __init__(self, device_profile):
         super().__init__()

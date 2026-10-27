@@ -49,3 +49,5 @@ RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모�
 최신 결과: [2026-10-20 OD 조회 최적화 재검증](RF-011-role-index-20261020.md). 9월 계측 시점의 미적용 상태를 대체한다.
 
 - [RF-016 — CiA402 Drive 프로파일 및 F-KR Internal 어댑터](RF-016-cia402-profile-adapter.md): 구조 이관·오프라인 검증 완료 / 물리 버스 회귀 대기.
+
+- [RF-017 — Copley FMU 초기 연동](RF-017-copley-fmu.md): 1차 오프라인 구현·실제 Linux FMU 검증 완료. 설정·Docker·지원 파라미터 저장 통합 검증 완료. SDO Abort·메일박스·Halt 후속 수정 반영. 최종 물리 연동 재검증·일반 장애 격리 대기. 모델 한계는 RF-017 참조.

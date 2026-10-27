@@ -86,7 +86,7 @@ bash scripts/docker/stop.sh
 
 장치 구성은 루트 `.env`에서 설정하며 [.env.example](.env.example)을 참고합니다. 개발용 검증 도구도 기본적으로 루트 `.env`를 읽습니다. 별도 파일은 `--env-file`로 지정할 수 있습니다. `config/` 예제 폴더는 제거했습니다.
 
-[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#수동-실행과-다음-물리-시험)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/models/f_kr_internal`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 위치 제한/회전 동작 개선을 별도 관리합니다.
+[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#수동-실행과-다음-물리-시험)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 위치 제한/회전 동작 개선을 별도 관리합니다.
 
 ## 2026-09-22 성능 계측 결과와 다음 작업
 
@@ -101,16 +101,17 @@ bash scripts/docker/stop.sh
 ```text
 src/ethercat_slave/                 # C++: EtherCAT Slave + IPC
 src/functional_model/
-  profiles/cia402_drive/            # 공통 OD·PDO 정의
-  adapters/                        # F-KR Internal 연결·계약·등록
-  models/f_kr_internal/             # 상태 전이·운동 계산
+  cia402_drive/
+    profile/                       # 공통 OD·PDO 정의
+    adapter/                       # F-KR Internal 연결·계약·등록
+    behaviour_model/f_kr_cmmt/  # 상태 전이·운동 계산
   runtime/                         # 축 인스턴스와 서비스
   ipc/ storage/ diagnostics/
 device_descriptions/cmmt_as/        # 기존 identity·ESI·확장·저장 명령
 protocols/ipc/                      # 메시지 계약
 ```
 
-기존 `.env`, `f_kr_internal` 모델 ID 및 저장 파라미터 형식은 유지한다. 내부 프로파일은 cia402-drive지만 외부 BUS는 cmmt-as, identity/PDO는 기존 CMMT 호환 값이다. 어댑터는 미지원 운전 모드를 거부한다. 실제 모델 알고리즘은 유지했다. [RF-016](Doc/RF/RF-016-cia402-profile-adapter.md)에 오프라인 검증과 남은 물리 시험을 구분한다.
+기존 `.env`, `f_kr_cmmt` 모델 ID 및 저장 파라미터 형식은 유지한다. 내부 프로파일은 cia402-drive지만 BUS 설정은 cia402-drive, 모델 ID는 f_kr_cmmt이며 EtherCAT identity/PDO는 기존 CMMT 호환 값이다. 어댑터는 미지원 운전 모드를 거부한다. 실제 모델 알고리즘은 유지했다. [RF-016](Doc/RF/RF-016-cia402-profile-adapter.md)에 오프라인 검증과 남은 물리 시험을 구분한다.
 
 ```bash
 bash scripts/linux/build-cmmt.sh     # C++ 변경 시
@@ -118,3 +119,7 @@ bash scripts/docker/build.sh
 bash scripts/docker/validate.sh
 bash scripts/docker/start.sh
 ```
+
+### Copley FMU 오프라인 검증
+
+FMI3 CS 기반 PP 어댑터와 Linux FMU 빌드 도구의 실행 방법은 [RF-017](Doc/RF/RF-017-copley-fmu.md)을 따른다. `.env`에서 `copley_drive_sim` 선택, FMU 폴더 마운트 및 지원 파라미터 저장을 제공한다. 비물리 통합 검증은 완료했으며 물리 연동 전 IPC 장애 격리가 남아 있다.

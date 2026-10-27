@@ -1,10 +1,10 @@
 # TD-001 — KickCAT SDO Abort 응답 호환성
 
-- 상태: 등록 / 보류 (추후 구현)
+- 상태: 래퍼 구현·비물리 응답/복구 검증 완료 / 물리 PySOEM 재검증 대기
 - 등록일: 2026-09-14
 - 관련 RF: [RF-002-1](../RF/RF-002-1-sdo-diagnostic.md), [RF-003](../RF/RF-003-cmmt-model-integration.md)
 - 영향: 오류 SDO 응답이 PySOEM에서 SdoError 대신 PacketError로 전달됨
-- 결정: 이번에는 기록만 한다. KickCAT·SOEM·PySOEM 수정 및 응답 보정 래퍼는 적용하지 않았다.
+- 초기 결정(2026-09-14): 기록 후 보류. 2026-10-27 아래 프로젝트 래퍼를 구현했다.
 - 구현 방향: upstream 직접 수정보다 래퍼를 우선 검토하되 세부 방식은 추후 결정한다.
 
 2026-09-14 16:50 KST. KickCAT/PySOEM/래퍼 동작을 수정하지 않고 `--with-sdo --sdo-errors`로 재현했다.
@@ -88,3 +88,20 @@ Mailbox 헤더를 제외한 데이터이다. 보정한다면 검증된 Abort의 
 ## 관련 RF 추가 (2026-09-22)
 
 [RF-014 동적 PDO 매핑](../RF/RF-014-dynamic-pdo-mapping.md)의 잘못된 설정 거부에도 정상 SDO Abort가 필요하다. TD-001의 응답 형식 보정과 RF-014의 매핑 검증·오류 생성은 별개다. 등록만으로 본 TD를 해결 처리하지 않는다.
+
+
+## 2026-10-27 구현 및 검증
+
+- KickCAT submodule 및 PySOEM/SOEM 원본은 수정하지 않았다. GNU linker `--wrap`으로 CoE 메시지 팩토리를 프로젝트 gateway로 감싼다.
+- 모델 소유 OD는 직접 IPC 검증 후 성공 응답을 만든다. 기존 KickCAT after-write hook의 성공 응답 선발행 문제를 피한다.
+- 미지원 SDO는 Python 서비스에서 구조화된 error 응답을 반환한다. C++ gateway는 0x80/CoE service 2/length 10의 Abort로 변환하고 다음 요청을 계속 처리한다.
+- KickCAT이 처리하는 기타 OD의 Abort도 명령 바이트 전체를 0x80으로 정규화한다.
+- 실제 Copley FMU + Python IPC + C++ mailbox 시험에서 restart=0 성공, restart=1/미지원 mode/RO 쓰기/없는 객체·subindex/잘못된 길이 Abort, 실패 후 OD 값 보존, 정상 SDO 읽기 및 PDO Operation Enabled 도달을 검증했다.
+- 실행: `PYTHONPATH=src:. build/fmi-venv/bin/python scripts/linux/validate-sdo.py --binary build/timing/test_sdo_gateway` (Copley가 포함된 .env 필요, 임시 저장소 사용, NIC 미사용).
+- 물리 PySOEM의 SdoError 수신과 캡처는 아직 재검증하지 않았다. native FMU crash/hang·IPC timeout 시 Slave 유지 정책은 별도 작업이다.
+
+### 2026-10-27 — 메일박스 응답 길이 후속 수정
+
+물리 재시험의 초기화 OD Communication failed 원인은 FMU 변수 누락이 아니라 래퍼가 응답 backing buffer를 16바이트로 축소한 것이었다. EmulatedESC는 SM 마지막 바이트가 기록되어야 mailbox-full을 설정한다. 원래 메일박스 버퍼 크기는 보존하고 헤더 payload length만 10으로 설정하도록 수정했다.
+
+실제 Copley FMU + IPC에서 0x2194:1~4, 0x607D:1~2, 0x6081/6083/6084, 0x60A4:1, 0x607F, 0x2183:12, 0x60C5/C6 조회를 검증했다. 추가로 모든 응답을 실제 EmulatedESC의 128바이트 mailbox SM에 기록하여 mailbox-full 표시를 확인했다. 기존 Abort 및 후속 PDO 시험도 통과했다. Linux binary/Docker 이미지 갱신, 실행 중 컨테이너는 자동 재시작하지 않았다.

@@ -1,5 +1,5 @@
 from .codec import decode_od_value, encode_od_value
-from functional_model.adapters.errors import (
+from functional_model.cia402_drive.adapter.errors import (
     DeviceRejectedException,
     SdoObjectNotFoundException,
 )

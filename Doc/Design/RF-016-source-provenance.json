@@ -5,37 +5,37 @@
   "files": [
     {
       "source": "device/virtual_servo_drive/servo_model.py",
-      "destination": "src/functional_model/models/f_kr_internal/servo_model.py",
+      "destination": "src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt/servo_model.py",
       "sha256": "9ced19efbc8619832b4e459dd7ef2a5b3357c64481dde65436afeb541a472c87"
     },
     {
       "source": "device/virtual_servo_drive/od_model.py",
-      "destination": "src/functional_model/models/f_kr_internal/od_model.py",
+      "destination": "src/functional_model/cia402_drive/profile/configured_od.py",
       "sha256": "e8626d1c394b8f4cd34199228ad1539824f9cfe3cd1a878711e874430e3b361e"
     },
     {
       "source": "device/cia402/state_machine.py",
-      "destination": "src/functional_model/models/f_kr_internal/state_machine.py",
+      "destination": "src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt/state_machine.py",
       "sha256": "7cfd26e5993cf5e2483438c513d096e18e9641ab4375b3c83ff27553e4fb1012"
     },
     {
       "source": "device/virtual_device/od_model.py",
-      "destination": "src/functional_model/profiles/cia402_drive/object_dictionary.py",
+      "destination": "src/functional_model/cia402_drive/profile/object_dictionary.py",
       "sha256": "2444fd36dbd49d75ca84317e7e74de9b3a4d0550ac7d1554594ab6a4ae09563f"
     },
     {
       "source": "device/pdo_metadata/base.py",
-      "destination": "src/functional_model/profiles/cia402_drive/metadata.py",
+      "destination": "src/functional_model/cia402_drive/profile/metadata.py",
       "sha256": "164eff8dd48f9bf0b59666e9821e7f16f99a0c4c0bb5b59a769e00ff00156930"
     },
     {
       "source": "device/od_value_codec.py",
-      "destination": "src/functional_model/profiles/cia402_drive/codec.py",
+      "destination": "src/functional_model/cia402_drive/profile/codec.py",
       "sha256": "77f83ca956c0aa697803338e9cad19104f477c2073a1a5386282e7f8ec72debe"
     },
     {
       "source": "device/virtual_device/od_bridge.py",
-      "destination": "src/functional_model/profiles/cia402_drive/bridge.py",
+      "destination": "src/functional_model/cia402_drive/profile/bridge.py",
       "sha256": "ff086adbc8adf176766023dcf06e479c51b8fc45541da5dc3c7f91cc91f3ed4b"
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "source": "device/cmmt/required_non_pdo_od.py",
-      "destination": "src/functional_model/profiles/cia402_drive/roles.json + device_descriptions/cmmt_as/extensions.json",
+      "destination": "src/functional_model/cia402_drive/profile/roles.json + device_descriptions/cmmt_as/extensions.json",
       "sha256": "2082103090bb262f58aa2469cb2332cad75e7cf0483b02f50eaed81b2e48f9be",
       "transformation": "Selected runtime definitions exported as JSON; no operating configuration file"
     },
@@ -62,7 +62,7 @@
     },
     {
       "source": "device/cmmt/pdo_configuration.py",
-      "destination": "src/functional_model/profiles/cia402_drive/pdo.json",
+      "destination": "src/functional_model/cia402_drive/profile/pdo.json",
       "sha256": "25f79aa1e4281d4e0b5fc09b2ae01344d696e03ea58dc28cfa31362620e6a4bb",
       "transformation": "Selected runtime definitions exported as JSON; no operating configuration file"
     }

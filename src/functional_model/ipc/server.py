@@ -5,6 +5,21 @@ import json
 from functional_model.diagnostics.python_timing import stamp
 MAX_MESSAGE = 1024 * 1024
 
+def dispatch_request(model, request):
+    # Only rejected SDO operations are recoverable here. Model/cycle faults are
+    # not silently converted into successful or stale process data.
+    if request.get('op') not in ('read', 'write'):
+        return model.dispatch(request)
+    from functional_model.cia402_drive.adapter.errors import DeviceRejectedException, SdoObjectNotFoundException
+    try:
+        return model.dispatch(request)
+    except (DeviceRejectedException, SdoObjectNotFoundException, KeyError, ValueError) as exc:
+        if isinstance(exc, DeviceRejectedException): code = 0x06010000
+        elif isinstance(exc, (SdoObjectNotFoundException, KeyError)): code = 0x06020000
+        else: code = 0x06090030
+        return {'error': {'kind': 'sdo_abort', 'code': code, 'message': str(exc)}}
+
+
 def serve(model, path, timing=None):
     # Caller supplies a private session directory; never unlink an existing socket.
     path=Path(path)
@@ -28,7 +43,7 @@ def serve(model, path, timing=None):
                         begin = stamp()
                         request = json.loads(raw)
                         after_parse = stamp()
-                        response = model.dispatch(request)
+                        response = dispatch_request(model, request)
                         after_dispatch = stamp()
                         encoded = json.dumps(response,separators=(',',':')).encode()+b'\n'
                         after_encode = stamp()
@@ -42,7 +57,7 @@ def serve(model, path, timing=None):
                         timing.add(op+'_request', begin, after_send)
                         timing.due()
                     else:
-                        response=model.dispatch(json.loads(raw))
+                        response=dispatch_request(model, json.loads(raw))
                         stream.write(json.dumps(response,separators=(',',':')).encode()+b'\n'); stream.flush()
         finally:
             if timing: timing.flush("stop")

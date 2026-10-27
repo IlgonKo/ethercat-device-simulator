@@ -63,11 +63,18 @@ def validate_config(data, base_directory):
             if device[key] in used:
                 raise ValueError(f'{loc}.{key}: duplicate {device[key]}')
             used.add(device[key])
-        if device['type'] != 'cmmt-as':
-            raise ValueError(f'{loc}.type: only cmmt-as axes are supported; IO is deferred')
-        fields(device['model'], ('type', 'mode'), f'{loc}.model')
-        if device['model']['type'] != 'f_kr_internal' or device['model']['mode'] not in ('linear', 'rotary'):
-            raise ValueError(f'{loc}.model: expected f_kr_internal with linear or rotary mode')
+        if device['type'] != 'cia402-drive':
+            raise ValueError(f'{loc}.type: only cia402-drive axes are supported; IO is deferred')
+        model = device['model']
+        if not isinstance(model, dict): raise ValueError(f'{loc}.model: object required')
+        kind = model.get('type')
+        fields(model, ('type', 'mode', 'artifact') if kind == 'copley_drive_sim' else ('type', 'mode'), f'{loc}.model')
+        if kind not in ('f_kr_cmmt', 'copley_drive_sim') or model['mode'] not in ('linear', 'rotary'):
+            raise ValueError(f'{loc}.model: expected f_kr_cmmt/copley_drive_sim with linear or rotary mode')
+        if kind == 'copley_drive_sim':
+            if not isinstance(model['artifact'], str) or not model['artifact'].strip():
+                raise ValueError(f'{loc}.model.artifact: path required')
+            model['artifact'] = str((Path(base_directory) / model['artifact']).resolve())
     if indices != set(range(len(devices))):
         raise ValueError('devices.slave_index: must be contiguous from 0 to N-1')
     data['devices'] = sorted(devices, key=lambda d: d['slave_index'])
@@ -128,9 +135,9 @@ def load_environment(env, base_directory=None):
     devices = []
     indices = set()
     for entry in required('DEVICE_SIMULATOR_BUS').split(','):
-        match = re.fullmatch(r'\s*(0|[1-9][0-9]*)\s*:\s*axis\s*:\s*(cmmt-as)\s*', entry)
+        match = re.fullmatch(r'\s*(0|[1-9][0-9]*)\s*:\s*axis\s*:\s*(cia402-drive)\s*', entry)
         if not match:
-            raise ValueError('DEVICE_SIMULATOR_BUS: expected explicit index:axis:cmmt-as entries')
+            raise ValueError('DEVICE_SIMULATOR_BUS: expected explicit index:axis:cia402-drive entries')
         index = int(match[1])
         if index in indices:
             raise ValueError('DEVICE_SIMULATOR_BUS: duplicate slave index')
@@ -146,6 +153,11 @@ def load_environment(env, base_directory=None):
     unused = {key for key in env if key.startswith('DEVICE_SIMULATOR_AXIS_')} - allowed
     if unused:
         raise ValueError(f'Unknown axis settings: {sorted(unused)}')
+    for device in devices:
+        if device['model']['type'] == 'copley_drive_sim':
+            folder = env.get('DEVICE_SIMULATOR_FMU_DIR', './model_artifacts').strip()
+            if not folder: raise ValueError('DEVICE_SIMULATOR_FMU_DIR: nonempty path required')
+            device['model']['artifact'] = str(Path(folder) / 'CopleyDriveSim-linux.fmu')
     state = required('DEVICE_SIMULATOR_STATE_DIR')
     data = dict(schema_version=1, ethercat=dict(interface=required('KICKCAT_INTERFACE')),
                 storage=dict(directory=str(Path(state))), devices=devices)

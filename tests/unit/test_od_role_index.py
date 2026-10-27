@@ -3,12 +3,12 @@ from pathlib import Path
 import sys
 import unittest
 
-from functional_model.models.f_kr_internal.od_role_index import install_role_index
+from functional_model.cia402_drive.behaviour_model.f_kr_cmmt.od_role_index import install_role_index
 
 
 class RoleIndexTests(unittest.TestCase):
     def setUp(self):
-        from functional_model.profiles.cia402_drive.object_dictionary import VirtualOdModel
+        from functional_model.cia402_drive.profile.object_dictionary import VirtualOdModel
         self.od = VirtualOdModel()
         self.reference = VirtualOdModel()
         install_role_index(self.od)

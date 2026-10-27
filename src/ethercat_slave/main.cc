@@ -18,6 +18,7 @@
 #include "process_data/pdo_target.h"
 #include "diagnostics/timing.h"
 #include "ipc/model_client.h"
+#include "ipc/sdo_gateway.h"
 
 using json = nlohmann::json;
 using namespace kickcat;
@@ -93,18 +94,10 @@ int main(int argc,char** argv) {
                 (void)object;
                 if(!entry || !entry->data || entry->bitlen!=e.at("bits").get<uint16_t>())
                     throw std::runtime_error("ESI/model entry mismatch");
-                entry->before_access.push_back([&request,i,index,sub](uint16_t access,CoE::Entry* target) {
-                    if(access & CoE::Access::READ) {
-                        auto r=request(i,{{"op","read"},{"index",index},{"subindex",sub}});
-                        decode(r.at("data"),target->data,(target->bitlen+7)/8);
-                    }
-                });
-                entry->after_access.push_back([&request,i,index,sub](uint16_t access,CoE::Entry* target) {
-                    if(access & CoE::Access::WRITE)
-                        request(i,{{"op","write"},{"index",index},{"subindex",sub},
-                                       {"data",hex(target->data,(target->bitlen+7)/8)}});
-                });
+                cmmt::sdoGateways[sim.mailbox.get()].entries.emplace(index,sub);
+
             }
+            cmmt::sdoGateways[sim.mailbox.get()].request=[&request,i](json const& message){return request(i,message);};
             std::map<FixedMapping::Key,uint32_t> mapping_values;
             for(auto& object:*sim.dictionary) {
                 if(object.index!=0x1600 && object.index!=0x1a00 && object.index!=0x1c12 && object.index!=0x1c13)continue;

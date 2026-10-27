@@ -9,7 +9,7 @@ from unittest.mock import patch
 
 ROOT=Path(__file__).resolve().parents[2]
 from functional_model.runtime import axis as service
-from functional_model.adapters import f_kr_internal
+from functional_model.cia402_drive.adapter import f_kr_cmmt
 from device_descriptions.cmmt_as.fixture import generate_fixture
 
 
@@ -43,7 +43,7 @@ class ModelServiceTests(unittest.TestCase):
                 self.assertEqual(dt.findall('SubItem')[1].findtext('BitOffs'),'16')
 
     def test_readonly_write_is_not_accepted(self):
-        from functional_model.adapters.errors import DeviceRejectedException
+        from functional_model.cia402_drive.adapter.errors import DeviceRejectedException
         with self.assertRaises(DeviceRejectedException):self.model.dispatch(dict(op='write',index=0x6041,subindex=0,data='0000'))
         self.assertEqual(self.model.adapter.model.od.read(0x6041),0x40)
 
@@ -68,7 +68,7 @@ class ModelServiceTests(unittest.TestCase):
         self.assertEqual(self.model.cycles,1)
 
     def test_role_index_preserves_pdo_and_sdo_behavior(self):
-        with patch.object(f_kr_internal, 'install_role_index'):
+        with patch.object(f_kr_cmmt, 'install_role_index'):
             reference = service.Model()
         for mode in (1, 3, 8):
             for n, cw in enumerate((6, 7, 15, 15)):

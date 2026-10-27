@@ -1,4 +1,4 @@
-from .od_model import VirtualObjectDictionary
+from functional_model.cia402_drive.profile.configured_od import ConfiguredObjectDictionary
 from .state_machine import CiA402StateMachine
 
 
@@ -9,7 +9,7 @@ class VirtualCiA402Servo:
             raise ValueError("VirtualCiA402Servo requires an explicit device_profile")
         self.device_profile = device_profile
 
-        self.od = VirtualObjectDictionary(device_profile)
+        self.od = ConfiguredObjectDictionary(device_profile)
         self.sm = CiA402StateMachine()
 
         self.actual_position = 0.0

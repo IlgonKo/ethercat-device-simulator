@@ -25,10 +25,12 @@ def main():
             config = load_config(args.env_file) if args.env_file else load_environment(os.environ)
             store = stack.enter_context(ParameterStore(config['storage']['directory']))
             model = ModelFleet(config, store)
+            stack.callback(model.close)
             if args.fixture_dir: model.generate_fixture(args.fixture_dir)
         else:
             # Explicit original one-axis feasibility harness, without persistence.
             model = Model()
+            stack.callback(model.close)
             if args.fixture_dir: generate_fixture(model,args.fixture_dir)
         print(json.dumps(model.describe()), flush=True)
         timing = None

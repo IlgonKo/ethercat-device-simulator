@@ -1,9 +1,9 @@
-from functional_model.profiles.cia402_drive.codec import normalize_od_data_type
+from functional_model.cia402_drive.profile.codec import normalize_od_data_type
 from functional_model.runtime.provenance import source_hash
 import time
 import hashlib
 import json
-from functional_model.adapters.registry import create_adapter
+from functional_model.cia402_drive.adapter.registry import create_adapter
 from functional_model.diagnostics.python_timing import stamp
 
 TYPES = {'uint8': 'USINT', 'int8': 'SINT', 'uint16': 'UINT', 'int16': 'INT',
@@ -11,8 +11,8 @@ TYPES = {'uint8': 'USINT', 'int8': 'SINT', 'uint16': 'UINT', 'int16': 'INT',
 
 class Model:
     def __init__(self, device=None):
-        self.device = device or dict(slave_index=0, id="axis-0", type="cmmt-as",
-                                     model=dict(type="f_kr_internal", mode="linear"), parameter_set="axis-0")
+        self.device = device or dict(slave_index=0, id="axis-0", type="cia402-drive",
+                                     model=dict(type="f_kr_cmmt", mode="linear"), parameter_set="axis-0")
         self.store = None
         self.timing = None
         self.preset = "linear_mm" if self.device["model"]["mode"] == "linear" else "rotary_deg"
@@ -52,12 +52,19 @@ class Model:
         result['contract_hash'] = hashlib.sha256(json.dumps(result, sort_keys=True).encode()).hexdigest()
         return result
 
+    def close(self):
+        close = getattr(self.adapter, 'close', None)
+        if close: close()
+
+    def persistent_roles(self):
+        return getattr(self.adapter, 'persistent_roles', self.profile.persistent_roles)
+
     def parameter_values(self):
         # Profile configuration parameters, not control/status/target/runtime data.
         return {f'{r.index:04x}:{r.subindex:02x}':
                 self.adapter.read_sdo(r.index, r.subindex,
                     self.adapter.od.definition(r.index, r.subindex).bit_size // 8).hex()
-                for r in self.profile.persistent_roles}
+                for r in self.persistent_roles()}
 
     def dispatch(self, request):
         op = request['op']

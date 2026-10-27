@@ -296,3 +296,53 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 - src/ethercat_slave 및 src/functional_model로 이관하고 CiA402 프로파일·F-KR Internal 어댑터·동작 모델을 분리했다. CMMT identity·ESI·확장 정보는 device_descriptions에 둔다.
 - 외부 Motion Server 모델 스냅샷 런타임 의존과 --model-root를 제거했다. 운영 .env와 저장 파라미터는 유지했다.
 - Windows/Linux Python 회귀, 800-cycle 이전 출력 비교, CTest 2개, 4축 IPC, Docker 저장값 검증·분리 network 시작/정상 종료를 통과했다. 실제 EtherCAT 혼합 라인·WKC·이동 시험은 미수행이며 RF-016을 완료로 표시하지 않는다.
+
+### 2026-10-26 CiA402 기능 모델을 장치별 패키지로 재배치
+
+- functional_model/cia402_drive 아래 profile·adapter·behaviour_model로 통합하고 공통 실행 기반은 상위에 유지했다. import·패키지 설정·테스트·문서를 갱신했다.
+- 실행 중인 Linux 컨테이너는 재시작하지 않았다. 새 이미지는 다음 컨테이너 재생성 시 적용한다.
+- 재배치 검증: Windows 53개 중 47개 통과(플랫폼 전용 6개 skip), Linux 51개 중 50개 통과(pysoem 모듈 1개 skip). 새 Docker 이미지의 임시 저장소 4축 초기화 통과. 기존 실행 컨테이너와 실제 state는 변경하지 않았다.
+
+### 2026-10-26 BUS cia402-drive / 자체 모델 f_kr_cmmt
+
+- .env·구성 검증·registry·모델 패키지·어댑터·테스트를 새 이름으로 변경했다. EtherCAT identity와 PDO는 기존 CMMT 호환 값을 유지한다.
+- 사용자 정지 확인 후 Linux state JSON 4개와 .env를 백업·이관했다. 파라미터 값과 모드, 파일 권한·소유자는 유지했다. 백업: build/rename-cia402-cmmt-20261026T092304.
+
+## 2026-10-26 — Copley FMU 1차 오프라인 구현
+
+- [RF-017](RF/RF-017-copley-fmu.md): FMI3 CS runner, Copley PP 어댑터, Linux 소스 FMU 빌드 도구 구현.
+- Stop/Halt 제외, 가상축 referenced bit15 항상 설정 합의 반영. Homing mode와 bit12를 강제 완료하지 않음.
+- 실제 Linux FMU에서 선형/회전 PP 절대·상대 이동, Enable/Disable, Fault/Reset, 파라미터 효과 및 인스턴스 독립성 통과. 기존 F-KR baseline 회귀 통과.
+- Linux 운영 컨테이너가 실행 중이어서 build/copley-offline에서만 시험. .env/저장 파라미터/운영 컨테이너 유지. 물리 시험·registry·저장소 연결·장애 격리는 후속.
+
+## 2026-10-26 — Copley 설정·Docker·저장소 통합
+
+- `copley_drive_sim` 모델 등록, `DEVICE_SIMULATOR_FMU_DIR` 및 읽기 전용 FMU 마운트 구현. 별도 파라미터 셋으로 8개 지원 파라미터 저장·복원. 모델 변경 시 기존 저장값 보호.
+- Docker FMU 추출 영역 실행 권한 문제를 `/run/fmu` 전용 exec tmpfs로 해결. 오프라인 wheel 설치 지원.
+- Windows 58개 통과/11개 skip, Linux 66개 통과/1개 skip. 실제 FMU Docker 5개 시험 및 혼합 2축 C++/Python IPC 검증 통과.
+- 운영 컨테이너 유지, Linux build/copley-offline 및 별도 validation 이미지에서 검증. 물리 연동과 IPC 장애 격리는 미완료.
+
+## 2026-10-27 — 초기화 OD 및 미지원 SDO 복구
+
+- 원인: Copley 0x2000:01=0 거부 예외가 Python 모델 서비스 및 Slave 종료로 전파됨.
+- 명령 해제 어댑터 처리 추가. SDO 실패는 IPC error → 프로젝트 C++ mailbox wrapper → 정상 Abort로 전달. KickCAT/마스터 원본 유지.
+- 실제 FMU와 mailbox의 Abort 형식·실패 후 OD 보존·정상 SDO·PDO Operation Enabled 연속 시험 통과. 물리 NIC 미사용.
+- Windows 72개 중 61개 통과/11개 skip. CTest 기존 2개 통과. Docker 재빌드 후 수동 재시험 준비. native crash/hang 격리와 물리 PySOEM 재검증은 후속.
+
+### 2026-10-27 — 메일박스 응답 길이 후속 수정
+
+물리 재시험의 초기화 OD Communication failed 원인은 FMU 변수 누락이 아니라 래퍼가 응답 backing buffer를 16바이트로 축소한 것이었다. EmulatedESC는 SM 마지막 바이트가 기록되어야 mailbox-full을 설정한다. 원래 메일박스 버퍼 크기는 보존하고 헤더 payload length만 10으로 설정하도록 수정했다.
+
+실제 Copley FMU + IPC에서 0x2194:1~4, 0x607D:1~2, 0x6081/6083/6084, 0x60A4:1, 0x607F, 0x2183:12, 0x60C5/C6 조회를 검증했다. 추가로 모든 응답을 실제 EmulatedESC의 128바이트 mailbox SM에 기록하여 mailbox-full 표시를 확인했다. 기존 Abort 및 후속 PDO 시험도 통과했다. Linux binary/Docker 이미지 갱신, 실행 중 컨테이너는 자동 재시작하지 않았다.
+
+### 2026-10-27 — Copley Halt 무시
+
+Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 및 다른 Controlword 비트 보존. 실제 FMU와 IPC 연속 처리 시험 통과, Docker 이미지 갱신. 운영 컨테이너 자동 시작/재시작 없음.
+
+### 2026-10-27 — 진행 정리 및 모델 한계 확인
+
+- RF-017에 현재 구현·배포 상태와 남은 검증을 통합 정리. 이전 검증 폴더 한정 기록과 현재 Linux 운영 소스/이미지 반영 상태를 구분.
+- Copley FMU는 외부 하중 입력, 관성/마찰/중력 모델, 하중에 필요한 모터 토크 계산을 제공하지 않음. PT는 단순 목표 토크 1차 지연 추종이고 현재 어댑터는 PP만 사용. 사용자 요청은 한계 확인이며 추가 구현은 하지 않음.
+- 지금까지의 구조 개편, Copley 실행기/어댑터, Docker/.env/저장소 통합, SDO Abort 및 mailbox/Halt 수정과 시험을 함께 커밋·푸시한다. 로컬 .env·state·FMU 바이너리·wheel·빌드 산출물은 제외.
+
+- 커밋 전 최종 Windows 회귀: 74개 중 62개 통과, Linux 전용/실제 Linux FMU 12개 skip. staged diff 공백 검사 통과. 실제 Linux FMU 및 Docker, C++ mailbox/IPC 시험 결과는 위 각 수정 기록을 참조.

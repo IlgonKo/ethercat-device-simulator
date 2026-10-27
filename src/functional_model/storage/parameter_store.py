@@ -41,7 +41,8 @@ class ParameterStore:
         return self.root / (model.device['parameter_set'] + '.json')
 
     def identity(self, model):
-        return {k: model.device[k] for k in ('type', 'model')}
+        return {'type': model.device['type'],
+                'model': {k: model.device['model'][k] for k in ('type', 'mode')}}
 
     @staticmethod
     def checksum(data):
@@ -63,7 +64,7 @@ class ParameterStore:
         if not isinstance(values, dict) or set(values) != set(expected):
             raise ValueError(f'{path}: parameter catalog mismatch')
         # Decode and validate everything before mutating the fresh model.
-        from functional_model.profiles.cia402_drive.codec import decode_od_value, encode_od_value
+        from functional_model.cia402_drive.profile.codec import decode_od_value, encode_od_value
         decoded = []
         for key, original in expected.items():
             raw = values[key]
@@ -79,6 +80,8 @@ class ParameterStore:
             if definition.access.lower() == 'ro' and raw != original:
                 raise ValueError(f'{path}: incompatible unit/scale {key}')
             decoded.append((index, sub, value))
+        validate = getattr(model.adapter, 'validate_parameters', None)
+        if validate: validate({(index, sub): value for index, sub, value in decoded})
         for index, sub, value in decoded:
             model.adapter.od.write(index, value, sub)
         return True
@@ -86,6 +89,10 @@ class ParameterStore:
     def save(self, model):
         if self.lock is None:
             raise RuntimeError('Parameter storage lock is required')
+        validate = getattr(model.adapter, 'validate_parameters', None)
+        if validate:
+            validate({(r.index, r.subindex): model.adapter.od.read(r.index, r.subindex)
+                      for r in model.persistent_roles()})
         data = dict(schema_version=1, identity=self.identity(model), values=model.parameter_values())
         data['checksum'] = self.checksum(data)
         target = self.path(model)

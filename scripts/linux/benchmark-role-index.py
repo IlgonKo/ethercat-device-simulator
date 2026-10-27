@@ -11,7 +11,7 @@ from unittest.mock import patch
 sys.path.insert(0, str(Path(__file__).resolve().parents[2] / 'src'))
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 from functional_model.runtime import axis as model_service
-from functional_model.adapters import f_kr_internal
+from functional_model.cia402_drive.adapter import f_kr_cmmt
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
         if enabled:
             model = model_service.Model()
         else:
-            with patch.object(f_kr_internal, 'install_role_index'):
+            with patch.object(f_kr_cmmt, 'install_role_index'):
                 model = model_service.Model()
         for cw in (6, 7, 15):
             model.adapter.bridge.rxpdo_payload_to_od(struct.pack('<HbiIihihB', cw, 1, 0, 100, 0, 0, 0, 0, 0))

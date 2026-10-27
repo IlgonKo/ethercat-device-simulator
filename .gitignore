@@ -8,3 +8,7 @@ __pycache__/
 /.env
 
 *.egg-info/
+
+/docker/wheels/*.whl
+/model_artifacts/*.fmu
+/model_artifacts/*.provenance.json

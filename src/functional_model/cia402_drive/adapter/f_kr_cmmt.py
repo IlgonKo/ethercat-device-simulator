@@ -1,10 +1,10 @@
-from functional_model.models.f_kr_internal.servo_model import VirtualCiA402Servo
-from functional_model.models.f_kr_internal.od_role_index import install_role_index
-from functional_model.profiles.cia402_drive.bridge import VirtualOdBridge
-from functional_model.profiles.cia402_drive.capabilities import DriveCapabilities
+from functional_model.cia402_drive.behaviour_model.f_kr_cmmt.servo_model import VirtualCiA402Servo
+from functional_model.cia402_drive.behaviour_model.f_kr_cmmt.od_role_index import install_role_index
+from functional_model.cia402_drive.profile.bridge import VirtualOdBridge
+from functional_model.cia402_drive.profile.capabilities import DriveCapabilities
 from .errors import DeviceRejectedException
 
-class FKrInternalAdapter:
+class FKrCmmtAdapter:
     capabilities = DriveCapabilities(frozenset({1, 3, 6, 8, -3}))
 
     def __init__(self, profile):

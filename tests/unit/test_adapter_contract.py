@@ -1,9 +1,9 @@
 from types import SimpleNamespace
 import struct
 import unittest
-from functional_model.adapters.contract import validate_adapter
-from functional_model.adapters.registry import create_adapter
-from functional_model.adapters.errors import DeviceRejectedException
+from functional_model.cia402_drive.adapter.contract import validate_adapter
+from functional_model.cia402_drive.adapter.registry import create_adapter
+from functional_model.cia402_drive.adapter.errors import DeviceRejectedException
 from functional_model.runtime.axis import Model
 
 class AdapterContractTests(unittest.TestCase):
@@ -17,7 +17,7 @@ class AdapterContractTests(unittest.TestCase):
 
     def test_unknown_model_is_rejected(self):
         with self.assertRaisesRegex(ValueError, 'Unsupported profile/model'):
-            create_adapter(dict(type='cmmt-as', model=dict(type='unknown', mode='linear')))
+            create_adapter(dict(type='cia402-drive', model=dict(type='unknown', mode='linear')))
 
     def test_unsupported_mode_never_mutates_od(self):
         model = Model()

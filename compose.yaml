@@ -27,6 +27,8 @@ services:
       - ${DEVICE_SIMULATOR_ENV_FILE:-.env}
     environment:
       DEVICE_SIMULATOR_STATE_DIR: /state
+      DEVICE_SIMULATOR_FMU_DIR: /model_artifacts
+      TMPDIR: /run/fmu
       KICKCAT_INTERFACE: ${KICKCAT_INTERFACE:?Set KICKCAT_INTERFACE in .env}
       DEVICE_SIMULATOR_CYCLE_STATS_LOGS: ${DEVICE_SIMULATOR_CYCLE_STATS_LOGS:-0}
       DEVICE_SIMULATOR_SESSION_TIMEOUT: ${DEVICE_SIMULATOR_SESSION_TIMEOUT:-0}
@@ -35,9 +37,15 @@ services:
       - type: bind
         source: ${DEVICE_SIMULATOR_STATE_DIR:-./state}
         target: /state
+      - type: bind
+        source: ${DEVICE_SIMULATOR_FMU_DIR:-./model_artifacts}
+        target: /model_artifacts
+        read_only: true
     tmpfs:
       - /tmp:mode=1777
       - /run/simulator:mode=0700
+      # FMU shared libraries require executable mappings after extraction.
+      - /run/fmu:mode=0700,exec
     healthcheck:
       test: [CMD, python3, /opt/simulator/docker/service.py, --healthcheck]
       interval: 5s

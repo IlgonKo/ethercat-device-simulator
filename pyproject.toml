@@ -8,13 +8,16 @@ version = "0.1.0"
 requires-python = ">=3.10"
 description = "EtherCAT Slave functional models and adapters"
 
+[project.optional-dependencies]
+fmi = ["fmpy==0.3.26"]
+
 [project.scripts]
 functional-model = "functional_model.runtime.service:main"
 
 [tool.setuptools]
 package-dir = {"" = "src", "device_descriptions" = "device_descriptions"}
-packages = ["functional_model", "functional_model.profiles", "functional_model.profiles.cia402_drive", "functional_model.adapters", "functional_model.models", "functional_model.models.f_kr_internal", "functional_model.runtime", "functional_model.ipc", "functional_model.storage", "functional_model.diagnostics", "device_descriptions", "device_descriptions.cmmt_as"]
+packages = ["functional_model", "functional_model.cia402_drive", "functional_model.cia402_drive.profile", "functional_model.cia402_drive.adapter", "functional_model.cia402_drive.behaviour_model", "functional_model.cia402_drive.behaviour_model.f_kr_cmmt", "functional_model.runtime", "functional_model.runtime.fmi", "functional_model.cia402_drive.model_definitions", "functional_model.cia402_drive.model_definitions.copley_drive_sim", "functional_model.ipc", "functional_model.storage", "functional_model.diagnostics", "device_descriptions", "device_descriptions.cmmt_as"]
 
 [tool.setuptools.package-data]
-"functional_model.profiles.cia402_drive" = ["*.json"]
+"functional_model.cia402_drive.profile" = ["*.json"]
 "device_descriptions.cmmt_as" = ["*.json", "esi/*.xml"]
