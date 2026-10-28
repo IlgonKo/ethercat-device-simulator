@@ -1,7 +1,7 @@
 # DT-008 — Diagnostic 및 Fault 처리
 
 - 합의 반영일: 2026-10-28
-- 상태: 현재 축 Fault/Reset·IPC 격리 구현 및 가상 네트워크 검증 / 관리·자동 복구 후속 보류
+- 상태: 현재 축 Fault/Reset·IPC 격리 구현 및 물리 연동 검증 완료 / 관리·자동 복구 후속 보류
 - 관련 요구: [RF-018](../RF/RF-018-diagnostic-fault.md)
 - 참조: Motion Server `docs/diagnostic/diagnostic_model.md`, `motion_server/diagnostic/{models,manager,runtime}.py`, `motion_server/app/recovery.py`
 

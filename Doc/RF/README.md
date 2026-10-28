@@ -52,4 +52,4 @@ RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모�
 
 - [RF-017 — Copley FMU 초기 연동](RF-017-copley-fmu.md): 1차 오프라인 구현·실제 Linux FMU 검증 완료. 설정·Docker·지원 파라미터 저장 통합 검증 완료. SDO Abort·메일박스·Halt 후속 수정 반영. 최종 물리 연동 재검증·일반 장애 격리 대기. 모델 한계는 RF-017 참조.
 
-- [RF-018 — 공통 Diagnostic 및 모델 장애 격리](RF-018-diagnostic-fault.md): [DT-008](../Design/DT-008-diagnostic-fault.md)의 데이터 구조·처리표 합의, 상세 정책 논의 중 / 구현 미착수.
+- [RF-018 — 공통 Diagnostic 및 모델 장애 격리](RF-018-diagnostic-fault.md): 현재 범위 완료(2026-10-28). 축 Fault/Reset·비차단 IPC, Host 정지/종료 시 통신 유지, SDO 및 수동 복구 검증. 관리·자동 복구는 후속 범위.

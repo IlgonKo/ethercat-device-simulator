@@ -1,6 +1,6 @@
 # RF-018 — 공통 Diagnostic 및 모델 장애 격리
 
-- 상태: 축 Fault/Reset 및 비차단 IPC 구현·격리 네트워크 검증 완료 / JOG Fault/PP 복원/축 Reset 수동 검증 완료 · Host 장애 물리 검증 잔여
+- 상태: 완료 — 현재 합의 범위의 Fault/Reset·Host 장애 격리 및 물리 복구 검증 완료 (2026-10-28); 관리·자동 복구 등 후속 범위 제외
 - 등록일: 2026-10-28
 - 설계 기준: [DT-008](../Design/DT-008-diagnostic-fault.md)
 
@@ -89,3 +89,64 @@ Motion Server와 동일한 Diagnostic 데이터 구조·수명 주기를 사용�
 - Motion Server의 「프로젝트 설계 및 의사결정」 스레드(01a021b7-133b-7801-a2a2-1986dbed08f9)의 개별 축 Drive Fault 대응을 기준으로 한다. Fault 최초 검출 시 해당 축의 위치 목표를 현재 위치로, 속도 지령을 0으로 정리하고 Controlword 0x0007로 운전 허가를 해제한다. Jog/Homing은 진입 전 모드로 PDO 복원하며 PP/PV/CSP는 유지한다. 자동 Reset·Enable·이전 동작 재개와 다축 연계 처리는 포함하지 않는다.
 - 이번 PP → JOG → Fault → PP 복원 → 사용자 축 Fault Reset 경로에는 시뮬레이터의 미지원 JOG Reset 예외를 추가하지 않는다. 원인 해소 후 Reset이라는 기존 정책을 유지한다.
 - 증거 수준: 사용자 수동 성공 보고. 시험 시간·주기·WKC 수치, 재Enable 후 새 이동, Host timeout/단절 및 Docker 복구의 물리 시험 결과까지 확인한 것으로 확대하지 않는다. Host 장애 격리의 자동 veth 검증과 이번 수동 축 복구 시험을 구분한다.
+
+
+### 2026-10-28 — 물리 라인 모델 정지 시험 중간 결과
+
+- 사용자 확인: 축 Fault Reset 후 별도 Enable 및 새 PP 명령으로 운전 재개하는 수동 시험도 완료.
+- 실제 Motion Server TCP 상태 조회로 기준 WKC 18/18, 6 slaves/5 axes, 전 축 속도 0 및 trajectory/homing 비활성을 확인한 후 모델 프로세스에 SIGSTOP을 전달했다. EtherCAT Slave 프로세스는 정지하지 않았다.
+- MODEL_RESPONSE_TIMEOUT 진단과 Slave 생존을 확인했다. SIGCONT 후 모델은 PDO gap 오류 및 닫힌 IPC 연결의 BrokenPipeError로 종료됐으나 Slave는 계속 실행됐다. 이 경로는 모델 자동 복구 성공을 의미하지 않는다.
+- 장애 후 약 11.45초 동안 bus/status 100회 조회에서 WKC 18/18, 불일치 표본 0. 가상축 4개의 Fault bit 설정 및 Operation Enabled 해제, 실제 축 Fault bit 미설정을 확인했다.
+- 한계: 관측용 TCP 연결이 장애 전환 중 끊겨 연속 관측이 누락됐다. 위 수치는 주기별 전체 프레임 통계가 아닌 상태 조회 표본이며 전환 순간 WKC 무손실을 입증하지 않는다. 정상 세션에서 SIGKILL하는 독립 종료 시험은 재시작·버스 초기화 후 진행 예정.
+- 원본 상태 표본: 로컬 ignored build/diagnostics/rf018-physical/timeout.json 및 post-timeout.json. SIGCONT 후 BrokenPipe traceback은 별도 진단 정리 검토 항목이며 이번에는 실행 코드를 변경하지 않았다.
+
+
+### 2026-10-28 — 물리 라인 모델 강제 종료 시험 완료
+
+- 사용자가 Docker 재시작 및 Motion Server 버스 초기화를 완료한 새 세션에서 시험했다. 시작 전 WKC=18/18, 6 slaves/5 axes, 축 Fault 없음, 실제 속도 전 축 0, trajectory/homing 비활성을 확인했다.
+- 모델 프로세스에만 SIGKILL을 전달했다. MODEL_HOST_DISCONNECTED가 검출되고 supervisor에서 모델 exit_code=-9를 확인했다. EtherCAT Slave는 동일 PID로 살아 있었으며 재시작하지 않았다.
+- 종료 전 3초와 종료 요청 이후 25초를 포함한 약 28.01초 동안 TCP bus/status 638회 조회에서 WKC는 모두 18/18이었다. 관측 연결 오류는 0건이었다. 가상축 4개는 Fault bit 설정·Operation Enabled 해제, 실제 축은 Fault bit 미설정을 확인했다.
+- 이번 결과는 실제 NIC/혼합 버스에서 모델 종료 후 EtherCAT 통신 유지의 성공 근거다. 약 40ms 간격 상태 조회 표본이므로 모든 EtherCAT 주기의 WKC 무손실이나 최악 지연을 증명하는 결과로 해석하지 않는다. 앞선 SIGSTOP 시험의 전환 순간 관측 누락은 별도 한계로 남는다.
+- 관측 클라이언트가 SSH 작업 중에도 heartbeat에 응답하도록 수신 경로를 분리했다. 이번 시험에서 TCP 관측 단절은 재현되지 않았다.
+- 원본 증거: ignored build/diagnostics/rf018-physical/kill-samples.json, kill-summary.json. Windows/Linux 시계 차이가 있어 양쪽 타임스탬프를 직접 빼서 검출 지연을 산출하지 않는다.
+- 시험 후 모델은 종료 상태, Slave는 생존 및 가상축 Fault 유지 상태로 남겼다. 자동 Docker 재시작·Reset·Enable·이동 명령은 수행하지 않았다. 장애 중 SDO 및 축 Reset 거부의 물리 검증은 이번 시험에 포함하지 않는다.
+
+
+### 2026-10-28 — Host 장애 중 물리 SDO 조회 확인
+
+- 사용자가 재시작한 정상 세션에서 모델 SIGKILL 장애를 다시 주입했다. 실제 속도 0·동작 비활성을 먼저 확인했고, 약 28.03초 동안 상태 조회 638회 WKC 18/18 및 동일 Slave PID 생존을 재확인했다.
+- Motion Server API로 Master axis=3(virtual-axis-2)의 0x6041:0 uint16 조회 성공: 33304 / 0x8218, Fault bit 설정.
+- 동일 축 0x6081:0 uint32 조회는 DEVICE_REJECTED, device_code=134217728(0x08000000)으로 정상 SDO Abort 전달. 모델이 없어도 메일박스 응답 및 EtherCAT 통신이 유지됐다.
+- 시험 클라이언트의 조작권 요청은 AUTHORITY_BUSY(owner=1)로 거부됐다. 따라서 축 Reset은 아직 송신하지 않았으며, 조작권 해제 후 별도 확인해야 한다. 이 거부를 장치 Fault Reset 거부로 해석하지 않는다.
+- 원본 응답: ignored build/diagnostics/rf018-physical/sdo-reset.json. 실행 코드는 변경하지 않았다. 모델 종료·Slave 생존·가상축 Fault 상태를 유지한다.
+
+
+### 2026-10-28 — Host 장애 중 축 Fault Reset 해제 불가 확인
+
+- 사용자 조작권 해제 후 테스트 클라이언트가 조작권을 정상 획득하고 Master axis=3(virtual-axis-2)에 system/axis/fault_reset 1회를 요청했다. Enable·이동·Docker 재시작은 요청하지 않았다. 시험 후 조작권 반환 성공(owner=null)을 확인했다.
+- Reset 전후 Statusword는 0x8218로 동일하며 Fault bit 유지·Operation Enabled 해제를 확인했다. 이후 상태 조회 20회에서도 동일 조건과 WKC 18/18을 확인했다. 모델 프로세스는 종료 상태이고 Slave 프로세스는 계속 생존했다.
+- Motion Server API 응답은 result=success, message="Axis Fault Reset completed.", fault_count=1이었다. 이는 Reset 명령 처리 완료이며 장치 Fault 해제 성공이 아니다. 이번 시험의 합격 기준은 실제 Statusword Fault 유지다. API 수준 실패/거부 응답이 반환됐다고 기록하지 않는다.
+- 같은 세션에서 0x6041 읽기 성공(0x8218), 0x6081 읽기 정상 Abort(0x08000000)도 재확인했다. 증거: ignored build/diagnostics/rf018-physical/sdo-reset.json 및 reset-followup.json.
+- 결과: Host 장애가 축 Reset으로 해제되지 않는 물리 검증 완료. 수동 Docker 재시작·버스 초기화로 복구해야 하며, 현재 시험 종료 시점에는 Fault 상태로 유지했다.
+
+
+### 2026-10-28 — 사용자 Docker 재시작 후 정상 연결 복구 확인
+
+- 사용자가 Docker 재시작 및 Motion Server 재연결을 수행한 후 읽기 전용 조회로 확인했다. 컨테이너 healthy, 신규 모델/Slave 프로세스 실행 및 CMMT_READY slaves=4를 확인했다.
+- Motion Server initialized=true, runtime_state=normal, initialization_failure=null, diagnostic 정상. 통신 주기 0.004초, 6 slaves/5 axes 구성.
+- bus/status 30회 조회 모두 WKC=18/18, 축 Fault 표본 0. 전 축 PP, 실제 속도 0, trajectory/homing idle. 가상축 현재 위치는 모두 0으로 조회됐다.
+- 관측 시 전 축 Statusword에 Operation Enabled가 설정돼 있었다. 이번 확인에서는 Enable/이동 명령을 보내지 않았으며, 관측값만으로 사용자 Enable 여부나 초기화 중 자동 Enable 여부를 판정하지 않는다. 따라서 재시작 후 자동 Enable 방지의 합격 근거로 사용하지 않는다.
+- 정상 연결·모델 재기동·Fault 해제까지 복구 확인 완료. 이 재시작 세션의 새 PP 이동 시험은 수행하지 않았다. 증거: ignored build/diagnostics/rf018-physical/recovery.json.
+
+
+### 2026-10-28 — 모델 SIGSTOP 전환 재검증 및 현재 범위 완료
+
+- 사용자 수동 확인: 재시작 후 Enable 경로 및 초기화 위치 기준 새 PP 이동(완료 전 확인 항목 1·2) 검증 완료 보고를 받았다. 개별 조작 순서의 계측 로그는 별도 수집하지 않았다.
+- 정상 버스·축 Fault 없음·전 축 실제 속도 0·trajectory/homing 비활성을 확인한 뒤 모델에만 SIGSTOP을 전달했다. TCP heartbeat 수신을 독립 처리하여 SSH 조작 중에도 관측 연결을 유지했다.
+- 약 3초 기준 구간, 15초 정지/timeout 관측, SIGCONT 후 5초를 포함해 약 23.32초 동안 bus/status 1,908회 조회. WKC 불일치 0, 모든 표본 18/18, 관측 연결 오류 0. 전환 구간의 이전 TCP 단절 문제는 재현되지 않았다.
+- Linux 동일 시계 기준 SIGSTOP 시각 1793158859.4433532, MODEL_RESPONSE_TIMEOUT 검출 1793158859.5433724: 약 100.02ms. 이는 이 시험의 로그 기반 관측값이며 최악 응답시간 보장은 아니다.
+- Slave 동일 PID 생존, 가상축 4개 Fault 및 Operation Enabled 해제, 실제 축 Fault 미설정 확인. SIGCONT 후에도 자동 Fault 해제·운전 재개 없음. 모델은 닫힌 IPC 세션에서 종료됐고 Slave는 유지됐다.
+- 상태 조회는 약 10ms 대기 간격의 표본 관측이다. 모든 4ms EtherCAT 프레임의 WKC 무손실을 입증하는 전수 캡처는 아니며, 이를 이번 완료 범위에 추가하지 않는다.
+- 증거: ignored build/diagnostics/rf018-physical/stop-retest-summary.json 및 stop-retest-samples.json.
+- 결론: 합의한 현재 범위의 RF-018 검증 완료. 축 Fault/Reset, 원인 미해소 시 Fault 유지, Host 장애 중 Slave/통신 유지, 장애 중 SDO 응답, 수동 재시작 복구와 운전 재개를 확인했다. 관리 API·Model/Slave Recovery·위치 수락·비PP 장애 후 재개·다축 연계는 후속 범위다. 재개 시 BrokenPipe traceback 정리는 알려진 후속 개선 사항이며 Slave 유지 합격을 무효화하지 않는다.
+- 시험 종료 상태: 모델 종료, Slave 생존, 가상축 Fault 유지. 정상 운전 복귀에는 사용자 Docker 재시작 및 Motion Server 버스 초기화가 필요하다. 이번 검증에서는 Enable·이동·자동 재시작을 요청하지 않았다.
