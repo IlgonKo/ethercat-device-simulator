@@ -40,6 +40,10 @@ class ParameterStore:
     def path(self, model):
         return self.root / (model.device['parameter_set'] + '.json')
 
+    @staticmethod
+    def schema_version(model):
+        return 2 if model.device["model"]["type"] == "f_kr_cmmt" else 1
+
     def identity(self, model):
         return {'type': model.device['type'],
                 'model': {k: model.device['model'][k] for k in ('type', 'mode')}}
@@ -57,7 +61,7 @@ class ParameterStore:
         digest = data.pop('checksum')
         if self.checksum(data) != digest:
             raise ValueError(f'{path}: checksum mismatch')
-        if type(data['schema_version']) is not int or data['schema_version'] != 1 or data['identity'] != self.identity(model):
+        if type(data['schema_version']) is not int or data['schema_version'] != self.schema_version(model) or data['identity'] != self.identity(model):
             raise ValueError(f'{path}: incompatible parameter schema/type/model/mode')
         expected = model.parameter_values()
         values = data['values']
@@ -93,7 +97,7 @@ class ParameterStore:
         if validate:
             validate({(r.index, r.subindex): model.adapter.od.read(r.index, r.subindex)
                       for r in model.persistent_roles()})
-        data = dict(schema_version=1, identity=self.identity(model), values=model.parameter_values())
+        data = dict(schema_version=self.schema_version(model), identity=self.identity(model), values=model.parameter_values())
         data['checksum'] = self.checksum(data)
         target = self.path(model)
         fd, temporary = tempfile.mkstemp(prefix='.' + target.name, dir=self.root)

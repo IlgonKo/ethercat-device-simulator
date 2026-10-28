@@ -11,6 +11,8 @@ class FKrCmmtAdapter:
         self.profile = profile
         self.model = VirtualCiA402Servo(cycle_time=0.01, device_profile=profile)
         self.od = self.model.od
+        self.persistent_roles = profile.persistent_roles + tuple(
+            r for r in profile.pdo_configuration.rx if (r.index, r.subindex) == (0x6081, 0))
         install_role_index(self.od)
         self.bridge = VirtualOdBridge(self.od, profile.pdo_configuration)
 

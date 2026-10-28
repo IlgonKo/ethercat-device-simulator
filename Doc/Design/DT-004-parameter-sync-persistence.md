@@ -78,3 +78,8 @@ parameter_set은 preset 초기값이 아닌 영구 저장 공간의 논리 이�
 ## 초기 구현 경계
 
 RF-011 연계 초기 구현은 NON_PDO_CONFIGURATION_OD_ROLES 20개 값만 저장한다. 0x2005:03=1 및 0x2005:01=1 요청을 수신하면 파일 저장이 완료된 후 성공 상태를 설정한다. 미지원 selection·저장 실패는 성공으로 처리하지 않으며 현재 IPC는 fail-closed다. 정상 오류 Abort 호환성은 TD-001의 잔여 작업이다. 운전 상태 복원, 전체 OD 저장, 0x2000 reset 의미 변경, revision 이력/관리 API는 이번 구현에 포함하지 않는다. 자세한 검증 경계는 RF-010을 따른다.
+
+
+## 2026-10-28 현재 구현·사용자 결정
+
+현재 설정은 .env 및 DEVICE_SIMULATOR_STATE_DIR=./state다. 이전 구성 JSON 및 state/parameters 예시는 이력이다. F-KR CMMT와 Copley 모두 Profile Velocity(0x6081)를 영구 저장한다. F-KR은 스키마 2로 명시적 이관하고 Copley는 스키마 1을 유지한다. 기존 F-KR 파일에는 속도값이 없으므로 사용자 지정 raw 100을 cmmt-0/1에 추가하며 나머지 값을 보존한다. 이관은 잠금·검증·원본 백업·원자적 저장으로 수행하며 서비스 시작 시 자동 이관하지 않는다. 상세 절차와 검증 범위는 RF-010을 따른다.

@@ -472,3 +472,37 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 증거: ignored build/diagnostics/rf018-physical/stop-retest-summary.json 및 stop-retest-samples.json.
 - 결론: 합의한 현재 범위의 RF-018 검증 완료. 축 Fault/Reset, 원인 미해소 시 Fault 유지, Host 장애 중 Slave/통신 유지, 장애 중 SDO 응답, 수동 재시작 복구와 운전 재개를 확인했다. 관리 API·Model/Slave Recovery·위치 수락·비PP 장애 후 재개·다축 연계는 후속 범위다. 재개 시 BrokenPipe traceback 정리는 알려진 후속 개선 사항이며 Slave 유지 합격을 무효화하지 않는다.
 - 시험 종료 상태: 모델 종료, Slave 생존, 가상축 Fault 유지. 정상 운전 복귀에는 사용자 Docker 재시작 및 Motion Server 버스 초기화가 필요하다. 이번 검증에서는 Enable·이동·자동 재시작을 요청하지 않았다.
+
+
+### 2026-10-28 — RF-016/017 대조 및 RF-010 Profile Velocity 저장 통일
+
+- RF-016/017/012의 물리 연동·장애 격리 미착수 표기를 RF-018 증거로 갱신했다. 기존 성능·세부 이동·저장 완료 기준을 임의로 삭제하거나 RF 전체 완료로 확대하지 않았다.
+- 격리 Docker 기존 구성/저장 25개 통과. 임시 bind 저장소를 두 컨테이너에서 사용하여 저장/미저장 경계 및 실행 상태 미복원 확인. 이 시험 중 F-KR에서 0x6081이 저장 목록에 없는 차이를 발견했다.
+- 사용자 결정으로 두 모델 모두 0x6081 영구 저장. F-KR 21개 OD/스키마 2, Copley 8개 OD/스키마 1 유지. 자동 구형 입력 허용 대신 명시적 이관 도구·원본 백업·엄격한 검증을 추가했다.
+- Windows 관련 28개, 새 Linux 이미지 실제 Copley 포함 29개 통과. 잘못된 입력·목록, 원본 보존, 저장 실패, 이관 재실행, SDO 저장 후 새 인스턴스 복원 테스트 포함.
+- Linux 운영 모델 프로세스가 종료돼 저장소 잠금을 해제한 상태에서 사용자 지정값 raw 100으로 cmmt-0/1을 이관했다. 원본은 state/cmmt-0.json.schema1.bak 및 cmmt-1.json.schema1.bak. 읽기 전용 검증 컨테이너에서 모든 기존값 보존 및 새 스키마 로드 성공 확인. Copley 운영 파일은 수정하지 않았다.
+- 새 ethercat-device-simulator:dev 이미지 빌드 완료. 실행 중 Slave/기존 컨테이너는 교체하지 않았다. 단순 restart는 이전 이미지를 사용하므로 시작 스크립트로 재생성해야 한다. Motion Server 정지 후 전환 및 물리 SDO 저장·초기화 후 readback 검증 대기.
+- Motion Server 초기화에서 저장 Profile Velocity readback을 PDO에 반영하는 코드와 0x000F 자동 Enable 단계를 확인했다. 저장소의 실행 상태 미복원과 Master 초기화 동작은 별개이며 서버 코드는 변경하지 않았다.
+
+
+### 2026-10-28 — Profile Velocity 저장 이미지 운영 전환
+
+사용자 정지 완료 응답 후 scripts/docker/start.sh로 컨테이너를 새 이미지로 재생성했다. 컨테이너 healthy 및 모델/Slave 신규 프로세스 기동을 확인했다. 저장 파일 cmmt-0/1의 6081:00은 64000000(raw 100)이다. Motion Server는 TCP listener가 남아 있고 bus_disconnected 상태였으므로 새 버스 연결 완료를 확인한 것으로 기록하지 않는다. 사용자에게 재연결·초기화를 요청했으며 그 이후 물리 SDO readback 검증 대기다. 이동·Enable 명령은 보내지 않았다.
+
+
+### 2026-10-28 — 새 이미지 Master 초기화 후 물리 SDO readback
+
+사용자 버스 재연결 완료 후 Motion Server API를 통해 실제 SDO를 조회했다. Master axis=1/2(F-KR virtual-axis-0/1)의 0x6081:0 uint32 모두 100(0x00000064)을 반환했다. 새 이미지에서 저장 파일 복원 후 Master 초기화와 주기 PDO 통신을 거쳐도 속도값이 유지됨을 확인했다. 서버 initialized=true/runtime_state=normal, 4ms 주기, 6 slaves/5 axes, 상태 조회 21회 모두 WKC 18/18 및 Fault 없음. 이동·Enable·파라미터 쓰기는 요청하지 않았다.
+
+증거: ignored build/diagnostics/rf010-physical/startup-readback.json. 이번 값의 출처는 명시적 파일 이관이다. 실제 EtherCAT SDO 변경·저장 명령 후 재시작 복원 시험까지 수행한 것으로 확대하지 않는다. 해당 write/save/recreate/readback 경로는 다음 검증이다.
+
+
+### 2026-10-28 — 실제 SDO 변경·저장·컨테이너 재생성 복원 시험
+
+- 사전 확인: 조작권 사용 가능, 전 축 실제 속도 0, trajectory/homing idle, WKC 18/18. 대상은 Master axis=1(F-KR virtual-axis-0/cmmt-0), axis=3(Copley virtual-axis-2/copley-2)로 한정했다. 변경 전 0x6081 값은 두 축 모두 raw 100이며 로컬 증거에 보관했다.
+- system/axis/profile을 사용해 F-KR raw 111, Copley raw 123으로 설정했다. 해당 서버 경로는 0x6081 SDO 쓰기와 RxPDO 속도 갱신을 함께 수행하므로 순환 PDO에 의한 기존값 덮어쓰기를 방지한다. system/axis/param_read로 실제 SDO readback 후 system/axis/param_save를 요청하고 재조회했다. 모두 성공.
+- scripts/docker/start.sh로 컨테이너를 새로 생성하고 system/bus/reconnect로 버스를 초기화했다. 이후 실제 SDO readback이 F-KR 111, Copley 123으로 유지됨을 확인했다. 따라서 파일 이관만이 아닌 물리 쓰기·저장·재생성·Master 초기화 경로 검증이다.
+- 시험 완료 후 동일 API로 두 축의 속도를 raw 100으로 복원·저장하고 SDO readback 및 운영 JSON에서 64000000을 확인했다. 다른 가상축의 저장 속도도 100이다. 복원 후 추가 재생성은 하지 않았다. 시험 조작권 반환 완료. 이동 명령과 별도 Enable 요청은 보내지 않았다.
+- 통신은 WKC 18/18이며 가상축 Fault 없음. 단, 재연결 후 실제 축 A0에 Fault가 발생/관측됐다: 0x6041=0x8638, 0x603F=0x8188. 실제 축에 Reset이나 파라미터 쓰기는 하지 않았다. 오류 원인은 이번 시험에서 확정하지 않았으며 전체 장비 정상 상태로 보고하지 않는다. 서버 reconnect 초기화가 실제 축에도 영향을 준다는 경계를 유지한다.
+- 증거(ignored): build/diagnostics/rf010-physical/save-original.json, save-write.json, save-reconnect.json, save-verify.json, save-restore.json, post-reconnect-real-axis-diagnostic.json.
+- 결과: 두 모델의 0x6081 물리 저장·재생성 복원 및 Master 초기화 후 유지 검증 통과. RF-010 전체의 관리 API·실제→가상 동기화·revision/백업 정책 등은 완료 처리하지 않는다.

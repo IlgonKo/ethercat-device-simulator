@@ -1,7 +1,7 @@
 # RF-012 — Simulator Docker 패키징 및 실행 검증
 
 - 등록일: 2026-09-15
-- 상태: Docker/.env 실행 초기 구현 및 컨테이너 수명 주기 검증 완료, 물리 PDO·영구 저장 회귀 및 장애 격리 후속
+- 상태: Docker/.env 및 물리 통신·모델 장애 격리 검증 반영 / 저장·배포 세부 기준 확인 중
 - 설계: [DT-006](../Design/DT-006-docker-deployment.md)
 - 연계: RF-003/004 기존 단축 통신, RF-005 혼합 버스, RF-010 저장, RF-011 구성
 
@@ -113,3 +113,8 @@ RF-005 기본 3 Slave 완료를 선행 근거로 사용하되 컨테이너 및 E
 scripts/docker/start.sh [--build], stop.sh, build.sh, validate.sh, status.sh, logs.sh를 제공한다. Motion Server의 start/stop 사용 방식을 참고하되 start는 이미지 빌드 성공 후 컨테이너를 재생성하고 healthcheck를 최대 30초 기다린다. 실패 시 최근 로그를 출력하고 실패 코드를 반환한다. --build는 이미지 빌드이며 native C++ 빌드까지 수행하지 않는다.
 
 삭제한 11개 native/Board/Windows 통합 진입점과 유지한 빌드/오프라인/시험 의존 도구는 [scripts 목록](../../scripts/README.md)을 따른다. 이 삭제로 기존 물리 진단 자동화가 Docker용으로 이식된 것은 아니다. 물리 PDO/WKC 회귀는 여전히 후속이다. 현재 주 실행 경로는 Docker이며 Master·Panel은 각 패키지에서 별도로 실행한다.
+
+
+## 2026-10-28 검증 근거 갱신
+
+RF-018의 운영 Docker 물리 통신·모델 종료/정지 중 Slave 생존·수동 재시작 결과를 참조한다. 모델 장애 격리를 미구현으로 간주하지 않는다. RF-010에서 별도 --network none 컨테이너를 제거하고 같은 임시 bind 저장소로 새 컨테이너를 생성하여 저장값 복원과 미저장 변경 폐기를 확인했다. 이 검증은 물리 SDO·Motion Server 재연결 경로 및 다른 버전 이미지 교체 시험을 대체하지 않는다. 서비스/Slave 자체 실패 시 정리, 배포 재현성·NIC 권한·성능 비교 등 나머지 완료 기준은 유지한다.

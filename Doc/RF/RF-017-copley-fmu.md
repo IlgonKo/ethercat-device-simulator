@@ -1,6 +1,6 @@
 # RF-017 — Copley FMU 초기 연동
 
-상태: **설정·Docker·저장소 통합 검증 완료 / 물리 EtherCAT 연동 대기** (2026-10-26)
+상태: **기본 물리 PP·Fault/Reset 및 RF-018 장애 격리 검증 반영 / 세부 이동·혼합 성능 검증 잔여** (2026-10-28)
 
 ## 현재 상태 요약 (2026-10-27)
 
@@ -185,3 +185,11 @@ PT 계산은 `torque += (targetTorque - torque) * dt / max(TorqueTimeConstant, d
 ## 후속 장애 격리 설계 (2026-10-28)
 
 공통 Diagnostic 데이터 구조 및 오류별 정책은 [DT-008](../Design/DT-008-diagnostic-fault.md), 구현 추적은 [RF-018](RF-018-diagnostic-fault.md)으로 분리한다. 응답 제한 시간·복구 명령·재Enable 정책은 아직 확정하지 않았다.
+
+
+## 2026-10-28 현재 상태 갱신 — 이전 단계 기록보다 우선
+
+- RF-018 완료로 crash/hang/IPC 단절·timeout 격리, 물리 WKC 유지, 정상 SDO Abort, 축 Reset 및 Docker 재시작 후 복구를 확인했다. 이를 다시 미구현 작업으로 요구하지 않는다.
+- 사용자가 새 PP 이동 및 Fault Reset 후 복귀를 확인했다. 절대/상대 이동 각각의 정량 결과·파라미터 변화의 물리 효과·혼합 4축 장시간 성능은 기존 보고로 확대 인정하지 않는다.
+- 남은 범위: 위 세부 물리 항목의 증거 확보 및 명시적 합격 시간/주기 결정. 기존 오프라인 PP/단위/저장 테스트는 유효하다.
+- RF-010과 함께 격리 Docker에서 실제 Copley/F-KR 혼합 저장·복원을 재검증했다. 운영 state는 해당 시험에 사용하지 않았다.
