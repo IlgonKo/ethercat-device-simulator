@@ -6,8 +6,7 @@ from functional_model.diagnostics.python_timing import stamp
 MAX_MESSAGE = 1024 * 1024
 
 def dispatch_request(model, request):
-    # Only rejected SDO operations are recoverable here. Model/cycle faults are
-    # not silently converted into successful or stale process data.
+    # Axis runtime projects cycle failures as explicit Fault feedback.
     if request.get('op') not in ('read', 'write'):
         return model.dispatch(request)
     from functional_model.cia402_drive.adapter.errors import DeviceRejectedException, SdoObjectNotFoundException
@@ -18,6 +17,8 @@ def dispatch_request(model, request):
         elif isinstance(exc, (SdoObjectNotFoundException, KeyError)): code = 0x06020000
         else: code = 0x06090030
         return {'error': {'kind': 'sdo_abort', 'code': code, 'message': str(exc)}}
+    except OSError as exc:
+        return {'error': {'kind': 'sdo_abort', 'code': 0x08000020, 'message': str(exc)}}
 
 
 def serve(model, path, timing=None):
@@ -32,7 +33,7 @@ def serve(model, path, timing=None):
             conn,_=server.accept()
             with conn,conn.makefile('rwb') as stream:
                 # The owning session bounds lifetime; an idle EtherCAT link is
-                # not by itself an IPC failure. Client RPCs have a 1 s timeout.
+                # not by itself an IPC failure. Client RPC deadline is bounded.
                 conn.settimeout(None)
                 while True:
                     raw=stream.readline(MAX_MESSAGE+1)

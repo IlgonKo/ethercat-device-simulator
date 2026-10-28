@@ -1,5 +1,6 @@
 #pragma once
 #include <functional>
+#include <future>
 #include <map>
 #include <set>
 #include <nlohmann/json.hpp>
@@ -9,6 +10,7 @@ namespace cmmt {
 struct SdoGateway {
     std::set<std::pair<uint16_t,uint8_t>> entries;
     std::function<nlohmann::json(nlohmann::json)> request;
+    std::function<std::shared_future<nlohmann::json>(nlohmann::json)> submit;
 };
 // Registered once at startup; mailbox processing runs on the Slave thread.
 inline std::map<kickcat::mailbox::response::Mailbox*, SdoGateway> sdoGateways;

@@ -5,6 +5,8 @@ import hashlib
 import json
 from functional_model.cia402_drive.adapter.registry import create_adapter
 from functional_model.diagnostics.python_timing import stamp
+from functional_model.diagnostics.fault import AxisFault, Diagnostic
+from functional_model.cia402_drive.adapter.errors import DeviceRejectedException
 
 TYPES = {'uint8': 'USINT', 'int8': 'SINT', 'uint16': 'UINT', 'int16': 'INT',
          'uint32': 'UDINT', 'int32': 'DINT', 'float32': 'REAL'}
@@ -36,6 +38,8 @@ class Model:
         self.last_cycle = None
         self.cycles = 0
         self.source_hash = source_hash()
+        self.fault_state = AxisFault(self.device['slave_index'], self.adapter.read_inputs())
+        self.save_diagnostic = None
 
     def describe(self):
         catalog = self.profile.esi_catalog
@@ -68,6 +72,68 @@ class Model:
 
     def dispatch(self, request):
         op = request['op']
+        guard = self.fault_state
+        if op == 'read' and request['index'] == 0x6041 and request['subindex'] == 0:
+            if guard.phase != 'normal':
+                return {'data': guard.response()['data'][:4]}
+        if guard.restart_required and op in ('read', 'write'):
+            return {'error': {'kind': 'sdo_abort', 'code': 0x08000022,
+                              'message': 'Model requires manual Docker restart'}}
+        if op not in ('cycle', 'idle'):
+            try:
+                return self._dispatch(request)
+            except OSError as exc:
+                if op == 'write' and (request.get('index'), request.get('subindex')) == (0x2005, 1):
+                    # Storage failures do not invalidate an otherwise running model.
+                    raise
+                guard.detect('AXIS_MODEL_EXECUTION_FAILED', str(exc), restart=True)
+                return {'error': {'kind': 'sdo_abort', 'code': 0x08000000,
+                                  'message': 'Model access failed; manual restart required'}}
+            except (DeviceRejectedException, KeyError, ValueError):
+                raise
+            except Exception as exc:
+                guard.detect('AXIS_MODEL_EXECUTION_FAILED', str(exc), restart=True)
+                return {'error': {'kind': 'sdo_abort', 'code': 0x08000000,
+                                  'message': 'Model execution failed; manual restart required'}}
+        resetting = False
+        try:
+            if op == 'cycle':
+                payload = bytes.fromhex(request['data'])
+                if len(payload) != self.rx_size:
+                    raise DeviceRejectedException('RxPDO length mismatch')
+                payload, resetting = guard.prepare(payload)
+                if payload is None:
+                    self.last_cycle = None
+                    return guard.response()
+                if resetting:
+                    self.last_cycle = None
+                    if guard.fault.value['definition']['code'] == 'AXIS_ADAPTER_FAULT':
+                        # The model may still be internally enabled after a rejected
+                        # PDO. Disable it before pulsing reset; never step old motion.
+                        self.adapter.apply_outputs(b'\x00\x00' + payload[2:])
+                        self.adapter.step(.002)
+                request = dict(request, data=payload.hex())
+            elif guard.phase != 'normal':
+                self.last_cycle = None
+                return guard.response()
+            result = self._dispatch(request)
+            try:
+                guard.accept(bytes.fromhex(result['data']), resetting)
+            except (ValueError, TypeError, KeyError) as exc:
+                guard.detect('AXIS_MODEL_OUTPUT_INVALID', str(exc), restart=True)
+                self.last_cycle = None
+        except DeviceRejectedException as exc:
+            guard.detect('AXIS_ADAPTER_FAULT', str(exc))
+            self.last_cycle = None
+        except Exception as exc:
+            guard.detect('AXIS_MODEL_EXECUTION_FAILED', str(exc), restart=True)
+            self.last_cycle = None
+        if guard.phase == 'normal' and guard.fault is None:
+            return result
+        return dict(guard.response(), cycles=self.cycles)
+
+    def _dispatch(self, request):
+        op = request['op']
         if op == 'describe':
             return self.describe()
         if op in ('read', 'write'):
@@ -80,7 +146,18 @@ class Model:
             payload = bytes.fromhex(request['data'])
             if len(payload) != entry['bits'] // 8:
                 raise ValueError('SDO length mismatch')
-            save = (lambda: self.store.save(self)) if self.store else None
+            def save_parameters():
+                try:
+                    self.store.save(self)
+                except Exception as exc:
+                    if self.save_diagnostic is None:
+                        self.save_diagnostic = Diagnostic('PARAMETER_SAVE_FAILED', self.device['slave_index'],
+                                                          str(exc), latching=False, level='alarm')
+                    raise OSError(str(exc)) from exc
+                if self.save_diagnostic:
+                    self.save_diagnostic.resolve()
+                    self.save_diagnostic = None
+            save = save_parameters if self.store else None
             self.profile.description.write_sdo(self.adapter, index, sub, payload,
                                               entry['access'], save)
             return {}

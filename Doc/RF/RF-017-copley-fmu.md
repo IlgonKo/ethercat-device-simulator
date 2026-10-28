@@ -181,3 +181,7 @@ PT 계산은 `torque += (targetTorque - torque) * dt / max(TorqueTimeConstant, d
 따라서 현재 모델은 드라이브 제어 인터페이스와 단순 이동 응답을 검증하는 용도다. 실제 기계의 부하·토크 성능 예측 모델로 간주하지 않는다. 향후 CMMT FMU도 FMI 준수 여부와 별도로 실제 모델링 범위를 확인해야 한다. 이번 한계 확인으로 새 구현 항목은 추가하지 않는다.
 
 근거: 검토 revision `68978af04ea475cf89e39ae872cdccb5ddc95e4c`의 modelDescription.xml 및 copley_drive_sim_step.m. 소스 FMU 빌드의 revision/hash는 위 재현 절차에 고정한다.
+
+## 후속 장애 격리 설계 (2026-10-28)
+
+공통 Diagnostic 데이터 구조 및 오류별 정책은 [DT-008](../Design/DT-008-diagnostic-fault.md), 구현 추적은 [RF-018](RF-018-diagnostic-fault.md)으로 분리한다. 응답 제한 시간·복구 명령·재Enable 정책은 아직 확정하지 않았다.

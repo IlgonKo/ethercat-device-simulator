@@ -51,3 +51,5 @@ RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모�
 - [RF-016 — CiA402 Drive 프로파일 및 F-KR Internal 어댑터](RF-016-cia402-profile-adapter.md): 구조 이관·오프라인 검증 완료 / 물리 버스 회귀 대기.
 
 - [RF-017 — Copley FMU 초기 연동](RF-017-copley-fmu.md): 1차 오프라인 구현·실제 Linux FMU 검증 완료. 설정·Docker·지원 파라미터 저장 통합 검증 완료. SDO Abort·메일박스·Halt 후속 수정 반영. 최종 물리 연동 재검증·일반 장애 격리 대기. 모델 한계는 RF-017 참조.
+
+- [RF-018 — 공통 Diagnostic 및 모델 장애 격리](RF-018-diagnostic-fault.md): [DT-008](../Design/DT-008-diagnostic-fault.md)의 데이터 구조·처리표 합의, 상세 정책 논의 중 / 구현 미착수.

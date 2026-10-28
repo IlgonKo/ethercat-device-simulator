@@ -346,3 +346,68 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 지금까지의 구조 개편, Copley 실행기/어댑터, Docker/.env/저장소 통합, SDO Abort 및 mailbox/Halt 수정과 시험을 함께 커밋·푸시한다. 로컬 .env·state·FMU 바이너리·wheel·빌드 산출물은 제외.
 
 - 커밋 전 최종 Windows 회귀: 74개 중 62개 통과, Linux 전용/실제 Linux FMU 12개 skip. staged diff 공백 검사 통과. 실제 Linux FMU 및 Docker, C++ mailbox/IPC 시험 결과는 위 각 수정 기록을 참조.
+
+## 2026-10-28 — Diagnostic/Fault 설계 합의 반영
+
+- DT-008에 Motion Server와 동일한 데이터 계약·수명 주기, 오류별 검출 책임/영향 범위/상태 반영/Resolve 조건을 기록. RF-018에 후속 작업 등록.
+- 미지원 요청과 지속 Fault, 모델 자체 Fault와 내부 실행 장애, 축 단위와 Host 단위 장애를 구분.
+- 구현 전 남은 결정: 관리 인터페이스와 Fault Reset 범위, 피드백·재Enable, 검출 수치 및 잘못된 PDO, 이벤트 소유권/전달, 이력 보관. 32ms 제한이나 자동 복구는 미확정.
+- 문서만 수정. 실행 코드·컨테이너·사용자 설정·저장 파라미터 변경 없음.
+
+### 2026-10-28 — Fault Reset 및 Recovery 역할 보완
+
+- DT-008/RF-018에 어댑터·모델 드라이브 Fault를 처리하는 축 Fault Reset, Model Recovery, Master의 EtherCAT AL 오류 확인·상태 복구, Slave Recovery 및 전체 Restart의 역할을 기록했다.
+- 축 Reset으로 공유 Slave를 재시작하지 않으며, 복구 성공 후 자동 Enable·이전 이동 명령 재실행을 금지한다. SDO Abort는 Reset 대상에서 제외한다.
+- 다음 논의는 장애·복구 중 피드백 유효성 및 위치 재동기화·재Enable 조건이다. 관리 인터페이스, Reset의 acknowledge 연계와 어댑터 Fault 세부 코드는 미확정이다.
+- 문서만 변경했으며 실행 코드·컨테이너·설정·저장 파라미터는 변경하지 않았다.
+
+### 2026-10-28 — 장애 피드백 정책 및 재동기화 검토
+
+- DT-008/RF-018에 마지막 정상값 보관·피드백 유효성 분리, Master에 Fault 표시, 모델 준비와 운전 가능 상태 분리, 위치 불일치 시 Enable 차단 정책을 합의 내용으로 반영했다.
+- 복구된 모델 위치를 새 기준으로 수락하고 Master/DT 재조회 후 새 명령으로 재개하는 절차는 미확정 제안으로 기록했다. Copley의 0 초기화와 상태 복원 제약, 좌표 offset의 한계를 명시했다.
+- 문서만 변경. 실행 코드·컨테이너·설정·저장 파라미터 변경 없음.
+
+### 2026-10-28 — 복구 모델 위치 수락 방식 확정
+
+- DT-008/RF-018의 재동기화 방식을 제안에서 합의로 변경했다. 사용자가 복구된 모델의 위치를 새 기준으로 수락하며, Copley 재생성 시 위치 0을 기준으로 재개한다.
+- 이전 위치로 자동 이동, 좌표 offset, 이전 모델 상태 주입은 1차 구현 범위에서 제외한다.
+- 다음 결정은 수락 대상 세션과 Master/DT 재조회 확인, 필요한 Reset·재Enable 및 이전 PDO 명령 재실행 방지 조건이다. 구현·실행 환경은 변경하지 않았다.
+
+### 2026-10-28 — 복구 위치 수락 거부·보류 정책 합의
+
+- DT-008/RF-018에 수락하지 않은 축의 재동기화 대기·Enable/이동 차단과 EtherCAT 통신·진단 조회 유지 정책을 기록했다.
+- 나중에 수락, Model Recovery 재시도, 시험 종료를 선택할 수 있다. 수락 대기는 새로운 모델 오류가 아니며 모델 복구 성공과 별도 상태로 표시한다.
+- 자동 수락·이전 위치 자동 이동은 하지 않는다. 관련 예정 검증을 추가했으며 문서 외 실행 환경은 변경하지 않았다.
+
+### 2026-10-28 — 운전 재개 정책 및 Motion Server PP 순서 확인
+
+- 위치 수락의 세션 제한, 원인 해소 후 Reset, 새 Enable·PP 요청 요구, 이전 명령 폐기 및 관련 진단만 acknowledge하는 정책을 DT-008/RF-018에 반영했다.
+- Motion Server HEAD 1c159b6의 로컬 소스에서 Reset bit7 low/high/low 후 0x0006→0x0007, Enable 0x000F, PP 0x000F→0x003F→0x000F 및 SW bit12 ACK 대기를 확인했다. 서버 코드는 변경하지 않았다.
+- Reset 펄스에 이전 운동 비트가 남는 문제를 시뮬레이터 명령 차단으로 처리하고, 준비 이후 새 bit4 edge를 수락하는 조건을 정리했다. 상태 확인 없이 Reset 완료 응답만 신뢰하지 않는다.
+- 서버의 전체 축 Fault 검사 때문에 다른 축 신규 위치 명령도 차단될 수 있으며, 외부 클라이언트에 남은 요청은 PDO만으로 발행 시점을 식별할 수 없음을 기록했다.
+- 문서 공백 검사를 수행했다. 이번 확인은 코드 검토이며 복구 기능 구현·물리 시험·컨테이너 재시작은 수행하지 않았다. 비PP 모드 재개 계약 및 관리 인터페이스는 후속 결정이다.
+
+### 2026-10-28 — 관리 인터페이스·실행 중 복구 보류
+
+- 사용자 요청에 따라 관리 API/CLI, Model/Slave Recovery, 위치 수락·재동기화 기능을 후속으로 미뤘다. 기존 설계는 보관하고 현재 범위가 우선함을 DT-008/RF-018에 명시했다.
+- 현재 복구는 Motion Server를 통한 축 Fault Reset과 수동 Docker 재시작으로 한정한다. 일반 축 Reset에는 위치 수락 API를 요구하지 않으며 모델 재생성·공유 Slave 재시작을 수행하지 않는다.
+- Docker 재시작 후 버스 재연결/초기화·새 위치 확인·명시적 Enable·새 명령은 수동 절차다. 장애 시 EtherCAT Slave 유지 목표는 별도로 유지한다.
+- 문서만 변경했으며 코드 구현·컨테이너 재시작은 수행하지 않았다.
+
+### 2026-10-28 — RF-018 현재 범위 Fault/Reset 구현
+
+- 축별 Diagnostic/Fault 상태와 마지막 정상 PDO 보관을 구현했다. 어댑터 입력 오류는 원인 수정 후 Reset, 계산/출력 오류·Host timeout/단절은 수동 Docker 재시작 대상으로 분리했다. 저장 실패는 Alarm/Abort로 처리한다.
+- Motion Server의 bit7 펄스→0x0006→0x0007→새 Enable 순서를 적용했다. Reset-low에서 해제를 재확인하고 이전 Enable/PP 비트 재실행을 차단한다. Copley의 FaultInject가 남아 있으면 Reset을 거부한다. 장애 후 재Enable은 현재 PP 모드 범위다.
+- C++ IPC를 전용 worker와 비동기 future로 분리하고 SDO mailbox도 비차단 처리로 변경했다. 개별 RPC deadline 기본 100ms(환경변수 10..5000ms), queue 최대 64, 축별 pending 1개. 시간 초과·단절은 재연결 없이 latch하고 ESC 응답을 유지한다.
+- Windows 회귀 80개 중 67개 통과/13개 플랫폼·FMU skip, Linux 실제 FMU 포함 78개 중 77개 통과/1개 skip. 최종 피드백 유효성 보완 후 관련 15개 재검증 통과. CTest 3개 및 실제 FMU/비동기 mailbox 검증 통과.
+- 격리 Docker + veth + PySOEM으로 F-KR 2축/Copley 2축 OP, 축 Fault·Reset·재Enable·PP ACK 확인. Host SIGSTOP/SIGKILL 각각 80주기 WKC=12/12, 전체 축 Fault 유지, 0x6041 조회·다른 모델 SDO Abort, 늦은 응답/Reset으로 Host Fault가 풀리지 않음 검증. 최종 이미지에서도 재통과했다.
+- Linux 바이너리 및 ethercat-device-simulator:dev 이미지 반영. 실제 NIC·사용자 파라미터 파일은 시험에 사용하지 않았고 운영 컨테이너를 자동 재시작하지 않았다. 최종 확인 시 운영 이름의 컨테이너는 존재하지 않았다. Motion Server/Axis Panel 실제 물리 라인 검증은 남아 있다.
+- DT-008/RF-018에 구현 범위·설정·제약·수동 적용 절차를 기록했다. 관리 API·Model Recovery·위치 수락은 구현하지 않았다. 커밋·푸시는 요청되지 않아 수행하지 않았다.
+
+
+### 2026-10-28 — JOG Fault 복원 수동 시험 확인 및 변경사항 정리
+
+- Motion Server 「프로젝트 설계 및 의사결정」 스레드의 개별 축 Fault 대응 구현을 참조했다. Fault 검출 시 지령 정리·운전 허가 제거 및 Jog/Homing 이전 모드 PDO 복원을 수행하며, 자동 Reset/Enable과 다축 연계 정지는 하지 않는다.
+- 사용자가 Copley virtual-axis-2에서 JOG 미지원 Fault를 발생시킨 뒤 PP 복원과 Motion Server 축 Fault Reset으로 정상 복귀함을 확인했다. 시뮬레이터에 JOG Reset 예외 처리는 추가하지 않았다.
+- DT-008/RF-018에 수동 시험 결과와 확인 범위를 기록했다. Host timeout/단절·Docker 재시작의 물리 검증 및 수동 시험 WKC/시간/주기는 이번 성공 보고에 포함하지 않았다.
+- 이번 저장 범위는 시뮬레이터 저장소의 RF-018 Fault/Reset·비차단 IPC 구현, 테스트 및 관련 문서다. 별도 Motion Server 저장소의 변경은 포함하지 않는다.

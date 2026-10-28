@@ -17,7 +17,7 @@
 #include "process_data/fixed_mapping.h"
 #include "process_data/pdo_target.h"
 #include "diagnostics/timing.h"
-#include "ipc/model_client.h"
+#include "ipc/async_model_client.h"
 #include "ipc/sdo_gateway.h"
 
 using json = nlohmann::json;
@@ -46,7 +46,7 @@ int main(int argc,char** argv) {
     std::signal(SIGINT,stop); std::signal(SIGTERM,stop);
     cmmt::Timing timing(argc==6);
     try {
-        ModelClient model(argv[4]);
+        AsyncModelClient model(argv[4]);
         std::ifstream input(argv[3]); json expected; input>>expected;
         auto spec=model.request({{"op","describe"}});
         if(spec!=expected)throw std::runtime_error("Fixture/model contract mismatch");
@@ -62,6 +62,9 @@ int main(int argc,char** argv) {
         std::vector<std::unique_ptr<sim::SimulatedSlave>> slaves;
         std::vector<std::shared_ptr<FixedMapping>> mappings;
         std::vector<EmulatedESC*> escs;
+        bool host_failed=false;
+        std::vector<std::shared_future<json>> pending(paths.size());
+        std::vector<cmmt::TimingClock::time_point> pending_since(paths.size());
         timing.axes=paths.size();
         auto request=[&model,&timing,fleet](size_t i,json message) {
             if(fleet)message["slave_index"]=i;
@@ -97,7 +100,15 @@ int main(int argc,char** argv) {
                 cmmt::sdoGateways[sim.mailbox.get()].entries.emplace(index,sub);
 
             }
-            cmmt::sdoGateways[sim.mailbox.get()].request=[&request,i](json const& message){return request(i,message);};
+            cmmt::sdoGateways[sim.mailbox.get()].submit=[&model,&slaves,&host_failed,fleet,i](json message){
+                if(message.at("op")=="read" && message.at("index")==0x6041 && message.at("subindex")==0 && host_failed) {
+                    std::promise<json> result;
+                    result.set_value({{"data",hex(slaves[i]->input.data(),2)}});
+                    return result.get_future().share();
+                }
+                if(fleet)message["slave_index"]=i;
+                return model.submit(std::move(message));
+            };
             std::map<FixedMapping::Key,uint32_t> mapping_values;
             for(auto& object:*sim.dictionary) {
                 if(object.index!=0x1600 && object.index!=0x1a00 && object.index!=0x1c12 && object.index!=0x1c13)continue;
@@ -142,8 +153,45 @@ int main(int argc,char** argv) {
         }
         std::cout<<"CMMT_READY slaves="<<slaves.size()<<std::endl;
         auto previous_rx=cmmt::TimingClock::time_point{};
+        auto fail_host=[&](std::string const& cause) {
+            if(host_failed)return;
+            host_failed=true;
+            auto code=cause.find("TIMEOUT")!=std::string::npos?"MODEL_RESPONSE_TIMEOUT":"MODEL_HOST_DISCONNECTED";
+            auto now=std::chrono::duration<double>(std::chrono::system_clock::now().time_since_epoch()).count();
+            std::cerr<<json({{"event","diagnostic"},{"action","detected"},
+                {"diagnostic_id","host-"+std::to_string(now)},
+                {"definition",{{"code",code},{"level","fault"},{"title",code},{"description","Model Host unavailable; manual Docker restart required"},{"latching",true}}},
+                {"source",{{"type","model_host"},{"index",0}}},
+                {"history",{{"occurred_at",now},{"acknowledged_at",nullptr},{"resolved_at",nullptr}}},
+                {"detail",cause},{"context",{{"feedback_valid",false},{"restart_required",true}}}}).dump()<<std::endl;
+        };
+        auto pump=[&]() {
+            if(!model.failure().empty())fail_host(model.failure());
+            for(size_t i=0;i<slaves.size();++i) {
+                auto& sim=*slaves[i];
+                if(pending[i].valid() && pending[i].wait_for(std::chrono::seconds(0))==std::future_status::ready) {
+                    try {
+                        auto response=pending[i].get();
+                        if(!host_failed) {
+                            std::vector<uint8_t> validated(contracts[i].at("tx_size").get<size_t>());
+                            decode(response.at("data"),validated.data(),validated.size());
+                            std::copy(validated.begin(),validated.end(),sim.input.begin());
+                            timing.add("ipc_async_axis_"+std::to_string(i),pending_since[i],cmmt::TimingClock::now());
+                        }
+                    } catch(std::exception const& e) {fail_host(e.what());}
+                    pending[i]={};
+                }
+                if(host_failed) {
+                    uint16_t sw=0;std::memcpy(&sw,sim.input.data(),2);
+                    sw=(sw & ~0x106f)|8;std::memcpy(sim.input.data(),&sw,2);
+                }
+                if(sim.slave->state()==State::OPERATIONAL || sim.slave->state()==State::SAFE_OP)
+                    sim.pdo->updateInput();
+            }
+        };
         while(running) {
             timing.due();
+            pump();
             Frame frame;
             // readFrame() is a master helper which clears the EtherCAT length.
             // A simulator must preserve that header while routing the original frame.
@@ -151,6 +199,7 @@ int main(int argc,char** argv) {
             auto n=socket->read(frame.data(),ETH_MAX_SIZE);
             auto received=cmmt::TimingClock::now();
             timing.add("socket_read_wait",read_start,received);
+            pump();
             if(n<static_cast<int>(sizeof(EthernetHeader)+sizeof(EthercatHeader)))continue;
             if(frame.ethernet()->type!=ETH_ETHERCAT_TYPE)continue;
             if(frame.header()->len+sizeof(EthernetHeader)+sizeof(EthercatHeader)>static_cast<size_t>(n))continue;
@@ -177,7 +226,7 @@ int main(int argc,char** argv) {
             size_t cycled=0;
             for(size_t i=0;i<slaves.size();++i) {
                 auto& sim=*slaves[i];
-                size_t rx_size=contracts[i].at("rx_size"),tx_size=contracts[i].at("tx_size");
+                size_t rx_size=contracts[i].at("rx_size");
                 auto routine_start=cmmt::TimingClock::now();
                 sim.slave->routine();
                 timing.add("slave_routine",routine_start,cmmt::TimingClock::now());
@@ -185,13 +234,17 @@ int main(int argc,char** argv) {
                 if((state==State::SAFE_OP || state==State::OPERATIONAL) && !mappings[i]->complete())
                     throw std::runtime_error("PDO configuration was not restored before SAFE-OP");
                 if(state==State::SAFE_OP && pdo[i])sim.slave->validateOutputData();
-                if(state==State::OPERATIONAL && pdo[i]) {
+                if(!host_failed && !pending[i].valid() && state==State::OPERATIONAL && pdo[i]) {
                     ++cycled;
-                    auto r=request(i,{{"op","cycle"},{"data",hex(sim.output.data(),rx_size)}});
-                    decode(r.at("data"),sim.input.data(),tx_size);
-                    sim.pdo->updateInput();
-                } else if(state!=State::OPERATIONAL) {
-                    decode(request(i,{{"op","idle"}}).at("data"),sim.input.data(),tx_size);
+                    json message={{"op","cycle"},{"data",hex(sim.output.data(),rx_size)}};
+                    if(fleet)message["slave_index"]=i;
+                    pending_since[i]=cmmt::TimingClock::now();
+                    pending[i]=model.submit(std::move(message));
+                } else if(!host_failed && !pending[i].valid() && state!=State::OPERATIONAL) {
+                    json message={{"op","idle"}};
+                    if(fleet)message["slave_index"]=i;
+                    pending_since[i]=cmmt::TimingClock::now();
+                    pending[i]=model.submit(std::move(message));
                 }
             }
             auto finished=cmmt::TimingClock::now();

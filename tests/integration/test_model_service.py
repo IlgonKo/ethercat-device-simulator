@@ -50,7 +50,8 @@ class ModelServiceTests(unittest.TestCase):
     def test_mailbox_does_not_tick_and_pdo_has_exact_length(self):
         self.model.dispatch(dict(op='read',index=0x6041,subindex=0))
         self.assertEqual(self.model.cycles,0)
-        with self.assertRaises(ValueError):self.model.dispatch(dict(op='cycle',data='00'))
+        result = self.model.dispatch(dict(op='cycle',data='00'))
+        self.assertEqual(result['fault']['definition']['code'], 'AXIS_ADAPTER_FAULT')
         self.assertEqual(self.model.cycles,0)
 
     def test_cia402_transitions_through_existing_model(self):
@@ -64,7 +65,8 @@ class ModelServiceTests(unittest.TestCase):
     def test_long_pdo_gap_fails_without_advancing_model(self):
         with patch.object(service.time,'monotonic',side_effect=[10,11]):
             self.model.dispatch(dict(op='cycle',data='00'*24))
-            with self.assertRaises(RuntimeError):self.model.dispatch(dict(op='cycle',data='00'*24))
+            result = self.model.dispatch(dict(op='cycle',data='00'*24))
+            self.assertTrue(result['restart_required'])
         self.assertEqual(self.model.cycles,1)
 
     def test_role_index_preserves_pdo_and_sdo_behavior(self):

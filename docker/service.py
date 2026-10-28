@@ -178,7 +178,7 @@ def main():
                 raise RuntimeError(f'Slave exited: {processes["slave"].returncode}')
             if processes['model'].poll() is not None:
                 # Do not terminate a surviving Slave just because the Host died.
-                # The current C++ client still exits on IPC failure; see RF-012.
+                # Slave latches Host Fault and continues EtherCAT until manual restart.
                 if not (STATUS.exists() and json.loads(STATUS.read_text())['event'] == 'model-failed'):
                     write_status('model-failed', processes)
             else:

@@ -1,4 +1,4 @@
-"""PP adapter. Physical operation still requires IPC fault isolation."""
+"""PP adapter. Runtime Fault projection and IPC isolation live outside the FMU."""
 import math
 from functional_model.cia402_drive.profile.configured_od import ConfiguredObjectDictionary
 from functional_model.cia402_drive.profile.bridge import VirtualOdBridge
@@ -102,6 +102,8 @@ class CopleyAdapter:
     def step(self, dt):
         if not math.isfinite(dt) or not 0 < dt <= 0.1:
             raise ValueError('Model dt must be in (0, 0.1] seconds')
+        if self._fault and self.od.read(0x6040) & 0x80:
+            raise DeviceRejectedException('Fault injection is still active')
         acceleration, deceleration = self.od.read(0x6083), self.od.read(0x6084)
         # Permit sequential SDO updates, but never execute with an unequal pair.
         if acceleration != deceleration:

@@ -4,7 +4,7 @@
 #include <iostream>
 #include <stdexcept>
 #include "kickcat/simulation/SimulatedSlave.h"
-#include "ipc/model_client.h"
+#include "ipc/async_model_client.h"
 #include "ipc/sdo_gateway.h"
 using namespace kickcat;
 void require(bool condition,char const* message){if(!condition)throw std::runtime_error(message);}
@@ -12,7 +12,7 @@ int main(int argc,char** argv) {
     try {
         require(argc==4,"fixture manifest, contract and socket required");
         json manifest,spec; std::ifstream(argv[1])>>manifest; std::ifstream(argv[2])>>spec;
-        ModelClient client(argv[3]);
+        AsyncModelClient client(argv[3]);
         require(client.request({{"op","describe"}})==spec,"contract mismatch");
         size_t axis=0;
         for(;axis<spec["devices"].size();++axis)
@@ -23,6 +23,7 @@ int main(int argc,char** argv) {
         for(auto const& e:spec["devices"][axis]["contract"]["entries"])
             gateway.entries.emplace(e["index"],e["subindex"]);
         gateway.request=[&](json r){r["slave_index"]=axis;return client.request(r);};
+        gateway.submit=[&](json r){r["slave_index"]=axis;return client.submit(r);};
         unsigned calls=0;
         auto exchange=[&](uint16_t index,uint8_t sub,uint8_t command,uint32_t value=0) {
             std::vector<uint8_t> raw(128,0);
@@ -32,6 +33,10 @@ int main(int argc,char** argv) {
             raw[8]=command;raw[9]=index&255;raw[10]=index>>8;raw[11]=sub;
             for(int i=0;i<4;++i)raw[12+i]=value>>(8*i);
             auto response=sim.mailbox->processRequest(std::move(raw));
+            for(unsigned wait=0;response.empty() && wait<200;++wait) {
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+                sim.mailbox->process();response=sim.mailbox->popReply();
+            }
             require(response.size()==128,"mailbox buffer truncated: ESC would never signal ready");
             require(response[9]==(index&255)&&response[10]==(index>>8)&&response[11]==sub,"wrong echoed index");
             require(sim.mailbox->popReply().empty(),"more than one reply");

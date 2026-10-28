@@ -11,6 +11,43 @@ from functional_model.cia402_drive.adapter.copley import CopleyAdapter
 
 @unittest.skipUnless(os.environ.get('COPLEY_TEST_FMU'), 'COPLEY_TEST_FMU is not set')
 class CopleyFmuTests(unittest.TestCase):
+    def test_runtime_fault_reset_matches_motion_server_sequence(self):
+        from functional_model.runtime.axis import Model
+        from unittest.mock import patch
+        m = Model(dict(slave_index=0, id='fault-test', type='cia402-drive', parameter_set='temporary',
+                       model=dict(type='copley_drive_sim', mode='linear',
+                                  artifact=str(Path(os.environ['COPLEY_TEST_FMU']).resolve()))))
+        self.addCleanup(m.close)
+        tick = 10.0
+        def run(cw, mode=1, target=2000):
+            nonlocal tick
+            tick += .008
+            payload = struct.pack('<HbiIihihB', cw, mode, target, m.adapter.od.read(0x6081), 0, 0, 0, 0, 0)
+            with patch('functional_model.runtime.axis.time.monotonic', return_value=tick):
+                r = m.dispatch(dict(op='cycle', data=payload.hex()))
+            return struct.unpack('<HbiihB', bytes.fromhex(r['data']))
+        for cw in (6, 7, 15): run(cw)
+        run(0x3f)
+        m.adapter.inject_fault(True)
+        self.assertTrue(run(15)[0] & 8)
+        # Cause remains: reset is acknowledged, but Fault cannot clear.
+        self.assertTrue(run(0x8f)[0] & 8)
+        self.assertTrue(run(15)[0] & 8)
+        m.adapter.inject_fault(False)
+        self.assertTrue(run(15)[0] & 8)
+        for cw in [15]*2 + [0x8f]*2 + [15]*2 + [6]*5 + [7]*5: result = run(cw)
+        self.assertEqual(result[0] & 0x6f, 0x23)
+        position = result[2]
+        for _ in range(5): self.assertEqual(run(15)[2], position)
+        self.assertEqual(run(15)[0] & 0x6f, 0x27)
+        self.assertTrue(run(0x3f)[0] & 0x1000)
+        self.assertFalse(run(15)[0] & 0x1000)
+        # Adapter rejection is isolated and corrected via the same Reset path.
+        self.assertTrue(run(15, mode=99)[0] & 8)
+        run(15)
+        for cw in [0x8f]*2 + [15]*2 + [6]*5 + [7]*5 + [15]*3: result = run(cw)
+        self.assertEqual(result[0] & 0x6f, 0x27)
+
     def open(self, mode='linear'):
         a = CopleyAdapter.open(CiA402DriveProfile(CmmtAsDescription(mode)), os.environ['COPLEY_TEST_FMU'])
         self.addCleanup(a.close)

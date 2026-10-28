@@ -27,6 +27,7 @@ std::vector<uint8_t> unhex(std::string const& s,size_t n) {
 class GatewayMessage final: public AbstractMessage {
     std::shared_ptr<AbstractMessage> delegate_;
     cmmt::SdoGateway* gateway_;
+    std::shared_future<json> pending_;
     void abort(uint32_t code) {
         // Keep the complete mailbox buffer: ESC publishes only on last-byte write.
         if(data_.size()<P+4)data_.resize(P+4);
@@ -95,7 +96,13 @@ public:
             request["data"]=hex(value.data(),size);
         }
         try {
-            auto result=gateway_->request(request);
+            json result;
+            if(gateway_->submit) {
+                if(!pending_.valid())pending_=gateway_->submit(request);
+                if(pending_.wait_for(std::chrono::seconds(0))!=std::future_status::ready)
+                    return ProcessingResult::CONTINUE;
+                result=pending_.get();
+            } else result=gateway_->request(request);
             if(result.contains("error")) {
                 abort(result.at("error").at("code").get<uint32_t>());return ProcessingResult::FINALIZE;
             }
