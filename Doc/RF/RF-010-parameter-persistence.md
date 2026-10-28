@@ -1,24 +1,27 @@
 # RF-010 — 가상장치 파라미터 영구 저장 및 복원
 
 - 등록일: 2026-09-15
-- 상태: Profile Velocity 양 모델 저장 통일·명시적 이관 및 물리 SDO 저장/재생성 복원 검증 완료 / 전체 요구 잔여
+- 상태: 완료 — 2026-10-28 현재 합의 범위 (관리 API·양방향 동기화·이력 관리 후속 분리)
 - 설계: [DT-004](../Design/DT-004-parameter-sync-persistence.md)
 - 연계: RF-007 모델 초기화, RF-009 파라미터 동기화
 
-## 작업 범위
+## 현재 합의 범위 — 2026-10-28
 
-시뮬레이터 소유 영구 저장소를 구현한다. 안정적인 장치 ID, 스키마/설정 revision, 타입·단위·변경 이력을 관리한다. 배포 기본값·영구 설정·실행 상태를 분리하고 EtherCAT/관리 인터페이스의 변경을 공통 정책으로 처리한다. 저장 형식·데이터 경로·commit 및 응답 시점을 구현 전에 확정한다.
+시뮬레이터 소유 parameter_set별 영구 저장소, SDO 적용·명시적 저장, 저장 완료 응답, 정상 재시작 복원, 오류 검출·단일 writer, 수동 백업/복원·명시적 초기화 및 지원 스키마 이관을 대상으로 한다. 배포 기본값·영구 설정·실행 상태를 분리한다.
 
-## 완료 기준
+관리 API는 [RF-019](RF-019-parameter-management-api.md), 양방향 파라미터 동기화는 기존 [RF-009](RF-009-parameter-sync.md), 설정 revision·변경 이력은 [RF-020](RF-020-parameter-history.md)으로 이관한다. 이 항목들은 현재 RF-010 완료 조건에서 제외한다. 아래 과거 기록보다 이 범위가 우선한다.
 
-- [ ] SDO 및 관리 경로에서 변경한 영구 파라미터가 정상 재시작 후 동일하게 복원됨.
-- [ ] 실제→가상 동기화 완료 후 재시작해도 값 유지. 단순 RAM 적용과 저장 완료 구분.
-- [ ] 저장 도중 중단·쓰기 실패·동시 갱신에서 불완전 revision을 정상값으로 사용하지 않음.
-- [ ] 장치 순번 변경과 다장치 환경에서 다른 장치의 설정을 잘못 로드하지 않음.
-- [ ] 최초 초기화와 기존 설정 누락·손상·스키마 불일치 구분, 백업·이관·명시적 초기화 검증.
-- [ ] 위치·센서·Controlword·진행 명령 등 실행 상태를 자동 복원하지 않음.
-- [ ] Motion Server 연결 후 값 유지 및 초기화 시 재기입 항목의 소유권·우선순위 검증.
-- [ ] build/임시 폴더 정리와 독립된 저장 경로 및 컨테이너 볼륨 운영 절차 문서화.
+## 완료 기준 및 근거
+
+- [x] 실제 SDO 변경·명시적 저장 후 컨테이너 재생성·Master 초기화 후 복원: F-KR 111, Copley 123 확인 후 원래 100으로 복원·저장.
+- [x] 저장 도중 프로세스 종료·쓰기 실패·동시 writer에서 불완전 snapshot 사용 방지: Linux SIGKILL 3경계, 원자적 교체 실패 및 잠금 시험.
+- [x] 장치 순서 변경 시 parameter_set 연결 유지: 기존 구성 회귀 시험.
+- [x] 최초 생성·손상/누락 필드·스키마 불일치 거부, 백업 복원·명시적 초기화·F-KR 1→2 이관 검증.
+- [x] 위치·속도 피드백·Controlword·Enable·진행 명령을 영구 저장하지 않음: 모델 재생성 회귀. Profile Velocity 설정은 저장 대상이며 실제 속도 피드백과 구분.
+- [x] Master 초기화 후 저장 항목 유지: F-KR 21개×2 + Copley 8개×2 = 58개 물리 SDO readback이 파일과 일치. 재기입 경계는 아래 처리표 참조.
+- [x] ./state bind mount와 독립된 임시 소켓·build 경로, 백업·복원·초기화 운영 절차 문서화.
+
+검증은 정상 재시작과 프로세스 강제 종료까지다. 디스크/파일시스템 결함 또는 실제 전원 차단의 내구성 인증·장시간 스트레스 시험은 수행하지 않았다.
 
 ## 검증 기록
 
@@ -88,3 +91,66 @@ python -m functional_model.storage.migrate --store /state --parameter-set cmmt-1
 - 통신은 WKC 18/18이며 가상축 Fault 없음. 단, 재연결 후 실제 축 A0에 Fault가 발생/관측됐다: 0x6041=0x8638, 0x603F=0x8188. 실제 축에 Reset이나 파라미터 쓰기는 하지 않았다. 오류 원인은 이번 시험에서 확정하지 않았으며 전체 장비 정상 상태로 보고하지 않는다. 서버 reconnect 초기화가 실제 축에도 영향을 준다는 경계를 유지한다.
 - 증거(ignored): build/diagnostics/rf010-physical/save-original.json, save-write.json, save-reconnect.json, save-verify.json, save-restore.json, post-reconnect-real-axis-diagnostic.json.
 - 결과: 두 모델의 0x6081 물리 저장·재생성 복원 및 Master 초기화 후 유지 검증 통과. RF-010 전체의 관리 API·실제→가상 동기화·revision/백업 정책 등은 완료 처리하지 않는다.
+
+
+## 2026-10-28 최종 검증
+
+- tests/integration/test_parameter_crash_recovery.py 추가. 부분 JSON 쓰기 후, 임시 파일 fsync 후 replace 전, replace 후 디렉터리 fsync 전의 세 경계에서 자식 writer를 멈춘 뒤 실제 SIGKILL했다. 앞 두 경우 기존 111, 마지막 경우 완성된 새 값 222만 로드됐다. 잠금 자동 해제·재저장 333 성공, 남은 임시 파일이 정식 snapshot으로 읽히지 않음 확인.
+- 동일 임시 저장소에서 손상 파일 시작 거부, 백업 원문 복원 후 검증, 명시적 이름 변경 후 기본값 신규 생성 확인. Linux Docker에서 관련 회귀 총 30개 통과. 운영 state 및 실제 EtherCAT NIC는 장애 시험에 사용하지 않았다.
+- Master 초기화 이후 4개 가상축의 저장 목록 전체를 실제 SDO로 조회했다. F-KR 42개, Copley 16개 총 58개를 타입별 바이트로 변환하여 파일 값과 비교했고 불일치 0, WKC 18/18이었다. 현재 4ms/basic/PP 설정에서의 결과다. 다른 Master/모드/설정에 자동 일반화하지 않는다.
+- 증거: ignored build/diagnostics/rf010-physical/full-catalog-readback.json. 앞선 물리 SDO 저장 및 복원 증거와 함께 판정한다. 실제 축 A0의 기존 Fault는 이번 시험에서 Reset/변경하지 않았다.
+
+## 저장 항목과 Master 초기화 우선순위
+
+| 항목 | F-KR | Copley | 초기화/운전 중 소유권 |
+| --- | --- | --- | --- |
+| 0x216E:01, 0x2194:01..04 단위 | 저장 | 저장 | 프로파일 호환성 검증 후 로드, Master는 읽기. 읽기 전용 값의 불일치 거부 |
+| 0x6081:00 Profile Velocity | 저장 | 저장 | Master가 SDO readback을 첫 PDO에 반영. 운전 중 PDO가 현재 OD를 갱신하므로 SDO만 단발 쓰면 덮어써질 수 있음 |
+| 0x6083:00, 0x6084:00 가감속 | 저장 | 저장 | 복원값을 Master가 읽음. 명시적 profile 변경 시 쓰기. Copley 가감속은 같은 값 필요 |
+| 0x607D:01..02 위치 제한, 0x6067:00/0x6068:00 위치 창 | 저장 | 제외 | 기본 초기화에서 저장값 재기입 없음. 조회·명시적 설정 경로와 구분 |
+| 0x607F:00, 0x2183:0C, 0x60C5:00, 0x60C6:00, 0x60A4:01 제한/jerk | 저장 | 제외 | 저장값 복원 후 읽기. 사용자 설정 시 별도 변경 |
+| 0x6098:00, 0x6099:01..02, 0x609A:00 Homing 설정 | 저장 | 제외 | 기본 PP 초기화에서 재기입 없음. Homing 설정 명령의 변경은 별개 |
+| 0x6040/0x6060, 목표값·피드백, PDO 매핑·보간 설정, 저장/재시작 제어 OD | 제외 | 제외 | Master 초기화/운전 제어 또는 세션 상태. 파라미터 복원 범위 아님 |
+
+우선순위: 모델 기본값 → 검증된 영구 snapshot → Master 초기화의 별도 제어·PDO 설정 → 명시적 사용자 변경 → 명시적 저장 시점의 OD. Master 초기화는 0x2000 restart-clear, 모드, PDO 매핑 및 조건부 CSP 보간 설정을 다루지만 이들은 저장 목록 밖이다. 0x6081은 SDO readback으로 송신 PDO를 초기화하는 경로를 확인했다. 향후 서버 초기화 변경 시 목록 대조를 재검증한다.
+
+저장소는 모델의 Enable/위치를 복원하지 않는다. Motion Server 자체는 초기화에서 0x000F를 보낼 수 있으므로 이를 저장 상태 복원으로 해석하지 않는다. 0x2000 장치 reset은 Docker 재기동·공장 초기화와 동일 계약이 아니며, Copley는 restart-clear(0)만 지원한다.
+
+## 백업·복원·명시적 초기화 운영 절차
+
+Linux 저장소 루트에서 수행한다. 먼저 Master 통신/동작을 정지하고 `bash scripts/docker/stop.sh`로 모델과 Slave를 종료한다. 저장소 잠금 파일을 삭제해 실행 중 writer의 잠금을 우회하지 않는다. 아래는 수동 예시이며 모델/저장공간 이름은 실제 .env와 대조한다.
+
+### 백업
+
+```bash
+mkdir -p backups
+cp -a state backups/state-20261028-before-maintenance
+```
+
+백업 폴더는 매번 고유한 이름으로 만들고 기존 백업에 덮어쓰지 않는다. .env의 장치 ID·모델·mode·parameter_set 매핑 및 사용한 이미지/소스 revision도 함께 보관한다. 기본 ./state 외 경로를 쓰는 경우 실제 마운트 경로를 사용한다.
+
+### 복원
+
+서비스를 정지한 상태에서 대상 원본을 별도 보관하고, 동일 모델/mode/schema의 백업 파일을 임시 이름으로 복사한 뒤 정식 이름으로 이동한다. 예:
+
+```bash
+cp -p state/cmmt-0.json backups/cmmt-0-before-restore.json
+cp -p backups/state-20261028-before-maintenance/cmmt-0.json state/.cmmt-0.restore
+mv state/.cmmt-0.restore state/cmmt-0.json
+```
+
+Master를 연결하지 않은 상태에서 Simulator를 기동해 체크섬·타입·목록·단위 검증과 ready를 확인한다. 실패하면 연결하지 말고 원본을 되돌린다. 성공 후 Master를 연결하고 SDO readback을 확인한다. schema 1 F-KR 백업을 새 이미지에 적용하려면 앞서 문서화한 명시적 이관이 필요하다. JSON을 직접 수정하거나 체크섬을 재계산해 손상/호환성 검사를 우회하지 않는다.
+
+### 명시적 기본값 초기화
+
+서비스 정지·백업 후 초기화할 단일 parameter_set 파일을 state 밖으로 옮긴다. 다른 장치 파일은 유지한다.
+
+```bash
+mv state/cmmt-0.json backups/cmmt-0-before-reset.json
+```
+
+재기동 시 해당 공간이 없으므로 모델 기본값으로 새 snapshot을 생성한다. F-KR의 기본 0x6081은 0이며 이관 시 사용자가 지정했던 100과 다르다. 필요한 설정을 명시적으로 적용·저장하고 readback 후 사용한다. 이 절차는 위치·기계 상태 동기화나 자동 Enable/이동을 요청하는 기능이 아니다.
+
+누락 파일 한 개만 보고 최초 생성인지 사용자의 실수로 삭제됐는지 자동 구분할 수는 없다. 현재 계약은 '파일 부재 시 신규 기본값 생성'이다. 기존 파일 내부 손상/필드 누락은 자동 초기화하지 않고 거부한다. 삭제/이동 의도와 백업 확인은 운영 절차로 보장하며 저장공간 등록 이력은 RF-020에서 검토한다.
+
+강제 종료 후 남은 숨김 임시 파일은 로드 대상이 아니다. 정식 snapshot과 백업을 확인한 후 서비스 정지 중 해당 임시 파일만 정리할 수 있다. state 전체나 .lock 파일을 실행 중 삭제하지 않는다. 전원 차단/스토리지 자체 장애의 결과를 이번 SIGKILL 시험으로 보장하지 않는다.

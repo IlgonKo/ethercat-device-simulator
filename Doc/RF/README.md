@@ -22,7 +22,7 @@ KickCAT 기본 타당성 검증과 후속 DT 연동 개발을 관리한다. 기�
 DT 설계 결정은 [전체 구조](../Design/DT-001-system-architecture.md), [모드 전환](../Design/DT-002-mode-switching.md), [모델 경계](../Design/DT-003-model-interface.md)를 참조한다.
 
 - [RF-009 — 양방향 파라미터 동기화](RF-009-parameter-sync.md): 계획 / 미착수.
-- [RF-010 — 가상장치 파라미터 영구 저장·복원](RF-010-parameter-persistence.md): 기본 저장/복원·격리 컨테이너 재생성 검증, Profile Velocity 저장 통일·F-KR 스키마 2 이관 완료. 양 모델 0x6081 물리 SDO 저장·재생성·Master 초기화 후 복원 검증 통과. 전체 요구 잔여.
+- [RF-010 — 가상장치 파라미터 영구 저장·복원](RF-010-parameter-persistence.md): **현재 범위 완료(2026-10-28)**. 물리 SDO 저장/복원, 58개 목록 대조, 저장 중 SIGKILL·백업/초기화 검증. 후속은 RF-009/019/020.
 
 관련 설계: [DT-004](../Design/DT-004-parameter-sync-persistence.md).
 
@@ -53,3 +53,6 @@ RF-011 계측 근거: [프레임·IPC](RF-011-timing-20260922.md), [Python 모�
 - [RF-017 — Copley FMU 초기 연동](RF-017-copley-fmu.md): 1차 오프라인 구현·실제 Linux FMU 검증 완료. 설정·Docker·지원 파라미터 저장 통합 검증 완료. SDO Abort·메일박스·Halt 후속 수정 반영. 기본 물리 PP/복구 및 RF-018 장애 격리 반영. 절대/상대 이동 세부·혼합 장시간 성능 증거 잔여. 모델 한계는 RF-017 참조.
 
 - [RF-018 — 공통 Diagnostic 및 모델 장애 격리](RF-018-diagnostic-fault.md): 현재 범위 완료(2026-10-28). 축 Fault/Reset·비차단 IPC, Host 정지/종료 시 통신 유지, SDO 및 수동 복구 검증. 관리·자동 복구는 후속 범위.
+
+- [RF-019 — 파라미터 관리 API](RF-019-parameter-management-api.md): 계획 / 미착수. RF-010에서 분리.
+- [RF-020 — 파라미터 revision·변경 이력](RF-020-parameter-history.md): 계획 / 미착수. RF-010에서 분리.

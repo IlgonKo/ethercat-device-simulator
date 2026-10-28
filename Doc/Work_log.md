@@ -506,3 +506,12 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 통신은 WKC 18/18이며 가상축 Fault 없음. 단, 재연결 후 실제 축 A0에 Fault가 발생/관측됐다: 0x6041=0x8638, 0x603F=0x8188. 실제 축에 Reset이나 파라미터 쓰기는 하지 않았다. 오류 원인은 이번 시험에서 확정하지 않았으며 전체 장비 정상 상태로 보고하지 않는다. 서버 reconnect 초기화가 실제 축에도 영향을 준다는 경계를 유지한다.
 - 증거(ignored): build/diagnostics/rf010-physical/save-original.json, save-write.json, save-reconnect.json, save-verify.json, save-restore.json, post-reconnect-real-axis-diagnostic.json.
 - 결과: 두 모델의 0x6081 물리 저장·재생성 복원 및 Master 초기화 후 유지 검증 통과. RF-010 전체의 관리 API·실제→가상 동기화·revision/백업 정책 등은 완료 처리하지 않는다.
+
+
+### 2026-10-28 — RF-010 잔여 검증 완료 및 후속 분리
+
+- 사용자 합의로 관리 API RF-019, 양방향 동기화 기존 RF-009, revision/변경 이력 RF-020으로 분리했다. RF-010 현재 범위 완료 기준을 재정리하고 각 항목 근거를 연결했다.
+- Linux 격리 Docker에서 부분 기록/replace 전/replace 후 실제 writer SIGKILL, 잠금 회수·재저장, 백업 복원·명시적 초기화 시험 추가. 관련 회귀 30개 통과. 전원 차단 시험이 아님을 명시했다.
+- 실제 Motion Server를 통해 가상축 4개의 전체 저장 항목 58개를 SDO로 읽고 파일과 바이트 단위 일치 확인(불일치 0), WKC 18/18. 운영 저장값·실제 축·컨테이너는 이번 검증에서 수정/재시작하지 않았다.
+- 초기화 시 쓰기 대상과 저장 목록을 대조하고 0x6081 readback→PDO 경로, 프로파일/실행 상태 경계, 파일 부재와 손상의 차이, 백업 복원·초기화 절차를 RF-010/DT-004에 기록했다.
+- RF-010 현재 범위를 완료 처리했다. 실제 축 A0의 이전 Fault를 이번 결과로 정상 복귀했다고 간주하지 않는다. 커밋/푸시는 아직 수행하지 않았다.
