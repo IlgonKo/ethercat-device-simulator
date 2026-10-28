@@ -1,9 +1,11 @@
 # RF-002-1 — SDO 읽기·쓰기 및 복원 검증
 
+- 현재 상태: **완료**
+- 상태 상세: 기본 읽기·쓰기·복원 및 PDO 회귀 완료 (2026-09-14)
+
 2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
 
 - 단계: 2-1 (2단계에서 분리한 하위 항목)
-- 상태: 기본 읽기·쓰기·복원 및 PDO 회귀 완료 (2026-09-14)
 - 선행 항목: [RF-002](RF-002-windows-pdo-diagnostic.md)
 - 미해결 오류 응답: [TD-001](../TD/TD-001-sdo-abort-response.md) — 보류, 미구현
 - 완료 범위: 정상 SDO 경로. Abort 오류 경로는 완료에 포함하지 않는다.

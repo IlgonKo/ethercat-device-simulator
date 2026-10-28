@@ -1,7 +1,9 @@
 # RF-014 — 동적 PDO 매핑 지원
 
+- 현재 상태: **예정**
+- 상태 상세: 계획 / 미착수
+
 - 등록일: 2026-09-22
-- 상태: 계획 / 미착수
 - 현재 대상: 가상축. 가상 IO는 RF-013의 별도 보류 범위.
 - 관련: [RF-004](RF-004-motion-server-axis-panel.md), [RF-011](RF-011-device-configuration.md), [TD-001](../TD/TD-001-sdo-abort-response.md)
 

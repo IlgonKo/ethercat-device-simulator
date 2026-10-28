@@ -1,7 +1,9 @@
 # RF-013 — 가상 IO 및 IO-Link 시뮬레이션
 
+- 현재 상태: **보류**
+- 상태 상세: Pending / 보류 — 사용자와 별도 재논의 후 착수
+
 - 등록일: 2026-09-22
-- 상태: **Pending / 보류 — 사용자와 별도 재논의 후 착수**
 - 등록 사유: 현재 구현 범위를 가상축으로 한정. RF-011의 가상 IO 항목을 분리한다.
 - 관련: [DT-005](../Design/DT-005-device-configuration.md), [RF-011](RF-011-device-configuration.md)
 

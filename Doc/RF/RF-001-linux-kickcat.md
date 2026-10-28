@@ -1,9 +1,11 @@
 # RF-001 — Linux KickCAT 빌드 및 기본 Slave 실행
 
+- 현재 상태: **완료**
+- 상태 상세: 완료 (2026-09-14)
+
 2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
 
 - 단계: 1
-- 상태: 완료 (2026-09-14)
 - 다음 항목: [RF-002 — 물리 PDO 검증](RF-002-windows-pdo-diagnostic.md)
 - 범위: 기본 통신용 Board Slave. CMMT 모델 구현은 RF-003에서 진행한다.
 

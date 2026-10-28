@@ -1,9 +1,11 @@
 # RF-002 — Windows PySOEM 물리 PDO 통신 검증
 
+- 현재 상태: **완료**
+- 상태 상세: 완료 (2026-09-14), 테스트 ESI 보정 적용 기준
+
 2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
 
 - 단계: 2
-- 상태: 완료 (2026-09-14), 테스트 ESI 보정 적용 기준
 - 선행 항목: [RF-001](RF-001-linux-kickcat.md)
 - 별도 SDO 검증: [RF-002-1](RF-002-1-sdo-diagnostic.md)
 - 다음 단계: [RF-003](RF-003-cmmt-model-integration.md)
