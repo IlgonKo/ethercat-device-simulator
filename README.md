@@ -78,7 +78,7 @@ bash scripts/docker/stop.sh
 
 [DT-005 독립 장치 구성](Doc/Design/DT-005-device-configuration.md)에 독립 .env 단일 형식(2026-10-26 변경), 별도 설정 소유권, 실제·가상 Slave 배치 및 번호 매핑을 기록했습니다. Motion Server 설정 자동 읽기는 채택하지 않습니다. 구성 로더와 4축 생성의 초기 구현·오프라인 검증을 완료했습니다. [RF-011](Doc/RF/RF-011-device-configuration.md)의 OD 조회 최적화 후 2축·4축 8 ms/120초 정지 상태 재검증을 통과했으며, 2026-10-26 사용자가 4축 동작 정상도 확인했습니다.
 
-[DT-006 Docker 배포](Doc/Design/DT-006-docker-deployment.md): Linux Edge PC의 단일 Simulator 컨테이너, host 네트워크, 외부 설정·영구 저장소를 사용합니다. Edge NIC 3개는 Master / Simulator / 엔지니어링·외부 Omniverse 연결에 각각 사용합니다. [RF-012](Doc/RF/RF-012-docker-deployment.md)는 Docker/.env 초기 실행을 구현하고 물리 통신·저장 회귀 및 장애 격리 검증을 남겨둔 상태입니다.
+[DT-006 Docker 배포](Doc/Design/DT-006-docker-deployment.md): Linux Edge PC의 단일 Simulator 컨테이너, host 네트워크, 외부 설정·영구 저장소를 사용합니다. Edge NIC 3개는 Master / Simulator / 엔지니어링·외부 Omniverse 연결에 각각 사용합니다. [RF-012](Doc/RF/RF-012-docker-deployment.md)는 독립 Docker 실행·혼합 물리 통신·저장 복원·모델 장애 격리를 확인했고, 배포 재현성·Slave 자체 실패 및 배치 조건 검증이 남아 있습니다.
 
 현재 구현 범위는 **가상축**입니다. RF-011은 독립 .env 설정과 다중 CMMT 축을 담당하며 가상 IO·IO-Link는 [RF-013](Doc/RF/RF-013-virtual-io.md)에 Pending으로 분리했습니다. 기존 IO 설계 예시는 현재 구현 계약이 아니며 별도 재논의합니다.
 
@@ -86,15 +86,15 @@ bash scripts/docker/stop.sh
 
 장치 구성은 루트 `.env`에서 설정하며 [.env.example](.env.example)을 참고합니다. 개발용 검증 도구도 기본적으로 루트 `.env`를 읽습니다. 별도 파일은 `--env-file`로 지정할 수 있습니다. `config/` 예제 폴더는 제거했습니다.
 
-[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#수동-실행과-다음-물리-시험)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 위치 제한/회전 동작 개선을 별도 관리합니다.
+[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#정지-후-재구성-절차)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 위치 제한/회전 동작 개선을 별도 관리합니다.
 
 ## 2026-09-22 성능 계측 결과와 다음 작업
 
 2축은 120초 관측에서 정상 동작했으나 4축은 PDO 처리 지연 및 버스 Fault가 재현됐습니다. [프레임·IPC 계측](Doc/Validation/RF-011/RF-011-timing-20260922.md)과 [Python 세부 계측](Doc/Validation/RF-011/RF-011-python-timing-20260922.md)에 시험 조건과 한계를 기록했습니다. IPC 시간의 약 90%가 모델 계산이며, 별도 오프라인 프로파일에서는 OD role 전체 검색이 모델 시간의 약 97.57%를 차지했습니다.
 
-2026-10-20 OD role 조회 인덱스 최적화를 적용했습니다. [2축/4축 재검증](Doc/Validation/RF-011/RF-011-role-index-20261020.md)은 각각 8 ms·120초 정지 상태에서 Fault 없이 통과했습니다. PDO 처리 평균은 0.223/0.395 ms입니다. 장시간·이동 부하와 나머지 RF-011 기준은 후속이며 IPC 묶음 처리는 미적용입니다.
+2026-10-20 OD role 조회 인덱스 최적화를 적용했습니다. [2축/4축 재검증](Doc/Validation/RF-011/RF-011-role-index-20261020.md)은 각각 8 ms·120초 정지 상태에서 Fault 없이 통과했습니다. PDO 처리 평균은 0.223/0.395 ms입니다. 현재 구조의 정량 성능·이동 부하 검증은 RF-016/017에서 추적합니다. 이 수치는 당시 정지 시험 결과입니다.
 
-2026-10-26 사용자가 **최적화 적용 후 4축 동작 테스트 정상**을 확인했습니다. 수동 시험의 상세 시간·모드·WKC 수치는 별도 보고되지 않았으며, RF-011 잔여 완료 기준은 계속 관리합니다.
+2026-10-26 사용자가 **최적화 적용 후 4축 동작 테스트 정상**을 확인했습니다. 수동 시험의 상세 시간·모드·WKC 수치는 별도 보고되지 않았으며, RF-011은 기존 구성·독립성 및 RF-010/018 근거를 종합하여 2026-10-28 완료 처리했습니다.
 
 ## RF-016 구현 구조 (2026-10-26)
 
@@ -122,4 +122,4 @@ bash scripts/docker/start.sh
 
 ### Copley FMU 오프라인 검증
 
-FMI3 CS 기반 PP 어댑터와 Linux FMU 빌드 도구의 실행 방법은 [RF-017](Doc/RF/RF-017-copley-fmu.md)을 따른다. `.env`에서 `copley_drive_sim` 선택, FMU 폴더 마운트 및 지원 파라미터 저장을 제공한다. 비물리 통합 검증은 완료했으며 물리 연동 전 IPC 장애 격리가 남아 있다.
+FMI3 CS 기반 PP 어댑터와 Linux FMU 빌드 도구의 실행 방법은 [RF-017](Doc/RF/RF-017-copley-fmu.md)을 따른다. `.env`에서 `copley_drive_sim` 선택, FMU 폴더 마운트 및 지원 파라미터 저장을 제공한다. 혼합 물리 PP·저장·Fault/Reset 및 RF-018 IPC 장애 격리를 확인했다. 세부 물리 이동·파라미터 효과와 정량 성능 근거는 RF-017에 남는다.

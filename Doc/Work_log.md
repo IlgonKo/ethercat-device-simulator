@@ -529,3 +529,26 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - Doc/RF에는 RF-011-device-configuration.md 본 문서만 남겼다. 검증 보고서 3개와 집계 JSON 1개를 Doc/Validation/RF-011로 이동했다.
 - 루트 README, 프로젝트 계획, RF 목록/본 문서, 작업 일지 및 보고서 간 상대 링크를 새 위치에 맞췄다. 본 문서로 돌아가는 링크와 JSON 링크도 확인했다.
 - 기존 검증 내용·수치·현재 RF 상태는 변경하지 않았다.
+
+
+### 2026-10-28 — RF-011/012/016/017 기존 근거 재대조
+
+- 사용자 확인: 실제 축·IO + F-KR 2축 + Copley 2축 혼합 환경에서 이미 계속 검증했다. 혼합 연결 시험을 신규 작업처럼 제안했던 부분을 정정했다.
+- RF-011은 .env 구성 회귀, 4축 OD/PDO/모델 독립성, 순서 재배치/parameter_set 시험, 사용자 물리 동작 및 RF-010/018 근거를 종합해 현재 기능 범위 완료 처리했다. 물리 케이블 재배열·장시간 성능을 검증했다고 확대하지 않았다.
+- RF-012/016/017은 확인된 부분을 완료로 반영했다. 배포/Slave 자체 실패/미시험 배치, 현 구조 계측, Copley 물리 세부 이동·파라미터 효과 등 기존 기준의 실제 미검증 항목은 남겼다. 신규 시험 시간·합격 수치는 추가하지 않았다.
+- 과거 상세 기록은 각 Doc/Validation/RF-번호/history-through-20261028.md로 보존하고 본문은 현재 범위/판정/잔여 항목 중심으로 정리했다. RF 목록·루트 안내·프로젝트 계획도 맞췄다.
+- Linux 문서만 변경했다. 실행 코드·운영 .env/state·컨테이너·Motion Server를 변경하거나 새 물리 시험을 수행하지 않았다.
+
+
+### 2026-11-03 — RF-012 Slave 자체 종료 시험
+
+- 사용자 준비 완료 후 정지·WKC 18/18을 확인하고 Slave에만 SIGKILL. supervisor 감지와 모델 SIGTERM 정리, 컨테이너 exit 1/unhealthy를 확인했다.
+- Motion Server는 BUS_CONNECTION_LOST를 보고하며 API 응답 유지. state JSON 해시 불변.
+- Simulator 재생성 healthy/ready 확인, 사용자 Master 재연결 후 최종 복구 확인 대기. 상세는 Doc/Validation/RF-012/slave-exit-20261103.md. 실행 코드 변경 없음.
+
+
+### 2026-11-03 — RF-012 Slave 장애 후 재연결 복구 확인
+
+- 사용자 Master 재연결 완료 후 읽기 전용 조회: 서버 normal/initialized, 4ms, 진단 정상. 약 3초간 30회 WKC 18/18, 불일치 0.
+- 전 축 Fault bit 없음·속도 0, trajectory/homing idle. 가상축 위치 0, 컨테이너 healthy 및 모델/Slave ready 확인. Enable·이동 명령은 보내지 않았다.
+- Slave 자체 종료 감지·모델 정리·컨테이너 오류 종료 및 수동 재기동/재연결 항목 완료. RF-012 전체의 배포 재현성·NIC/성능·배치 조건은 남긴다. 원본 recovery.json은 Linux build/diagnostics/rf012-slave-exit-20261103에 보관했다.
