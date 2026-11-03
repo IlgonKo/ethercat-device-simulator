@@ -34,8 +34,11 @@ class Model:
                 raise ValueError(f'Unsupported required entry {index:04x}:{subindex}: {dtype}')
             self.entries[index, subindex] = dict(index=index, subindex=subindex,
                 name=d.name, type=TYPES[dtype], bits=d.bit_size, access=d.access.lower(),
+                rx=bool(d.rxpdo), tx=bool(d.txpdo),
                 initial=self.adapter.read_sdo(index, subindex, d.bit_size // 8).hex())
         self.last_cycle = None
+        self.operation_active = False
+        self.pp_armed = False
         self.cycles = 0
         self.source_hash = source_hash()
         self.fault_state = AxisFault(self.device['slave_index'], self.adapter.read_inputs())
@@ -44,17 +47,59 @@ class Model:
     def describe(self):
         catalog = self.profile.esi_catalog
         vendor_id = self.profile.description.vendor_id
-        def mapping(objects):
-            return [dict(index=x.index, subindex=x.subindex, bits=x.bit_length,
-                         name=x.name, type=self.entries[x.index, x.subindex]['type'] if x.index else 'USINT')
-                    for x in objects]
-        result = dict(protocol=1, profile='cmmt_as', pdo='motion_server_default',
+        result = dict(protocol=3, profile='cia402-drive',
                       preset=self.preset, model_source_hash=self.source_hash,
                       vendor=vendor_id, product=catalog.product_code,
-                      revision=catalog.revision, rx_size=self.rx_size, tx_size=self.tx_size,
-                      entries=list(self.entries.values()), rx=mapping(self.rx), tx=mapping(self.tx))
+                      revision=catalog.revision, entries=list(self.entries.values()))
         result['contract_hash'] = hashlib.sha256(json.dumps(result, sort_keys=True).encode()).hexdigest()
         return result
+
+    def exchange(self, request):
+        # OD-addressed IPC. No offsets, assignments or mapping generations.
+        values, reads = request.get('values', []), request.get('reads', [])
+        active = request.get('active', False)
+        if type(active) is not bool: raise ValueError('active must be boolean')
+        updates = {}
+        for item in values:
+            key = (item['index'], item['subindex'])
+            entry, raw = self.entries[key], bytes.fromhex(item['data'])
+            if key in updates or not entry['rx'] or len(raw)*8 != entry['bits']:
+                raise ValueError('Invalid OD update')
+            updates[key] = raw
+        keys = [(item['index'], item['subindex']) for item in reads]
+        if len(keys) != len(set(keys)) or any(k not in self.entries for k in keys):
+            raise ValueError('Invalid OD read list')
+        if not active:
+            if self.operation_active and not self.fault_state.restart_required:
+                try: self.adapter.deactivate()
+                except Exception as exc:
+                    self.fault_state.detect('AXIS_MODEL_EXECUTION_FAILED', str(exc), restart=True)
+            self.operation_active, self.pp_armed = False, False
+            result = self.dispatch({'op': 'idle'})
+        else:
+            self.operation_active = True
+            # Canonical in-process representation only; omitted values come from
+            # the current shared OD, never a previous IPC frame.
+            payload = bytearray()
+            for entry in self.rx:
+                key = (entry.index, entry.subindex)
+                payload.extend(updates.get(key, self.adapter.read_sdo(*key, entry.byte_length))
+                               if entry.index else bytes(entry.byte_length))
+            cw = int.from_bytes(payload[:2], 'little')
+            if not cw & 0x10: self.pp_armed = True
+            if not self.pp_armed: payload[:2] = (cw & ~0x10).to_bytes(2, 'little')
+            result = self.dispatch({'op': 'cycle', 'data': payload.hex(), '_updated_keys': set(updates) | {(0x6040, 0)}})
+        projected, offset = {}, 0
+        raw = bytes.fromhex(result['data'])
+        for entry in self.tx:
+            if entry.index: projected[entry.index, entry.subindex] = raw[offset:offset+entry.byte_length]
+            offset += entry.byte_length
+        response = {k:v for k,v in result.items() if k != 'data'}
+        response['values'] = [dict(index=k[0], subindex=k[1], data=(projected[k]
+            if k in projected else self.adapter.read_sdo(*k, self.entries[k]['bits']//8)).hex()) for k in keys]
+        for field in ('session', 'request_id'):
+            if field in request: response[field] = request[field]
+        return response
 
     def close(self):
         close = getattr(self.adapter, 'close', None)
@@ -72,6 +117,8 @@ class Model:
 
     def dispatch(self, request):
         op = request['op']
+        if op == 'exchange':
+            return self.exchange(request)
         guard = self.fault_state
         if op == 'read' and request['index'] == 0x6041 and request['subindex'] == 0:
             if guard.phase != 'normal':
@@ -110,7 +157,7 @@ class Model:
                     if guard.fault.value['definition']['code'] == 'AXIS_ADAPTER_FAULT':
                         # The model may still be internally enabled after a rejected
                         # PDO. Disable it before pulsing reset; never step old motion.
-                        self.adapter.apply_outputs(b'\x00\x00' + payload[2:])
+                        self.adapter.apply_outputs(b'\x00\x00' + payload[2:], keys=request.get('_updated_keys'))
                         self.adapter.step(.002)
                 request = dict(request, data=payload.hex())
             elif guard.phase != 'normal':
@@ -172,7 +219,7 @@ class Model:
             self.last_cycle = now
             if self.timing:
                 begin = stamp()
-                self.adapter.apply_outputs(payload)
+                self.adapter.apply_outputs(payload) if request.get('_updated_keys') is None else self.adapter.apply_outputs(payload, keys=request['_updated_keys'])
                 after_rx = stamp()
                 self.adapter.step(dt)
                 after_model = stamp()
@@ -184,7 +231,7 @@ class Model:
                 self.timing.add(key+'txpdo', after_model, after_tx)
                 self.timing.add(key+'cycle_core', begin, after_tx)
             else:
-                self.adapter.apply_outputs(payload)
+                self.adapter.apply_outputs(payload) if request.get('_updated_keys') is None else self.adapter.apply_outputs(payload, keys=request['_updated_keys'])
                 self.adapter.step(dt)
                 result = self.adapter.read_inputs().hex()
             self.cycles += 1

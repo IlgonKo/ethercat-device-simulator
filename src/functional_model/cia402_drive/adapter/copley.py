@@ -14,12 +14,14 @@ class CopleyAdapter:
     WRITABLE = {(0x6040, 0), (0x6060, 0), (0x607A, 0), (0x6081, 0),
                 (0x6083, 0), (0x6084, 0), (0x2005, 1), (0x2005, 3), (0x2000, 1)}
 
-    def __init__(self, profile, runner):
+    def __init__(self, profile, runner, od=None):
         self.profile, self.runner = profile, runner
-        self.od = ConfiguredObjectDictionary(profile)
+        self.od = od if od is not None else ConfiguredObjectDictionary(profile)
         self.bridge = VirtualOdBridge(self.od, profile.pdo_configuration)
         self._remainder = 0.0
         self._fault = False
+        self._motion_inhibited = False
+        self._previous_cw = 0
         self.od.write_internal(0x6060, 1)
         self.od.write_internal(0x6061, 1)
         # Both models use raw OD position counts. Derive velocity/acceleration
@@ -47,10 +49,10 @@ class CopleyAdapter:
             raise ValueError('Copley requires equal profile acceleration and deceleration')
 
     @classmethod
-    def open(cls, profile, artifact, instance_name='copley'):
+    def open(cls, profile, artifact, instance_name='copley', od=None):
         runner = Fmi3Runner(artifact, SIGNATURE, instance_name)
         try:
-            return cls(profile, runner)
+            return cls(profile, runner, od=od)
         except Exception:
             runner.close()
             raise
@@ -81,23 +83,32 @@ class CopleyAdapter:
         self._validate(index, value)
         self.bridge.write_sdo(index, subindex, payload)
 
-    def apply_outputs(self, payload):
+    def apply_outputs(self, payload, keys=None):
         if len(payload) != sum(x.byte_length for x in self.profile.pdo_configuration.rx):
             raise ValueError('RxPDO length mismatch')
         offset = 0
         for entry in self.profile.pdo_configuration.rx:
             raw = payload[offset:offset + entry.byte_length]
             offset += entry.byte_length
-            if not entry.index: continue
+            if not entry.index or (keys is not None and (entry.index, entry.subindex) not in keys): continue
             value = decode_od_value(entry.data_type, raw)
             self._validate(entry.index, value)
             if entry.index in (0x60FF, 0x6071, 0x60B1, 0x60B2) and value:
                 raise DeviceRejectedException('Nonzero velocity/torque/offset input unsupported in PP')
-        self.bridge.rxpdo_payload_to_od(payload)
+        self.bridge.rxpdo_payload_to_od(payload, keys=keys)
 
     def inject_fault(self, active):
         """Offline test hook, not a manufacturer OD object."""
         self._fault = bool(active)
+
+    def deactivate(self):
+        self._motion_inhibited = True
+        self._previous_cw = 0
+        self.od.write_internal(0x6040, 0)
+        self.runner.set('ControlWord', 0)
+        self.runner.step(STEP_SECONDS)
+        self._remainder = 0.0
+        self._refresh()
 
     def step(self, dt):
         if not math.isfinite(dt) or not 0 < dt <= 0.1:
@@ -111,16 +122,28 @@ class CopleyAdapter:
         for index in (0x6040, 0x6060, 0x6081, 0x6083, 0x6084):
             self._validate(index, self.od.read(index))
         # Halt is intentionally unsupported: preserve raw OD, ignore only bit 8 at the FMU boundary.
+        cw = self.od.read(0x6040)
+        if self._motion_inhibited and (cw & 0x0f) == 0x0f and cw & 0x10 and not self._previous_cw & 0x10:
+            self._motion_inhibited = False
+        self._previous_cw = cw
+        held_position = self.runner.get('ActualPosition') if self._motion_inhibited else None
+        # This FMU retains its moving flag across Disable Voltage. Hold its
+        # profile velocity at zero until a new PP request replaces the old goal.
+        # This changes neither the persisted OD velocity nor the requested target.
         values = {'ControlWord': self.od.read(0x6040) & ~0x0100, 'ModesOfOp': self.od.read(0x6060),
                   'TargetPosition': self.od.read(0x607A), 'TargetVelocity': 0,
                   'TargetTorque': 0, 'FaultInject': self._fault,
-                  'ProfileVelocity': self.od.read(0x6081) * self.velocity_factor,
+                  'ProfileVelocity': 0.0 if self._motion_inhibited else self.od.read(0x6081) * self.velocity_factor,
                   'ProfileAcceleration': acceleration * self.acceleration_factor}
         for name, value in values.items(): self.runner.set(name, value)
         self._remainder += dt
         while self._remainder + 1e-12 >= STEP_SECONDS:
             self.runner.step(STEP_SECONDS)
             self._remainder = max(0.0, self._remainder - STEP_SECONDS)
+        if held_position is not None and self.runner.get('ActualPosition') != held_position:
+            # A model that cannot hold the accepted position must fail closed,
+            # not silently continue an old command or substitute feedback.
+            raise DeviceRejectedException('Copley moved without a fresh PP start after deactivation')
         self._refresh()
 
     def _refresh(self):

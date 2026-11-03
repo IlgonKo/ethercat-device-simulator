@@ -24,7 +24,7 @@ class VirtualOdBridge:
         value = decode_od_value(definition.data_type, payload)
         self.od_model.write(index, value, subindex)
 
-    def rxpdo_payload_to_od(self, payload):
+    def rxpdo_payload_to_od(self, payload, keys=None):
         payload = bytes(payload)
         offset = 0
         for obj in self.pdo_configuration.rxpdo_objects():
@@ -36,7 +36,7 @@ class VirtualOdBridge:
                 )
             raw_value = payload[offset:end]
             offset = end
-            if obj.index == 0 or obj.field is None:
+            if obj.index == 0 or obj.field is None or (keys is not None and (obj.index, obj.subindex) not in keys):
                 continue
             self.od_model.write(
                 obj.index,

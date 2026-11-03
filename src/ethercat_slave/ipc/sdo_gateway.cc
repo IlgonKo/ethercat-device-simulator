@@ -57,6 +57,9 @@ public:
         data_=std::move(raw);
     }
     ProcessingResult process() override {
+        if(data_.size()>=P && reinterpret_cast<CoE::ServiceData const*>(data_.data()+S)->complete_access) {
+            abort(0x06010000);return ProcessingResult::FINALIZE;
+        }
         if(delegate_) {
             try {
                 auto result=delegate_->process(); normalizeReplies(); return result;

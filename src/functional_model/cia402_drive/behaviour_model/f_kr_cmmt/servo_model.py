@@ -3,13 +3,13 @@ from .state_machine import CiA402StateMachine
 
 
 class VirtualCiA402Servo:
-    def __init__(self, cycle_time=0.001, device_profile=None):
+    def __init__(self, cycle_time=0.001, device_profile=None, od=None):
         self.cycle_time = cycle_time
         if device_profile is None:
             raise ValueError("VirtualCiA402Servo requires an explicit device_profile")
         self.device_profile = device_profile
 
-        self.od = ConfiguredObjectDictionary(device_profile)
+        self.od = od if od is not None else ConfiguredObjectDictionary(device_profile)
         self.sm = CiA402StateMachine()
 
         self.actual_position = 0.0

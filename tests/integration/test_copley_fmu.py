@@ -48,6 +48,44 @@ class CopleyFmuTests(unittest.TestCase):
         for cw in [0x8f]*2 + [15]*2 + [6]*5 + [7]*5 + [15]*3: result = run(cw)
         self.assertEqual(result[0] & 0x6f, 0x27)
 
+    def test_od_exchange_pp_target_latched_and_reactivation_requires_new_edge(self):
+        from functional_model.runtime.axis import Model
+        from unittest.mock import patch
+        m = Model(dict(slave_index=0, id='od-pp', type='cia402-drive', parameter_set='temporary',
+                       model=dict(type='copley_drive_sim', mode='linear',
+                                  artifact=str(Path(os.environ['COPLEY_TEST_FMU']).resolve()))))
+        self.addCleanup(m.close)
+        tick = 20.0
+        def write(index, value, size=4):
+            m.dispatch(dict(op='write', index=index, subindex=0,
+                            data=value.to_bytes(size,'little',signed=value<0).hex()))
+        def cycle(cw, active=True):
+            nonlocal tick
+            tick += .008
+            with patch('functional_model.runtime.axis.time.monotonic',return_value=tick):
+                return m.dispatch(dict(op='exchange',active=active,
+                    values=[dict(index=0x6040,subindex=0,data=cw.to_bytes(2,'little').hex())] if active else [],
+                    reads=[dict(index=0x6064,subindex=0),dict(index=0x6041,subindex=0)]))
+        write(0x6060,1,1);write(0x6081,1);write(0x607A,10000)
+        for cw in (6,7,15):cycle(cw)
+        cycle(0x3f)
+        for _ in range(5):cycle(15)
+        before=m.adapter.od.read(0x6064)
+        write(0x607A,-10000)
+        for _ in range(20):cycle(15)
+        self.assertGreater(m.adapter.od.read(0x6064),before)
+        self.assertEqual(m.adapter.od.read(0x607A),-10000)
+        cycle(0,False)
+        # Keep start high throughout re-enable; no new low-to-high edge.
+        for cw in (0x16,0x17):cycle(cw)
+        position=m.adapter.od.read(0x6064)
+        # A held start bit must not launch the newly stored target.
+        for _ in range(10):cycle(0x3f)
+        self.assertEqual(m.adapter.od.read(0x6064),position)
+        cycle(15);cycle(0x3f)
+        for _ in range(20):cycle(15)
+        self.assertLess(m.adapter.od.read(0x6064),position)
+
     def open(self, mode='linear'):
         a = CopleyAdapter.open(CiA402DriveProfile(CmmtAsDescription(mode)), os.environ['COPLEY_TEST_FMU'])
         self.addCleanup(a.close)

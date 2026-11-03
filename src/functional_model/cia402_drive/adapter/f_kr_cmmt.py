@@ -7,9 +7,9 @@ from .errors import DeviceRejectedException
 class FKrCmmtAdapter:
     capabilities = DriveCapabilities(frozenset({1, 3, 6, 8, -3}))
 
-    def __init__(self, profile):
+    def __init__(self, profile, od=None):
         self.profile = profile
-        self.model = VirtualCiA402Servo(cycle_time=0.01, device_profile=profile)
+        self.model = VirtualCiA402Servo(cycle_time=0.01, device_profile=profile, od=od)
         self.od = self.model.od
         self.persistent_roles = profile.persistent_roles + tuple(
             r for r in profile.pdo_configuration.rx if (r.index, r.subindex) == (0x6081, 0))
@@ -29,15 +29,25 @@ class FKrCmmtAdapter:
             self.validate_mode(int.from_bytes(payload, 'little', signed=True))
         self.bridge.write_sdo(index, subindex, payload)
 
-    def apply_outputs(self, payload):
+    def apply_outputs(self, payload, keys=None):
         expected = sum(x.byte_length for x in self.profile.pdo_configuration.rx)
         if len(payload) != expected: raise ValueError('RxPDO length mismatch')
         offset = 0
         for entry in self.profile.pdo_configuration.rx:
-            if (entry.index, entry.subindex) == (0x6060, 0):
+            if (entry.index, entry.subindex) == (0x6060, 0) and (keys is None or (entry.index, entry.subindex) in keys):
                 self.validate_mode(int.from_bytes(payload[offset:offset+entry.byte_length], 'little', signed=True))
             offset += entry.byte_length
-        self.bridge.rxpdo_payload_to_od(payload)
+        self.bridge.rxpdo_payload_to_od(payload, keys=keys)
+
+    def deactivate(self):
+        target = self.od.read(0x607A)
+        self.model.stop_at_current_position()
+        self.od.write_internal(0x607A, target)
+        self.model._last_target_position_command = target
+        self.model.previous_controlword = 0
+        self.model.pp_active = False
+        self.model.pp_setpoint_ack = False
+        self.od.write_internal(0x6040, 0)
 
     def step(self, dt):
         self.model.cycle_time = dt

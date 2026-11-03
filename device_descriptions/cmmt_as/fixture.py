@@ -5,7 +5,8 @@ import xml.etree.ElementTree as ET
 
 def generate_fixture(model, destination):
     """Generate a limited simulator ESI from the selected model contract, not a drive ESI clone."""
-    spec = model.describe()
+    contract = model.describe()
+    spec = dict(contract, rx_size=0, tx_size=0, rx=[], tx=[])
     root = ET.Element('EtherCATInfo', Version='1.6')
     def child(parent, name, value=None, **attrs):
         el = ET.SubElement(parent, name, attrs)
@@ -38,12 +39,12 @@ def generate_fixture(model, destination):
     # Explicit CA alignment for all communication arrays. KickCAT's automatic
     # assignment/mapping builders also start subindex 1 at bit 8.
     for index, key, assignment in [(0x1600, 'rx', 0x1c12), (0x1a00, 'tx', 0x1c13)]:
-        groups[index] = [value(index, 0, 'Count', 'USINT', 8, len(spec[key]))]
-        for sub, e in enumerate(spec[key], 1):
-            word = (e['index'] << 16) | (e['subindex'] << 8) | e['bits']
-            groups[index].append(value(index, sub, f'Mapping {sub}', 'UDINT', 32, word))
-        groups[assignment] = [value(assignment, 0, 'Count', 'USINT', 8, 1),
-                              value(assignment, 1, 'PDO', 'UINT', 16, index)]
+        groups[index] = [value(index, 0, 'Count', 'USINT', 8, 0)]
+        for sub in range(1, 17):
+            groups[index].append(value(index, sub, f'Mapping {sub}', 'UDINT', 32, 0))
+        groups[assignment] = [value(assignment, 0, 'Count', 'USINT', 8, 0),
+                              value(assignment, 1, 'PDO', 'UINT', 16, 0)]
+        for entry in groups[index] + groups[assignment]: entry['access'] = 'rw'
     for index, entries in sorted(groups.items()):
         entries = sorted(entries,key=lambda e:e['subindex'])
         obj = child(objects, 'Object'); child(obj, 'Index', f'#x{index:04X}')
@@ -74,17 +75,17 @@ def generate_fixture(model, destination):
                                      ('Outputs',spec['rx_size'],0x1800,0x64),('Inputs',spec['tx_size'],0x1c00,0x20)]:
         child(dev,'Sm',name,DefaultSize=str(size),StartAddress=f'#x{address:04X}',ControlByte=f'#x{control:02X}',Enable='1')
     for tag,key,index,sm in [('RxPdo','rx',0x1600,2),('TxPdo','tx',0x1a00,3)]:
-        pdo=child(dev,tag,Fixed='1',Mandatory='1',Sm=str(sm))
+        pdo=child(dev,tag,Fixed='0',Mandatory='0',Sm=str(sm))
         child(pdo,'Index',f'#x{index:04X}'); child(pdo,'Name',tag)
         for e in spec[key]:
             entry=child(pdo,'Entry')
             for name,v in [('Index',f"#x{e['index']:04X}"),('SubIndex',e['subindex']),('BitLen',e['bits']),('Name',e['name']),('DataType',e['type'])]:child(entry,name,v)
-    child(child(dev,'Mailbox',DataLinkLayer='true'),'CoE',SdoInfo='true',CompleteAccess='true',PdoAssign='false',PdoConfig='false')
+    child(child(dev,'Mailbox',DataLinkLayer='true'),'CoE',SdoInfo='true',CompleteAccess='false',PdoAssign='true',PdoConfig='true')
     eeprom=child(dev,'Eeprom'); child(eeprom,'ByteSize',2048); child(eeprom,'ConfigData','8002006EFF00FF000000')
     destination=Path(destination); destination.mkdir(parents=True,exist_ok=True)
     ET.indent(root)
     ET.ElementTree(root).write(destination/'cmmt.xml',encoding='utf-8',xml_declaration=True)
     (destination/'cmmt.json').write_text(json.dumps({'esi':'cmmt.xml','device_type':'CMMT_AS_SIM'}),encoding='utf-8')
-    (destination/'contract.json').write_text(json.dumps(spec,indent=2),encoding='utf-8')
-    return spec
+    (destination/'contract.json').write_text(json.dumps(contract,indent=2),encoding='utf-8')
+    return contract
 
