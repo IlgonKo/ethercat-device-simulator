@@ -552,3 +552,19 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 사용자 Master 재연결 완료 후 읽기 전용 조회: 서버 normal/initialized, 4ms, 진단 정상. 약 3초간 30회 WKC 18/18, 불일치 0.
 - 전 축 Fault bit 없음·속도 0, trajectory/homing idle. 가상축 위치 0, 컨테이너 healthy 및 모델/Slave ready 확인. Enable·이동 명령은 보내지 않았다.
 - Slave 자체 종료 감지·모델 정리·컨테이너 오류 종료 및 수동 재기동/재연결 항목 완료. RF-012 전체의 배포 재현성·NIC/성능·배치 조건은 남긴다. 원본 recovery.json은 Linux build/diagnostics/rf012-slave-exit-20261103에 보관했다.
+
+
+### 2026-11-03 — RF-017 Copley 물리 이동·파라미터 효과 확인
+
+- 사용자 조작권 해제 후 가상 Axis 3만 시험. Enable 단독 미전이 및 manualCW advanced_only 거부를 기록하고 기존 Fault Reset→Enable로 진행했다.
+- 절대 10mm, 상대 -4mm→6mm 및 속도/동일 가감속 효과 확인. 복귀 포함 9회 이동, 486개 상태 표본 WKC 불일치 0. 비대상 가상축 위치 변화 0, 실제 축 피드백 변동 약 0.001mm.
+- 위치 0 및 속도/가감속 100/500/500 복원·SDO readback, Disable·조작권 반환 확인. 영구 저장·실제 축 명령·코드 변경 없음.
+- 상세 Doc/Validation/RF-017/physical-motion-20261103.md. RF-017 잔여는 혼합 장시간 정량 성능이며 상대 이동 API와 FMU relative bit 검증을 구분했다.
+
+
+### 2026-11-03 — RF-017 혼합 가상 4축 10분 반복 운전
+
+- 첫 준비 시 F-KR 미원점으로 다축 PP handshake 실패, Copley는 부분 이동. 가상축 Disable·설정 복원 후 F-KR만 Home하고 모두 0으로 정렬하여 본 시험 수행. 실제 축 명령 없음.
+- 4ms 설정, 가상축 0↔10mm/10mm/s, 600.912초·542편도/271왕복. 조회 표본 WKC 불일치·Fault 없음. 가상축 위치 0·원래 속도100·Disable·조작권 반환 및 SDO 복원 확인.
+- 프레임 처리 평균0.020407/최대0.160152ms, IPC 실패0. 수신 간격 최대21.998ms·8ms 초과10회이므로 4ms 전수 준수로 보고하지 않는다.
+- RF-017 초기 연동 범위를 이번 관측 조건으로 완료 처리. RF-016 동일 조건 2축 비교 및 지터 원인 분리, RF-012 Docker/native 비교는 남긴다. 상세 Doc/Validation/RF-017/mixed-endurance-20261103.md.

@@ -23,7 +23,7 @@
 | [RF-014](RF-014-dynamic-pdo-mapping.md) | 동적 PDO 매핑 지원 | **예정** |
 | [RF-015](RF-015-axis-model-semantics.md) | 가상축 위치 제한 및 회전 경로 동작 정리 | **예정** |
 | [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **진행 중** |
-| [RF-017](RF-017-copley-fmu.md) | Copley FMU 초기 연동 | **진행 중** |
+| [RF-017](RF-017-copley-fmu.md) | Copley FMU 초기 연동 | **완료** |
 | [RF-018](RF-018-diagnostic-fault.md) | 공통 Diagnostic 및 모델 장애 격리 | **완료** |
 | [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **예정** |
 | [RF-020](RF-020-parameter-history.md) | 파라미터 revision 및 변경 이력 관리 | **예정** |
@@ -37,7 +37,7 @@
 | RF-011 | 완료 | 현재 구성·다축 독립성 범위 없음. 기존 오프라인/사용자 물리 확인/RF-010·018 근거 반영 |
 | RF-012 | 진행 중 | 배포 재현성, NIC 영향, Docker/native 지연, 동일 Edge 배치·외부 DT 경로 (Slave 자체 실패·복구는 11월 3일 확인) |
 | RF-016 | 진행 중 | 현 구조 동일 조건 2축/4축 계측·이동 부하 회귀 |
-| RF-017 | 진행 중 | 물리 절대/상대 이동 상세값·파라미터 동작 효과·혼합 장시간 정량 성능 |
+| RF-017 | 완료 | 초기 연동 범위: 세부 이동·파라미터 효과·혼합 10분 계측 확인. 4ms 전수 준수는 보장하지 않음 |
 
 성능 항목은 묶어서 검증할 수 있지만 기존 완료 기준을 임의 삭제하지 않았다. 30분 등의 신규 합격 조건은 정하지 않았다. 기존 저장/장애 격리 완료 근거는 RF-010/018을 따른다.
 
