@@ -13,7 +13,7 @@ Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프
 
 | 기준 | 상태 | 기존 근거 / 실제 남은 범위 |
 | --- | --- | --- |
-| Linux/CPU 이미지 빌드·배포 조건 | 부분 확인 | Edge x86_64 빌드·운영 성공. 깨끗한 checkout에서 전체 의존성까지 재현하는 검증은 남음 |
+| Linux/CPU 이미지 빌드·배포 조건 | 부분 확인 | Edge x86_64 빌드·운영 성공. 별도 checkout에서 C++·FMU 재빌드와 새 이미지 오프라인 검증 완료. 기존 의존성 묶음 사용; 새 PC 의존성 확보·고정은 남음 |
 | Motion Server와 독립 실행 | 완료 | RF-016 자체 모델 이관 및 운영 Docker |
 | 비대화식 지속 실행·정상 stop·자식 정리 | 완료 | Docker 시험에서 stdin 없이 실행, stop 코드 0 및 자식 종료 확인 |
 | 모델 실패 시 Slave 유지·장애 표시 | 완료 | RF-018 SIGSTOP/SIGKILL, WKC 표본·축 Fault·수동 복구 |
@@ -31,7 +31,7 @@ Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프
 
 ## 실제 남은 항목
 
-1. 깨끗한 Linux checkout 기준 C++·Python·FMU 준비와 전체 배포 재현성 검증.
+1. 새 PC 배포를 위한 오프라인 의존성 묶음/버전 고정 및 확보 절차 정리. 별도 Linux checkout에서 C++·Python·FMU·Docker 재빌드는 검증 완료(기존 Edge/오프라인 입력 범위).
 2. NIC 권한·플래그 영향 기록 및 Docker/native 동일 조건 지연 비교.
 3. 동일 Edge의 Master/Simulator 동시 배치, 별도 Omniverse PC와 외부 통신 경로 검증. 현재 구성의 실패가 아니라 아직 시험하지 않은 배치 조건이다.
 
@@ -46,3 +46,7 @@ Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프
 ## 2026-11-03 Slave 장애 시험
 
 [검증 기록](../Validation/RF-012/slave-exit-20261103.md). Slave SIGKILL 감지, 모델 정리, 컨테이너 비정상 종료 및 재생성 ready 확인. 저장 파라미터 불변. 사용자 Master 재연결 후 30회 모두 WKC 18/18, 정상 진단·전 축 Fault 없음 확인. Slave 종료·정리·수동 복구 항목을 완료 처리했다.
+
+## 2026-11-03 별도 checkout 빌드 검증
+
+[검증 기록](../Validation/RF-012/build-repro-20261103.md). KickCAT·Simulator·Linux FMU 재빌드, 별도 이미지, 혼합 4축 저장 복원·SDO gateway·실제 FMU 7개 테스트 통과. 운영 컨테이너는 유지했다. 외부 의존성 일부와 기본 이미지는 기존 오프라인 자료를 사용했으므로 새 OS부터의 전체 재현성 완료로 확대하지 않는다.
