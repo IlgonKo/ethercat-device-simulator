@@ -1,19 +1,19 @@
 # RF-012 — Simulator Docker 패키징 및 실행 검증
 
 - 현재 상태: **진행 중**
-- 상태 상세: 독립 Docker 운영·혼합 물리 통신·저장 복원·모델 장애 격리 확인. Slave 자체 장애 정리·재연결 복구도 확인. 배포 재현성·성능 비교·배치 조건 잔여 (2026-11-03).
+- 상태 상세: 독립 Docker 운영·혼합 물리 통신·저장 복원·모델 장애 격리 확인. Slave 자체 장애 정리·재연결 복구도 확인. 다단계 빌드 새 이미지의 사용자 수동 정상 동작 확인; 새 PC 확인·성능 비교·배치 조건 잔여 (2026-11-03).
 
 ## 현재 구현
 
 Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프로세스로 실행한다. Simulator 자체 `.env`, host 네트워크, 지정 NIC, `/state` bind 저장소, 임시 소켓을 사용한다. Motion Server 소스·설정·외부 모델 스냅샷을 마운트하지 않는다.
 
-이미지는 `ethercat-device-simulator:dev`, 운영은 [scripts/docker](../../scripts/README.md)를 따른다. Dockerfile은 현재 `build/timing/cmmt_simulator`를 패키징한다. `start.sh --build`는 C++ 소스 빌드까지 수행하지 않으며 사전 native 빌드가 필요하다. 모델은 `src/functional_model`에서 포함한다.
+이미지는 `ethercat-device-simulator:dev`, 운영은 [scripts/docker](../../scripts/README.md)를 따른다. Docker 다단계 빌드에서 C++ 의존성·KickCAT·Simulator·Linux Copley FMU를 빌드한다. `start.sh --build`에 호스트 native 사전 빌드가 필요하지 않다. 고정 Builder/base 이미지와 소스/wheel 입력은 먼저 준비한다. 기본 FMU는 이미지에 포함하며 기존 외부 경로 설정은 선택적 override로 유지한다.
 
 ## 완료 기준 대조
 
 | 기준 | 상태 | 기존 근거 / 실제 남은 범위 |
 | --- | --- | --- |
-| Linux/CPU 이미지 빌드·배포 조건 | 부분 확인 | Edge x86_64 빌드·운영 성공. 별도 checkout에서 C++·FMU 재빌드와 새 이미지 오프라인 검증 완료. 기존 의존성 묶음 사용; 새 PC 의존성 확보·고정은 남음 |
+| Linux/CPU 이미지 빌드·배포 조건 | 부분 확인 | Edge x86_64 빌드·운영 성공. 별도 checkout에서 C++·FMU 재빌드와 새 이미지 오프라인 검증 완료. 기존 의존성 묶음 사용; wheel/C++ 소스/base/Builder 고정 및 export·restore·rebuild 도구 구현. 새 PC/OS 확인은 남음 |
 | Motion Server와 독립 실행 | 완료 | RF-016 자체 모델 이관 및 운영 Docker |
 | 비대화식 지속 실행·정상 stop·자식 정리 | 완료 | Docker 시험에서 stdin 없이 실행, stop 코드 0 및 자식 종료 확인 |
 | 모델 실패 시 Slave 유지·장애 표시 | 완료 | RF-018 SIGSTOP/SIGKILL, WKC 표본·축 Fault·수동 복구 |
@@ -31,7 +31,7 @@ Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프
 
 ## 실제 남은 항목
 
-1. 새 PC 배포를 위한 오프라인 의존성 묶음/버전 고정 및 확보 절차 정리. 별도 Linux checkout에서 C++·Python·FMU·Docker 재빌드는 검증 완료(기존 Edge/오프라인 입력 범위).
+1. 배포 묶음을 실제 새 Linux PC/OS에서 확인. 의존성 고정·묶음 생성·복원·재빌드 절차는 구현했다. 호스트 compiler는 필요 없다. OS·Docker 설치 패키지는 묶음에 포함하지 않는다.
 2. NIC 권한·플래그 영향 기록 및 Docker/native 동일 조건 지연 비교.
 3. 동일 Edge의 Master/Simulator 동시 배치, 별도 Omniverse PC와 외부 통신 경로 검증. 현재 구성의 실패가 아니라 아직 시험하지 않은 배치 조건이다.
 
@@ -50,3 +50,19 @@ Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프
 ## 2026-11-03 별도 checkout 빌드 검증
 
 [검증 기록](../Validation/RF-012/build-repro-20261103.md). KickCAT·Simulator·Linux FMU 재빌드, 별도 이미지, 혼합 4축 저장 복원·SDO gateway·실제 FMU 7개 테스트 통과. 운영 컨테이너는 유지했다. 외부 의존성 일부와 기본 이미지는 기존 오프라인 자료를 사용했으므로 새 OS부터의 전체 재현성 완료로 확대하지 않는다.
+
+## 오프라인 배포 도구
+
+[운영 매뉴얼](../../scripts/deployment/README.md). Python wheel은 전이 의존성까지 버전/해시 고정, Docker base/Builder digest 고정, C++ 의존성은 소스 archive 해시 고정이다. Conan cache는 Docker 배포 경로에 사용하지 않는다. `offline.py`로 운영 설정/파라미터를 제외한 배포 묶음을 생성·검증하고 별도 경로에 복원 또는 재빌드한다. 컨테이너 시작·운영 :dev 태그 전환은 수동이다.
+
+[배포 도구 검증 결과](../Validation/RF-012/offline-deployment-20261103.md): export/verify/load/restore/전체 rebuild 및 새 이미지 혼합 4축·SDO·FMU 검증 통과. 현재 Edge의 격리 경로 범위이며 실제 새 PC 검증은 남는다.
+
+## Docker 다단계 빌드 전환
+
+기존 호스트 GCC/Conan archive 기반 절차는 native 개발용으로 남기고 Docker 배포 경로에서 제거했다. 컴파일러는 Builder 이미지에 포함하며 C++ 의존성도 소스로 빌드한다. schema 2 오프라인 묶음에는 Builder 이미지를 포함한다. [현재 매뉴얼](../../scripts/deployment/README.md)을 우선 적용하며 이전 검증 문서의 host compiler 조건은 당시 방식의 이력이다.
+
+[다단계 빌드 검증 결과](../Validation/RF-012/multistage-build-20261103.md): 컨테이너 내 소스 빌드·schema 2 offline rebuild·최종 이미지 내장 FMU 혼합 4축/SDO 검증 완료. 자동 검증 당시에는 운영 컨테이너를 교체하지 않았으며, 이후 사용자가 새 이미지로 수동 테스트를 완료하고 정상 동작을 확인했다 (2026-11-03).
+
+## 2026-11-03 사용자 수동 전환 검증
+
+사용자가 새 다단계 빌드 이미지로 수동 테스트를 완료하고 정상 동작을 확인했다. 새 이미지의 수동 적용·동작 확인을 완료로 기록한다. 상세 WKC 수치·시험 시간·개별 시험 항목별 로그는 추가 제출되지 않았으므로 새 정량 결과로 기록하지 않는다. 새 PC/OS·NIC 권한/플래그·배치 및 성능 비교 등 별도 잔여 기준이 있어 RF-012 전체는 진행 중을 유지한다.

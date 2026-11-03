@@ -1,0 +1,31 @@
+{
+  "platform": "linux/amd64",
+  "python": "3.12",
+  "base_image": "python@sha256:d764629ce0ddd8c71fd371e9901efb324a95789d2315a47db7e4d27e78f1b0e9",
+  "source_fmu_sha256": "e6456f4787b61b209f0e718c62ee3d570560ce975b7aacf733da6d4f21994b4d",
+  "native_sources": [
+    {
+      "file": "argparse-3.2.tar.gz",
+      "url": "https://codeload.github.com/p-ranav/argparse/tar.gz/refs/tags/v3.2",
+      "sha256": "9dcb3d8ce0a41b2a48ac8baa54b51a9f1b6a2c52dd374e28cc713bab0568ec98"
+    },
+    {
+      "file": "json-3.12.0.tar.gz",
+      "url": "https://codeload.github.com/nlohmann/json/tar.gz/refs/tags/v3.12.0",
+      "sha256": "4b92eb0c06d10683f7447ce9406cb97cd4b453be18d7279320f7b2f025c10187"
+    },
+    {
+      "file": "tinyxml2-11.0.0.tar.gz",
+      "url": "https://codeload.github.com/leethomason/tinyxml2/tar.gz/refs/tags/11.0.0",
+      "sha256": "5556deb5081fb246ee92afae73efd943c889cef0cafea92b0b82422d6a18f289"
+    }
+  ],
+  "source_fmu_url": "https://raw.githubusercontent.com/Beckhoff-USA-Community/AAG_TwinCAT_CiA402_CANopen_CPP_FMU_MATLAB/68978af04ea475cf89e39ae872cdccb5ddc95e4c/MATLAB_and_Simulink/FMU_DriveSim/CopleyDriveSim.fmu",
+  "builder_image": "python@sha256:17b9724493d916f56565c131f389faff2597f46dec6ce09516f95125bc9f519f",
+  "build_strategy": "Docker multi-stage; native dependency sources; no host compiler or Conan cache required",
+  "legacy_native": {
+    "gcc": "13.3.0",
+    "conan": "2.10.2",
+    "conan_cache_sha256": "ab59c10916a1c91cbf4879f017e0758a0dd7cb54b4de2e76cca35d9d06e958bf"
+  }
+}

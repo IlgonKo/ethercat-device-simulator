@@ -16,6 +16,8 @@ class DockerScriptTests(unittest.TestCase):
         self.addCleanup(self.temp.cleanup)
         self.root = Path(self.temp.name) / 'project with spaces'
         shutil.copytree(Path(__file__).resolve().parents[2] / 'scripts/docker', self.root / 'scripts/docker')
+        # Shell-dispatch tests use a prepared-input stub; checksums have separate tests.
+        (self.root / 'scripts/docker/prepare-inputs.py').write_text('raise SystemExit(0)\n')
         repository = Path(__file__).resolve().parents[2]
         (self.root / 'src/functional_model').mkdir(parents=True)
         shutil.copy2(repository / 'src/functional_model/configuration.py', self.root / 'src/functional_model/configuration.py')
@@ -86,6 +88,17 @@ if os.environ.get('FAKE_FAIL') in args: sys.exit(9)
         result, calls = self.run_script('start.sh')
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(calls, [])
+
+    def test_external_fmu_override_only_when_explicit(self):
+        result, calls = self.run_script('status.sh')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertFalse(any('compose.external-fmu.yaml' in str(c) for c in calls))
+        with (self.root / '.env').open('a') as f:
+            f.write('\nDEVICE_SIMULATOR_FMU_DIR=./custom-fmu\n')
+        self.log.unlink()
+        result, calls = self.run_script('status.sh')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertTrue(all(str(self.root / 'compose.external-fmu.yaml') in c for c in calls))
 
 
 if __name__ == '__main__':

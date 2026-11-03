@@ -1,0 +1,7 @@
+services:
+  simulator:
+    volumes:
+      - type: bind
+        source: ${DEVICE_SIMULATOR_FMU_DIR:?Set external FMU directory}
+        target: /model_artifacts
+        read_only: true

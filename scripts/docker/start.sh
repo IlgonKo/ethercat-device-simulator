@@ -7,6 +7,7 @@ if [[ $# -gt 1 || ( $# -eq 1 && "$1" != --build ) ]]; then
 fi
 source "$(dirname "${BASH_SOURCE[0]}")/common.sh"
 if [[ "${1:-}" == --build ]]; then
+    python3 "${SCRIPT_DIR}/prepare-inputs.py" --images
     "${COMPOSE[@]}" build simulator
 fi
 echo "Starting Simulator using ${PROJECT_ROOT}/.env"

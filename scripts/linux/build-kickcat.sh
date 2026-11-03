@@ -10,7 +10,7 @@ done
 test -f "$SRC/scripts/setup_build.sh" || { echo "Run: git submodule update --init --recursive" >&2; exit 1; }
 if [[ ! -x "$VENV/bin/conan" ]]; then
     python3 -m venv "$VENV"
-    "$VENV/bin/python" -m pip install 'conan==2.10.2'
+    "$VENV/bin/python" -m pip install -r "$ROOT/docker/requirements-build.txt"
 fi
 export PATH="$VENV/bin:$PATH"
 bash "$SRC/scripts/configure.sh" "$BUILD" -ni --without=all --with=simulation --with=esi_parser --with=master_examples

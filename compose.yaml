@@ -6,8 +6,8 @@ services:
       context: .
       dockerfile: docker/Dockerfile
       args:
-        BASE_IMAGE: python:3.12-slim
-        DEVICE_SIMULATOR_BINARY: build/timing/cmmt_simulator
+        BASE_IMAGE: python:simulator-runtime-d764629ce0dd
+        BUILDER_IMAGE: python:simulator-builder-17b9724493d9
     network_mode: host
     init: true
     restart: "no"
@@ -37,10 +37,6 @@ services:
       - type: bind
         source: ${DEVICE_SIMULATOR_STATE_DIR:-./state}
         target: /state
-      - type: bind
-        source: ${DEVICE_SIMULATOR_FMU_DIR:-./model_artifacts}
-        target: /model_artifacts
-        read_only: true
     tmpfs:
       - /tmp:mode=1777
       - /run/simulator:mode=0700

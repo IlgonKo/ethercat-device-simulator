@@ -20,15 +20,15 @@ start는 NIC를 실제로 연다. Motion Server를 정지하고 기존 native Si
 
 | 위치 | 이유 |
 | --- | --- |
-| linux/build-kickcat.sh | C++ 의존성/toolchain 준비. 현재 Dockerfile은 소스 빌드 대신 기존 바이너리를 패키징 |
-| linux/build-cmmt.sh | Docker에 넣을 cmmt_simulator 빌드 |
+| linux/build-kickcat.sh | 직접 native 개발·디버깅용 C++ 의존성/toolchain 준비 |
+| linux/build-cmmt.sh | 직접 native 개발·디버깅용 cmmt_simulator 빌드 |
 | linux/validate-fleet.py | 물리 NIC 없는 C++/Python 계약 검사; 모델/바이너리 변경 검증 |
 | linux/benchmark-role-index.py | 기존 모델 OD 조회 성능 회귀 검사 |
 | linux/summarize-timing.py | Docker 로그의 C++ 계측 분석 |
 | linux/summarize-python-timing.py | Docker 로그의 Python 계측 분석 |
 | windows/sdo_checks.py | 테스트가 사용하는 SDO 복원 검사 라이브러리. Docker 실행 스크립트는 아님 |
 
-build-cmmt.sh 산출물은 build/timing/cmmt_simulator이며 Compose와 동일한 경로를 사용한다. Python 기능 모델은 저장소 src/functional_model에서 이미지에 복사한다. 외부 모델 스냅샷이나 MODEL_SOURCE는 필요 없다. start --build는 이미지를 빌드하며 C++ 컴파일은 build-cmmt.sh로 별도 수행한다.
+Docker는 이제 Builder에서 C++ 의존성·KickCAT·Simulator·Linux Copley FMU를 소스로 빌드한다. 호스트 native 실행 파일은 사용하지 않는다. `start.sh --build`도 전체 소스 빌드이며 고정 이미지·입력을 먼저 준비한다. 자세한 준비 방법은 [배포 매뉴얼](deployment/README.md)을 따른다. Python 기능 모델은 저장소 내부 src/functional_model에서 포함한다.
 
 ## 삭제한 이전 진입점 (2026-10-26)
 
@@ -49,3 +49,7 @@ python3 scripts/linux/validate-fleet.py --binary build/timing/cmmt_simulator
 ```
 
 개발 검증에 --model-root는 사용하지 않는다. windows/export-model-source.py는 자체 모델 이관 후 삭제했다. tests/unit/test_sdo_restore.py는 Windows용 pysoem 의존성이 없는 환경에서는 건너뛴다.
+
+## 오프라인 배포·재빌드
+
+[배포 묶음 매뉴얼](deployment/README.md)을 따른다. `scripts/deployment/offline.py`는 export / verify / load-image / restore / rebuild를 제공한다. FMI 의존성은 wheel hash까지, C++ 의존성 소스와 FMU 소스는 SHA-256으로, Docker base/builder는 digest로 고정했다. 묶음은 운영 `.env`와 state를 포함하지 않으며 컨테이너를 자동 실행하지 않는다. 호스트 컴파일러는 필요 없으며 OS·Docker 및 기존 도구용 Python/Git은 별도 준비한다.

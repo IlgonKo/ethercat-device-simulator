@@ -581,3 +581,23 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - [별도 checkout 검증](Validation/RF-012/build-repro-20261103.md): 새 venv/Conan 캐시에서 KickCAT·Simulator·Copley FMU 재빌드 및 새 Docker 이미지 생성. CTest 3개, Python 39개(1 skip), 실제 FMU 7개 및 혼합 4축/SDO gateway 통과.
 - 운영 컨테이너 ID/시작 시간 유지. NIC와 운영 state에 접근하지 않았다. 오프라인 입력 재사용 및 새 PC 배포 한계 명시.
 - 사용자 결정: Motion Server가 비RT 환경이므로 추가 지터 원인 조사는 진행하지 않는다. 기존 측정 결과를 RT 성능 보장으로 해석하지 않는다.
+
+## 2026-11-03 RF-012 오프라인 배포 도구
+
+- Python runtime/Conan bootstrap wheel 버전·해시 및 Docker base digest 고정. Conan cache archive도 해시로 식별.
+- offline.py export/verify/load-image/restore/rebuild와 새 PC 매뉴얼 추가. 운영 .env/state 제외 및 자동 시작 없음.
+- 묶음만 사용한 전체 재빌드 통과. CTest 3개, unit 47개(1 skip), 실제 FMU 7개 및 혼합 4축/SDO gateway 통과. 운영 컨테이너 ID/시작 시간 유지.
+- [상세 결과](Validation/RF-012/offline-deployment-20261103.md). 새 PC/OS 확인과 NIC·배치 검증은 남음.
+
+## 2026-11-03 Docker Builder 통합
+
+- Docker 다단계 빌드로 C++ 의존성/KickCAT/Simulator/Copley FMU를 컨테이너에서 빌드. Docker 경로의 호스트 compiler/Conan cache 의존 제거.
+- 내장 FMU 기본값 및 기존 외부 FMU 경로 선택적 override. schema 2 bundle은 Builder 이미지와 소스 의존성 포함.
+- CTest 3개, unit 48개(1 skip), 실제 FMU 7개, offline rebuild 및 최종 runtime 내장 FMU 혼합 4축/SDO 검증 통과. 운영 컨테이너/.env/state 유지.
+- [검증 결과](Validation/RF-012/multistage-build-20261103.md), [매뉴얼](../scripts/deployment/README.md). 물리 적용은 아직 하지 않음.
+
+## 2026-11-03 새 Docker 이미지 사용자 수동 검증 완료
+
+- 사용자 확인: 새 이미지로 수동 테스트 완료, 정상 동작 확인. RF-012와 다단계 빌드 검증 기록에 반영. 별도 상세 계측 수치/개별 항목 로그는 추가하지 않음.
+- state JSON 백업의 Permission denied를 반영하여 sudo cp -a / sudo diff -qr 절차 및 원복 범위를 매뉴얼에 명시.
+- 새 이미지 수동 적용 확인은 완료. RF-012 전체는 별도 잔여 기준 때문에 진행 중 유지.
