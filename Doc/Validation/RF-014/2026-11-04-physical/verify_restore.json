@@ -1,0 +1,16 @@
+{
+  "stage": "verify_restore",
+  "started": 1793753172.2944803,
+  "aborts": [],
+  "restored_axes": 4,
+  "mapped_bytes": 358,
+  "wkc": {
+    "expected": 18,
+    "count": 125,
+    "minimum": 18,
+    "maximum": 18,
+    "mismatches": 0
+  },
+  "passed": true,
+  "finished": 1793753173.894781
+}

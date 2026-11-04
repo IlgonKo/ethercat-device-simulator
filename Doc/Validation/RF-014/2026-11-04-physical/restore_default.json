@@ -1,0 +1,9 @@
+{
+  "stage": "restore_default",
+  "started": 1793753174.1867266,
+  "aborts": [],
+  "mapped_bytes": 450,
+  "restored_axes": 4,
+  "passed": true,
+  "finished": 1793753174.7398915
+}

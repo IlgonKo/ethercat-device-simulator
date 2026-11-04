@@ -1,0 +1,198 @@
+{
+  "stage": "exercise",
+  "started": 1793753132.2582006,
+  "aborts": [
+    {
+      "name": "CA read 2",
+      "code": "0x6010000"
+    },
+    {
+      "name": "CA write 2",
+      "code": "0x6010000"
+    },
+    {
+      "name": "wrong length 2",
+      "code": "0x6040041"
+    },
+    {
+      "name": "duplicate 2",
+      "code": "0x6040041"
+    },
+    {
+      "name": "CA read 3",
+      "code": "0x6010000"
+    },
+    {
+      "name": "CA write 3",
+      "code": "0x6010000"
+    },
+    {
+      "name": "wrong length 3",
+      "code": "0x6040041"
+    },
+    {
+      "name": "duplicate 3",
+      "code": "0x6040041"
+    },
+    {
+      "name": "CA read 4",
+      "code": "0x6010000"
+    },
+    {
+      "name": "CA write 4",
+      "code": "0x6010000"
+    },
+    {
+      "name": "wrong length 4",
+      "code": "0x6040041"
+    },
+    {
+      "name": "duplicate 4",
+      "code": "0x6040041"
+    },
+    {
+      "name": "CA read 5",
+      "code": "0x6010000"
+    },
+    {
+      "name": "CA write 5",
+      "code": "0x6010000"
+    },
+    {
+      "name": "wrong length 5",
+      "code": "0x6040041"
+    },
+    {
+      "name": "duplicate 5",
+      "code": "0x6040041"
+    },
+    {
+      "name": "SAFEOP write 2",
+      "code": "0x8000022"
+    },
+    {
+      "name": "SAFEOP write 3",
+      "code": "0x8000022"
+    },
+    {
+      "name": "SAFEOP write 4",
+      "code": "0x8000022"
+    },
+    {
+      "name": "SAFEOP write 5",
+      "code": "0x8000022"
+    }
+  ],
+  "mapped_bytes": 358,
+  "expected_wkc": 18,
+  "enabled": [
+    [
+      334933,
+      39,
+      1,
+      0,
+      0
+    ],
+    [
+      0,
+      39,
+      1,
+      0,
+      0
+    ],
+    [
+      1000,
+      33335,
+      1,
+      0,
+      0
+    ],
+    [
+      1000,
+      33335,
+      1,
+      0,
+      0
+    ]
+  ],
+  "homing": [
+    [
+      0,
+      32807,
+      6,
+      0,
+      0
+    ],
+    [
+      0,
+      33831,
+      6,
+      0,
+      0
+    ],
+    [
+      1000,
+      33335,
+      1,
+      0,
+      0
+    ],
+    [
+      1000,
+      33335,
+      1,
+      0,
+      0
+    ]
+  ],
+  "intended_targets": [
+    1000,
+    1000,
+    2000,
+    2000
+  ],
+  "after_pp": [
+    [
+      1000,
+      33831,
+      1,
+      0,
+      0
+    ],
+    [
+      1000,
+      33831,
+      1,
+      0,
+      0
+    ],
+    [
+      2000,
+      34359,
+      1,
+      0,
+      0
+    ],
+    [
+      2000,
+      34359,
+      1,
+      0,
+      0
+    ]
+  ],
+  "targets": [
+    1000,
+    1000,
+    2000,
+    2000
+  ],
+  "wkc": {
+    "count": 427,
+    "minimum": 18,
+    "maximum": 18,
+    "mismatches": 0
+  },
+  "passed": true,
+  "finished": 1793753136.476767
+}

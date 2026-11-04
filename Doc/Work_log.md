@@ -725,3 +725,13 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 시험 전용 Docker 태그 ethercat-device-simulator:rf014로 빌드한다. 기존 dev 이미지와 운영 컨테이너는 전환하지 않는다. 세부 검증 범위는 RF-014의 구현 검증 절 참조.
 
 - 최종 검증: C++ 5/5, Python 55 통과·1 skip, Linux Copley FMU 8/8, 혼합 2축/4축 및 격리 runtime 시작 통과. 검증 보고서: [RF-014](Validation/RF-014/2026-11-03-offline-implementation.md). 이미지 :rf014 빌드 완료; 물리 시험 및 운영 이미지 전환은 미실시.
+
+
+## 2026-11-04 RF-014 변경 매핑 물리 시험
+
+- 사용자 1~3번 수동 확인 완료 및 Motion Server 연결 해제 후 Windows PySOEM으로 시험.
+- 가상 4축 Rx3/Tx12 변경 구성, SDO PP 이동, 정상 Abort 20건, WKC 427/427 정상. 재생성 복원 후 125/125 정상.
+- F-KR은 Homing 참조 설정 후 의도 목표와 실제 위치를 비교했다. 기본 매핑으로 복원하고 전 Slave PRE-OP/AL error 0 확인.
+- [상세 보고서](Validation/RF-014/2026-11-04-physical/README.md). 제품 코드 변경 없음.
+
+- RF-014 완료 기준에 기존 검증을 반영하고 잔여 검증을 전체 적용 실패·저장 경계·IPC 전환 장애·PP 재개·축별 매핑 독립성으로 정리했다. 별도의 RT 보장/장시간 시험 조건은 추가하지 않았다.
