@@ -22,7 +22,7 @@
 | [RF-013](RF-013-virtual-io.md) | 가상 IO 및 IO-Link 시뮬레이션 | **보류** |
 | [RF-014](RF-014-dynamic-pdo-mapping.md) | 동적 PDO 매핑 지원 | **완료** |
 | [RF-015](RF-015-axis-model-semantics.md) | 가상축 위치 제한 및 회전 경로 동작 정리 | **예정** |
-| [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **진행 중** |
+| [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **완료** |
 | [RF-017](RF-017-copley-fmu.md) | Copley FMU 초기 연동 | **완료** |
 | [RF-018](RF-018-diagnostic-fault.md) | 공통 Diagnostic 및 모델 장애 격리 | **완료** |
 | [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **예정** |
@@ -52,3 +52,7 @@ RF 본문에는 현재 범위·판정·실제 남은 항목을 둔다. 상세 �
 ## 2026-11-05 RF-014 완료
 
 동적 PDO 매핑·영구 복원·장애 경계·PP 재개·축별 독립성 및 수정 이미지 적용 후 사용자 수동 회귀 확인을 반영했다. 합의 범위 잔여 항목 없음. 상세 근거는 [RF-014](RF-014-dynamic-pdo-mapping.md)를 따른다.
+
+## 2026-11-05 성능 비교 반영
+
+RF-016의 현재 구조 2축/4축·이동 부하 비교 완료. RF-012 Docker/native 비교도 완료하여 새 PC/OS 및 동일 Edge Master 배치만 남긴다. NIC 추가 검증·Omniverse는 기존 결정대로 보류/추후 범위다. [공통 보고서](../Validation/RF-016/runtime-comparison-20261105/README.md).

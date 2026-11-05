@@ -1,0 +1,3058 @@
+{
+  "clock_offset_s": -19.63722336292267,
+  "clock_samples": [
+    {
+      "rtt_ms": 206.3589096069336,
+      "offset_s": -19.634297847747803
+    },
+    {
+      "rtt_ms": 203.39441299438477,
+      "offset_s": -19.636021614074707
+    },
+    {
+      "rtt_ms": 201.582670211792,
+      "offset_s": -19.63691282272339
+    },
+    {
+      "rtt_ms": 210.13569831848145,
+      "offset_s": -19.641446113586426
+    },
+    {
+      "rtt_ms": 216.30501747131348,
+      "offset_s": -19.63780951499939
+    },
+    {
+      "rtt_ms": 216.68696403503418,
+      "offset_s": -19.63753390312195
+    }
+  ],
+  "window_margin_s": 1,
+  "trials": [
+    {
+      "run": "docker2-a",
+      "mode": "docker",
+      "axes": 2,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.096565,
+          "avg_ms": 0.08226877777777777
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6763,
+          "max_ms": 0.059973,
+          "avg_ms": 0.021902964364926805
+        },
+        "python-timing:axis_0_model": {
+          "count": 6763,
+          "max_ms": 0.048889,
+          "avg_ms": 0.019013449652521074
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6763,
+          "max_ms": 0.037503,
+          "avg_ms": 0.008844749815170782
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6763,
+          "max_ms": 0.112346,
+          "avg_ms": 0.049761163832618666
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13526,
+          "max_ms": 0.055662,
+          "avg_ms": 0.014930837276356643
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13526,
+          "max_ms": 0.404123,
+          "avg_ms": 0.13285797730297208
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13526,
+          "max_ms": 0.038411,
+          "avg_ms": 0.011027791438710632
+        },
+        "python-timing:exchange_send": {
+          "count": 13526,
+          "max_ms": 0.028854,
+          "avg_ms": 0.0070400955197397605
+        },
+        "python-timing:exchange_request": {
+          "count": 13526,
+          "max_ms": 0.469765,
+          "avg_ms": 0.16585670153777915
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6763,
+          "max_ms": 0.06144,
+          "avg_ms": 0.029898723939080295
+        },
+        "python-timing:axis_1_model": {
+          "count": 6763,
+          "max_ms": 0.219819,
+          "avg_ms": 0.07369495948543546
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6763,
+          "max_ms": 0.031886,
+          "avg_ms": 0.009694423628567202
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6763,
+          "max_ms": 0.297279,
+          "avg_ms": 0.11328810705308298
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6767,
+          "max_ms": 0.138969,
+          "avg_ms": 0.0535452764888429
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6767,
+          "max_ms": 6.421313,
+          "avg_ms": 3.971509829614304
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6767,
+          "max_ms": 6.409954,
+          "avg_ms": 3.959783201861979
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6767,
+          "max_ms": 0.138969,
+          "avg_ms": 0.0535452764888429
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6767,
+          "max_ms": 0.089236,
+          "avg_ms": 0.03553301921087631
+        },
+        "simulator-timing:post_reply": {
+          "count": 6767,
+          "max_ms": 0.089236,
+          "avg_ms": 0.03553301921087631
+        },
+        "simulator-timing:route": {
+          "count": 6767,
+          "max_ms": 0.006451,
+          "avg_ms": 0.0004161669868479387
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6767,
+          "max_ms": 6.451064,
+          "avg_ms": 3.9999689296586385
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6767,
+          "max_ms": 0.064294,
+          "avg_ms": 0.018012257277966598
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13534,
+          "max_ms": 0.034945,
+          "avg_ms": 0.0003619287719816758
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6767,
+          "max_ms": 6.40001,
+          "avg_ms": 3.94507588739471
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.066894,
+          "avg_ms": 0.048579740740740736
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861721.6392334,
+        "end": 1793861751.651389,
+        "legs": 0,
+        "samples": 7503,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 3.9999999200297647,
+      "tx_gap_max_ms": 6.446900020819157,
+      "tx_gap_p95_ms": 4.309699987061322
+    },
+    {
+      "run": "docker2-a",
+      "mode": "docker",
+      "axes": 2,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.093464,
+          "avg_ms": 0.08085714814814814
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6762,
+          "max_ms": 0.06466,
+          "avg_ms": 0.030357360544217685
+        },
+        "python-timing:axis_1_model": {
+          "count": 6762,
+          "max_ms": 0.205108,
+          "avg_ms": 0.07507973203194322
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6762,
+          "max_ms": 0.035116,
+          "avg_ms": 0.009919724785566398
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6762,
+          "max_ms": 0.2787,
+          "avg_ms": 0.11535681736172736
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13524,
+          "max_ms": 0.055423,
+          "avg_ms": 0.01482681225968648
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13524,
+          "max_ms": 0.379055,
+          "avg_ms": 0.13701651989056493
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13524,
+          "max_ms": 0.034652,
+          "avg_ms": 0.0111802979148181
+        },
+        "python-timing:exchange_send": {
+          "count": 13524,
+          "max_ms": 0.030995,
+          "avg_ms": 0.0071672897811298425
+        },
+        "python-timing:exchange_request": {
+          "count": 13524,
+          "max_ms": 0.439378,
+          "avg_ms": 0.17019091984619927
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6762,
+          "max_ms": 0.051688,
+          "avg_ms": 0.02198005190771961
+        },
+        "python-timing:axis_0_model": {
+          "count": 6762,
+          "max_ms": 0.064763,
+          "avg_ms": 0.02415294424726412
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6762,
+          "max_ms": 0.031047,
+          "avg_ms": 0.009101959479443951
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6762,
+          "max_ms": 0.130677,
+          "avg_ms": 0.0552349556344277
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6766,
+          "max_ms": 0.141181,
+          "avg_ms": 0.05461636254803429
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6766,
+          "max_ms": 5.520219,
+          "avg_ms": 3.9714184955660654
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6766,
+          "max_ms": 5.509355,
+          "avg_ms": 3.959781026751403
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6766,
+          "max_ms": 0.141181,
+          "avg_ms": 0.05461636254803429
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6766,
+          "max_ms": 0.077537,
+          "avg_ms": 0.03585045152231747
+        },
+        "simulator-timing:post_reply": {
+          "count": 6766,
+          "max_ms": 0.077537,
+          "avg_ms": 0.03585045152231747
+        },
+        "simulator-timing:route": {
+          "count": 6766,
+          "max_ms": 0.013101,
+          "avg_ms": 0.000424421667159326
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6766,
+          "max_ms": 5.549971,
+          "avg_ms": 3.999932739875849
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6766,
+          "max_ms": 0.069443,
+          "avg_ms": 0.01876591102571682
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13532,
+          "max_ms": 0.012145,
+          "avg_ms": 0.00035448108187998833
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6766,
+          "max_ms": 5.497361,
+          "avg_ms": 3.943667732633758
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.066532,
+          "avg_ms": 0.04589851851851852
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861751.8515766,
+        "end": 1793861782.020342,
+        "legs": 28,
+        "samples": 7542,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 4.0000140944046185,
+      "tx_gap_max_ms": 11.386899976059794,
+      "tx_gap_p95_ms": 4.331999982241541
+    },
+    {
+      "run": "docker2-b",
+      "mode": "docker",
+      "axes": 2,
+      "phase": "stationary",
+      "windows": {
+        "simulator-timing": 27,
+        "python-timing": 27
+      },
+      "metrics": {
+        "simulator-timing:frame_busy": {
+          "count": 6766,
+          "max_ms": 0.099029,
+          "avg_ms": 0.05347041265149275
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6766,
+          "max_ms": 6.054172,
+          "avg_ms": 3.97193919464972
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6766,
+          "max_ms": 6.035591,
+          "avg_ms": 3.9604232385456704
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6766,
+          "max_ms": 0.099029,
+          "avg_ms": 0.05347041265149275
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6766,
+          "max_ms": 0.071025,
+          "avg_ms": 0.035333453000295605
+        },
+        "simulator-timing:post_reply": {
+          "count": 6766,
+          "max_ms": 0.071025,
+          "avg_ms": 0.035333453000295605
+        },
+        "simulator-timing:route": {
+          "count": 6766,
+          "max_ms": 0.006656,
+          "avg_ms": 0.0004086367129766479
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6766,
+          "max_ms": 6.107893,
+          "avg_ms": 3.9998931946497196
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6766,
+          "max_ms": 0.040208,
+          "avg_ms": 0.01813695965119716
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13532,
+          "max_ms": 0.007973,
+          "avg_ms": 0.0003553334318652084
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6766,
+          "max_ms": 6.023606,
+          "avg_ms": 3.944687240023647
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.068441,
+          "avg_ms": 0.04518637037037037
+        },
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.088805,
+          "avg_ms": 0.07888792592592592
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6762,
+          "max_ms": 0.052228,
+          "avg_ms": 0.022119362170955337
+        },
+        "python-timing:axis_0_model": {
+          "count": 6762,
+          "max_ms": 0.048269,
+          "avg_ms": 0.01895969402543626
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6762,
+          "max_ms": 0.029351,
+          "avg_ms": 0.00893234708666075
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6762,
+          "max_ms": 0.103849,
+          "avg_ms": 0.050011403283052355
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13523,
+          "max_ms": 0.054787,
+          "avg_ms": 0.014985567403682615
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13523,
+          "max_ms": 0.359271,
+          "avg_ms": 0.1354825438142424
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13523,
+          "max_ms": 0.038897,
+          "avg_ms": 0.011128015898839013
+        },
+        "python-timing:exchange_send": {
+          "count": 13523,
+          "max_ms": 0.052895,
+          "avg_ms": 0.006898725504695705
+        },
+        "python-timing:exchange_request": {
+          "count": 13523,
+          "max_ms": 0.418597,
+          "avg_ms": 0.1684948526214598
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6761,
+          "max_ms": 0.062042,
+          "avg_ms": 0.03060616269782576
+        },
+        "python-timing:axis_1_model": {
+          "count": 6761,
+          "max_ms": 0.182476,
+          "avg_ms": 0.07723310826800771
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6761,
+          "max_ms": 0.030454,
+          "avg_ms": 0.010074568998668836
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6761,
+          "max_ms": 0.261855,
+          "avg_ms": 0.11791383996450229
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862207.8248544,
+        "end": 1793862237.854111,
+        "legs": 0,
+        "samples": 7507,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 4.000026069005743,
+      "tx_gap_max_ms": 6.128799985162914,
+      "tx_gap_p95_ms": 4.334600002039224
+    },
+    {
+      "run": "docker2-b",
+      "mode": "docker",
+      "axes": 2,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.088383,
+          "avg_ms": 0.07910203703703703
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6759,
+          "max_ms": 0.062195,
+          "avg_ms": 0.030571472407160825
+        },
+        "python-timing:axis_1_model": {
+          "count": 6759,
+          "max_ms": 0.153021,
+          "avg_ms": 0.07719771623021159
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6759,
+          "max_ms": 0.035329,
+          "avg_ms": 0.009957201805000737
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6759,
+          "max_ms": 0.226021,
+          "avg_ms": 0.11772639044237315
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13517,
+          "max_ms": 0.054171,
+          "avg_ms": 0.015032950358807428
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13517,
+          "max_ms": 0.340682,
+          "avg_ms": 0.13835293918768957
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13517,
+          "max_ms": 0.031012,
+          "avg_ms": 0.011175445069172157
+        },
+        "python-timing:exchange_send": {
+          "count": 13517,
+          "max_ms": 0.027026,
+          "avg_ms": 0.006920160538581046
+        },
+        "python-timing:exchange_request": {
+          "count": 13517,
+          "max_ms": 0.405669,
+          "avg_ms": 0.17148149515425018
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6758,
+          "max_ms": 0.050676,
+          "avg_ms": 0.022353975732465226
+        },
+        "python-timing:axis_0_model": {
+          "count": 6758,
+          "max_ms": 0.055234,
+          "avg_ms": 0.02429048712636875
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6758,
+          "max_ms": 0.038632,
+          "avg_ms": 0.009192389168393017
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6758,
+          "max_ms": 0.120546,
+          "avg_ms": 0.05583685202722699
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6769,
+          "max_ms": 0.120967,
+          "avg_ms": 0.053114055399615896
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6769,
+          "max_ms": 9.145113,
+          "avg_ms": 3.971710599497711
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6769,
+          "max_ms": 9.135047,
+          "avg_ms": 3.9602628993942974
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6769,
+          "max_ms": 0.120967,
+          "avg_ms": 0.053114055399615896
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6769,
+          "max_ms": 0.074324,
+          "avg_ms": 0.03528986423400798
+        },
+        "simulator-timing:post_reply": {
+          "count": 6769,
+          "max_ms": 0.074324,
+          "avg_ms": 0.03528986423400798
+        },
+        "simulator-timing:route": {
+          "count": 6769,
+          "max_ms": 0.010137,
+          "avg_ms": 0.0004081984044910623
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6769,
+          "max_ms": 9.174596,
+          "avg_ms": 3.999930318806323
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6769,
+          "max_ms": 0.069259,
+          "avg_ms": 0.017824191165607916
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13538,
+          "max_ms": 0.019076,
+          "avg_ms": 0.00035768510858324716
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6769,
+          "max_ms": 9.120289,
+          "avg_ms": 3.9452893855813262
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.074475,
+          "avg_ms": 0.04645718518518519
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862238.055414,
+        "end": 1793862268.1620543,
+        "legs": 28,
+        "samples": 7526,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 4.000009952163212,
+      "tx_gap_max_ms": 7.094800006598234,
+      "tx_gap_p95_ms": 4.343500011600554
+    },
+    {
+      "run": "docker4-a",
+      "mode": "docker",
+      "axes": 4,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.116104,
+          "avg_ms": 0.1070507777777778
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.09053,
+          "avg_ms": 0.030007889546935156
+        },
+        "python-timing:axis_1_model": {
+          "count": 6754,
+          "max_ms": 0.19021,
+          "avg_ms": 0.07385204219721644
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6754,
+          "max_ms": 0.04809,
+          "avg_ms": 0.009749961060112524
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.248824,
+          "avg_ms": 0.11360989280426415
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 27016,
+          "max_ms": 0.053047,
+          "avg_ms": 0.013856129515842464
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 27016,
+          "max_ms": 0.331953,
+          "avg_ms": 0.12903739543233642
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 27016,
+          "max_ms": 0.034975,
+          "avg_ms": 0.010389867930115485
+        },
+        "python-timing:exchange_send": {
+          "count": 27016,
+          "max_ms": 0.053276,
+          "avg_ms": 0.006456564813443886
+        },
+        "python-timing:exchange_request": {
+          "count": 27016,
+          "max_ms": 0.396114,
+          "avg_ms": 0.15973995769173827
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.044823,
+          "avg_ms": 0.02082411859638732
+        },
+        "python-timing:axis_2_model": {
+          "count": 6754,
+          "max_ms": 0.055728,
+          "avg_ms": 0.017435708172934557
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 6754,
+          "max_ms": 0.028866,
+          "avg_ms": 0.008508285016286645
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.099194,
+          "avg_ms": 0.04676811178560854
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.077104,
+          "avg_ms": 0.029472132217944928
+        },
+        "python-timing:axis_3_model": {
+          "count": 6754,
+          "max_ms": 0.157654,
+          "avg_ms": 0.07016281225940184
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 6754,
+          "max_ms": 0.028166,
+          "avg_ms": 0.009366310038495706
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.233015,
+          "avg_ms": 0.10900125451584247
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.066031,
+          "avg_ms": 0.021501381403612678
+        },
+        "python-timing:axis_0_model": {
+          "count": 6754,
+          "max_ms": 0.045171,
+          "avg_ms": 0.018324799082025466
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6754,
+          "max_ms": 0.061683,
+          "avg_ms": 0.008885449067219426
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.164252,
+          "avg_ms": 0.04871162955285757
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6765,
+          "max_ms": 0.220318,
+          "avg_ms": 0.08885758477457499
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6765,
+          "max_ms": 5.641326,
+          "avg_ms": 3.963915123429416
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6765,
+          "max_ms": 5.629773,
+          "avg_ms": 3.952639032668144
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6765,
+          "max_ms": 5.620847,
+          "avg_ms": 3.942890470509978
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6765,
+          "max_ms": 5.610828,
+          "avg_ms": 3.9338371127864007
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6765,
+          "max_ms": 0.220318,
+          "avg_ms": 0.08885758477457499
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6765,
+          "max_ms": 0.183835,
+          "avg_ms": 0.060751219068736144
+        },
+        "simulator-timing:post_reply": {
+          "count": 6765,
+          "max_ms": 0.183835,
+          "avg_ms": 0.060751219068736144
+        },
+        "simulator-timing:route": {
+          "count": 6765,
+          "max_ms": 0.00506,
+          "avg_ms": 0.0006707753141167775
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6765,
+          "max_ms": 5.677364,
+          "avg_ms": 3.9999348249815228
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6765,
+          "max_ms": 0.065758,
+          "avg_ms": 0.02810636570583888
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27060,
+          "max_ms": 0.017153,
+          "avg_ms": 0.00029678688100517387
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6765,
+          "max_ms": 5.587951,
+          "avg_ms": 3.910000209460459
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.072999,
+          "avg_ms": 0.04745155555555555
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861951.609205,
+        "end": 1793861981.6375093,
+        "legs": 0,
+        "samples": 7507,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 3.999939936058616,
+      "tx_gap_max_ms": 5.710500001441687,
+      "tx_gap_p95_ms": 4.320399952121079
+    },
+    {
+      "run": "docker4-a",
+      "mode": "docker",
+      "axes": 4,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 28,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 28,
+          "max_ms": 0.125718,
+          "avg_ms": 0.10966560714285714
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 7005,
+          "max_ms": 0.056936,
+          "avg_ms": 0.020976259243397577
+        },
+        "python-timing:axis_2_model": {
+          "count": 7005,
+          "max_ms": 0.093021,
+          "avg_ms": 0.022535100785153462
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 7005,
+          "max_ms": 0.043706,
+          "avg_ms": 0.008707612276945038
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 7005,
+          "max_ms": 0.165535,
+          "avg_ms": 0.05221897230549607
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 28020,
+          "max_ms": 0.14192,
+          "avg_ms": 0.013995789543183439
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 28020,
+          "max_ms": 0.556524,
+          "avg_ms": 0.13272451266952182
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 28020,
+          "max_ms": 0.050332,
+          "avg_ms": 0.010510775410421128
+        },
+        "python-timing:exchange_send": {
+          "count": 28020,
+          "max_ms": 0.217718,
+          "avg_ms": 0.006527669450392575
+        },
+        "python-timing:exchange_request": {
+          "count": 28020,
+          "max_ms": 0.813622,
+          "avg_ms": 0.16375874707351892
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 7005,
+          "max_ms": 0.127741,
+          "avg_ms": 0.030035119486081372
+        },
+        "python-timing:axis_3_model": {
+          "count": 7005,
+          "max_ms": 0.244411,
+          "avg_ms": 0.07193736359743041
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 7005,
+          "max_ms": 0.03708,
+          "avg_ms": 0.009682679800142754
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 7005,
+          "max_ms": 0.354312,
+          "avg_ms": 0.11165516288365453
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 7005,
+          "max_ms": 0.067724,
+          "avg_ms": 0.021382521627409
+        },
+        "python-timing:axis_0_model": {
+          "count": 7005,
+          "max_ms": 0.091215,
+          "avg_ms": 0.0233079448965025
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 7005,
+          "max_ms": 0.026314,
+          "avg_ms": 0.009003605424696646
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 7005,
+          "max_ms": 0.164798,
+          "avg_ms": 0.05369407194860814
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 7005,
+          "max_ms": 0.077902,
+          "avg_ms": 0.029882671520342612
+        },
+        "python-timing:axis_1_model": {
+          "count": 7005,
+          "max_ms": 0.281137,
+          "avg_ms": 0.0744007182012848
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 7005,
+          "max_ms": 0.075393,
+          "avg_ms": 0.009779768022840828
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 7005,
+          "max_ms": 0.37471,
+          "avg_ms": 0.11406315774446822
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6766,
+          "max_ms": 0.373638,
+          "avg_ms": 0.08711332338161394
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6766,
+          "max_ms": 5.884511,
+          "avg_ms": 3.9645331170558684
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6766,
+          "max_ms": 5.876234,
+          "avg_ms": 3.9533006170558678
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6766,
+          "max_ms": 5.865126,
+          "avg_ms": 3.9436822205143365
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6766,
+          "max_ms": 5.856785,
+          "avg_ms": 3.934614483298847
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6766,
+          "max_ms": 0.373638,
+          "avg_ms": 0.08711332338161394
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6766,
+          "max_ms": 0.309536,
+          "avg_ms": 0.060011442063257474
+        },
+        "simulator-timing:post_reply": {
+          "count": 6766,
+          "max_ms": 0.309536,
+          "avg_ms": 0.060011442063257474
+        },
+        "simulator-timing:route": {
+          "count": 6766,
+          "max_ms": 0.007069,
+          "avg_ms": 0.0006602870233520543
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6766,
+          "max_ms": 5.924129,
+          "avg_ms": 3.9999446670115284
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6766,
+          "max_ms": 0.080174,
+          "avg_ms": 0.027101881318356485
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27064,
+          "max_ms": 0.010397,
+          "avg_ms": 0.00029663992757907227
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6766,
+          "max_ms": 5.822994,
+          "avg_ms": 3.911672757759386
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.077591,
+          "avg_ms": 0.05074537037037037
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861981.8385208,
+        "end": 1793862011.98302,
+        "legs": 28,
+        "samples": 7536,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 4.000028343952492,
+      "tx_gap_max_ms": 5.9016000013798475,
+      "tx_gap_p95_ms": 4.3391999788582325
+    },
+    {
+      "run": "docker4-b",
+      "mode": "docker",
+      "axes": 4,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.121084,
+          "avg_ms": 0.10649585185185186
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 6756,
+          "max_ms": 0.121457,
+          "avg_ms": 0.020712203226761396
+        },
+        "python-timing:axis_2_model": {
+          "count": 6756,
+          "max_ms": 0.044134,
+          "avg_ms": 0.01741850680876258
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 6756,
+          "max_ms": 0.02941,
+          "avg_ms": 0.008583710331557132
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 6756,
+          "max_ms": 0.179896,
+          "avg_ms": 0.046714420367081115
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 27023,
+          "max_ms": 0.054136,
+          "avg_ms": 0.013771891166783847
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 27023,
+          "max_ms": 0.383966,
+          "avg_ms": 0.1278128664841061
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 27023,
+          "max_ms": 0.051814,
+          "avg_ms": 0.010273007105058657
+        },
+        "python-timing:exchange_send": {
+          "count": 27023,
+          "max_ms": 0.034732,
+          "avg_ms": 0.0065391556451911345
+        },
+        "python-timing:exchange_request": {
+          "count": 27023,
+          "max_ms": 0.462557,
+          "avg_ms": 0.15839692040113973
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 6756,
+          "max_ms": 0.069565,
+          "avg_ms": 0.02929050888099467
+        },
+        "python-timing:axis_3_model": {
+          "count": 6756,
+          "max_ms": 0.158512,
+          "avg_ms": 0.06953265896980462
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 6756,
+          "max_ms": 0.030189,
+          "avg_ms": 0.009337844434576675
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 6756,
+          "max_ms": 0.238598,
+          "avg_ms": 0.10816101228537597
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6756,
+          "max_ms": 0.130558,
+          "avg_ms": 0.021198717584369444
+        },
+        "python-timing:axis_0_model": {
+          "count": 6756,
+          "max_ms": 0.063601,
+          "avg_ms": 0.018195437092954413
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6756,
+          "max_ms": 0.050026,
+          "avg_ms": 0.008801792036708115
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6756,
+          "max_ms": 0.211719,
+          "avg_ms": 0.048195946714031976
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.071685,
+          "avg_ms": 0.02958910407105848
+        },
+        "python-timing:axis_1_model": {
+          "count": 6755,
+          "max_ms": 0.179822,
+          "avg_ms": 0.07282631931902295
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6755,
+          "max_ms": 0.030047,
+          "avg_ms": 0.009688981051073279
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.263394,
+          "avg_ms": 0.1121044044411547
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6764,
+          "max_ms": 0.18874,
+          "avg_ms": 0.08767811945594323
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6764,
+          "max_ms": 7.061502,
+          "avg_ms": 3.964443288290952
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6764,
+          "max_ms": 7.053432,
+          "avg_ms": 3.953286982998227
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6764,
+          "max_ms": 7.046207,
+          "avg_ms": 3.9436594739798942
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6764,
+          "max_ms": 7.039008,
+          "avg_ms": 3.9346485733293903
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6764,
+          "max_ms": 0.18874,
+          "avg_ms": 0.08767811945594323
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6764,
+          "max_ms": 0.124654,
+          "avg_ms": 0.06003754420461265
+        },
+        "simulator-timing:post_reply": {
+          "count": 6764,
+          "max_ms": 0.124654,
+          "avg_ms": 0.06003754420461265
+        },
+        "simulator-timing:route": {
+          "count": 6764,
+          "max_ms": 0.007792,
+          "avg_ms": 0.0006715430218805442
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6764,
+          "max_ms": 7.08795,
+          "avg_ms": 4.000016967327026
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6764,
+          "max_ms": 0.074237,
+          "avg_ms": 0.02764057525133057
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27056,
+          "max_ms": 0.007414,
+          "avg_ms": 0.0002973867903607335
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6764,
+          "max_ms": 7.014566,
+          "avg_ms": 3.911234938202248
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.074635,
+          "avg_ms": 0.04758262962962962
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862015.996165,
+        "end": 1793862046.0225337,
+        "legs": 0,
+        "samples": 7507,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 4.000008045829707,
+      "tx_gap_max_ms": 7.085399993229657,
+      "tx_gap_p95_ms": 4.3175999890081584
+    },
+    {
+      "run": "docker4-b",
+      "mode": "docker",
+      "axes": 4,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 28,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 28,
+          "max_ms": 0.135796,
+          "avg_ms": 0.10888371428571428
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 7007,
+          "max_ms": 0.065062,
+          "avg_ms": 0.02060728442985586
+        },
+        "python-timing:axis_2_model": {
+          "count": 7007,
+          "max_ms": 0.08892,
+          "avg_ms": 0.022153283002711573
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 7007,
+          "max_ms": 0.046319,
+          "avg_ms": 0.008689521193092622
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 7007,
+          "max_ms": 0.200301,
+          "avg_ms": 0.05145008862566005
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 28027,
+          "max_ms": 0.063951,
+          "avg_ms": 0.013789603275412995
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 28027,
+          "max_ms": 0.406969,
+          "avg_ms": 0.13051416537624438
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 28027,
+          "max_ms": 0.035521,
+          "avg_ms": 0.010193395725550366
+        },
+        "python-timing:exchange_send": {
+          "count": 28027,
+          "max_ms": 0.033347,
+          "avg_ms": 0.006480504513504833
+        },
+        "python-timing:exchange_request": {
+          "count": 28027,
+          "max_ms": 0.474985,
+          "avg_ms": 0.16097766889071255
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 7007,
+          "max_ms": 0.060387,
+          "avg_ms": 0.029716140430997566
+        },
+        "python-timing:axis_3_model": {
+          "count": 7007,
+          "max_ms": 0.159194,
+          "avg_ms": 0.07016102112173539
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 7007,
+          "max_ms": 0.036385,
+          "avg_ms": 0.009532989153703443
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 7007,
+          "max_ms": 0.237491,
+          "avg_ms": 0.10941015070643642
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 7007,
+          "max_ms": 0.063325,
+          "avg_ms": 0.021198558156129588
+        },
+        "python-timing:axis_0_model": {
+          "count": 7007,
+          "max_ms": 0.064099,
+          "avg_ms": 0.023178504780933345
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 7007,
+          "max_ms": 0.028245,
+          "avg_ms": 0.009022236477807907
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 7007,
+          "max_ms": 0.130874,
+          "avg_ms": 0.05339929941487083
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 7006,
+          "max_ms": 0.07024,
+          "avg_ms": 0.029421852840422487
+        },
+        "python-timing:axis_1_model": {
+          "count": 7006,
+          "max_ms": 0.209417,
+          "avg_ms": 0.07260225706537254
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 7006,
+          "max_ms": 0.045576,
+          "avg_ms": 0.009627289180702254
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 7006,
+          "max_ms": 0.285206,
+          "avg_ms": 0.11165139908649728
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6766,
+          "max_ms": 0.204518,
+          "avg_ms": 0.08647021563700857
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6766,
+          "max_ms": 7.193918,
+          "avg_ms": 3.9646321915459657
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6766,
+          "max_ms": 7.183768,
+          "avg_ms": 3.9535355509902455
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6766,
+          "max_ms": 7.176091,
+          "avg_ms": 3.9440946696718884
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6766,
+          "max_ms": 7.167976,
+          "avg_ms": 3.9351710622228766
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6766,
+          "max_ms": 0.204518,
+          "avg_ms": 0.08647021563700857
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6766,
+          "max_ms": 0.141458,
+          "avg_ms": 0.05950121741058231
+        },
+        "simulator-timing:post_reply": {
+          "count": 6766,
+          "max_ms": 0.141458,
+          "avg_ms": 0.05950121741058231
+        },
+        "simulator-timing:route": {
+          "count": 6766,
+          "max_ms": 0.012785,
+          "avg_ms": 0.0006559295004433934
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6766,
+          "max_ms": 7.228845,
+          "avg_ms": 3.9999812156370096
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6766,
+          "max_ms": 0.084855,
+          "avg_ms": 0.026968998226426247
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27064,
+          "max_ms": 0.011409,
+          "avg_ms": 0.00029620325894176797
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6766,
+          "max_ms": 7.146799,
+          "avg_ms": 3.9123478994974876
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.05761,
+          "avg_ms": 0.04710011111111111
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862046.2227173,
+        "end": 1793862076.3818235,
+        "legs": 28,
+        "samples": 7540,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 4.000017029180473,
+      "tx_gap_max_ms": 7.216199999675155,
+      "tx_gap_p95_ms": 4.330200026743114
+    },
+    {
+      "run": "native2-a",
+      "mode": "native",
+      "axes": 2,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.118797,
+          "avg_ms": 0.08716214814814813
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6761,
+          "max_ms": 0.063861,
+          "avg_ms": 0.028552095104274516
+        },
+        "python-timing:axis_1_model": {
+          "count": 6761,
+          "max_ms": 0.169026,
+          "avg_ms": 0.0703148722082532
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6761,
+          "max_ms": 0.152107,
+          "avg_ms": 0.009622111226149978
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6761,
+          "max_ms": 0.350118,
+          "avg_ms": 0.10848907853867772
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13522,
+          "max_ms": 0.0547,
+          "avg_ms": 0.013726738278361189
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13522,
+          "max_ms": 0.436043,
+          "avg_ms": 0.12659983020263274
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13522,
+          "max_ms": 0.207063,
+          "avg_ms": 0.01072664132524774
+        },
+        "python-timing:exchange_send": {
+          "count": 13522,
+          "max_ms": 0.048977,
+          "avg_ms": 0.00676624138441059
+        },
+        "python-timing:exchange_request": {
+          "count": 13522,
+          "max_ms": 0.501766,
+          "avg_ms": 0.15781945119065222
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6761,
+          "max_ms": 0.058765,
+          "avg_ms": 0.02083567090667061
+        },
+        "python-timing:axis_0_model": {
+          "count": 6761,
+          "max_ms": 0.04688,
+          "avg_ms": 0.017892511758615587
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6761,
+          "max_ms": 0.032533,
+          "avg_ms": 0.008600299511906525
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6761,
+          "max_ms": 0.108648,
+          "avg_ms": 0.047328482177192724
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6768,
+          "max_ms": 0.123736,
+          "avg_ms": 0.05556918321513001
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6768,
+          "max_ms": 5.646302,
+          "avg_ms": 3.9712671876477548
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6768,
+          "max_ms": 5.634536,
+          "avg_ms": 3.9590905515661934
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6768,
+          "max_ms": 0.123736,
+          "avg_ms": 0.05556918321513001
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6768,
+          "max_ms": 0.089858,
+          "avg_ms": 0.036795728575650125
+        },
+        "simulator-timing:post_reply": {
+          "count": 6768,
+          "max_ms": 0.089858,
+          "avg_ms": 0.036795728575650125
+        },
+        "simulator-timing:route": {
+          "count": 6768,
+          "max_ms": 0.00687,
+          "avg_ms": 0.0004442098108747045
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6768,
+          "max_ms": 5.681981,
+          "avg_ms": 3.99993179964539
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6768,
+          "max_ms": 0.050588,
+          "avg_ms": 0.0187734546394799
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13536,
+          "max_ms": 0.005774,
+          "avg_ms": 0.00038508614066193846
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6768,
+          "max_ms": 5.612715,
+          "avg_ms": 3.9425543244680843
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.082525,
+          "avg_ms": 0.05948074074074074
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861822.8691986,
+        "end": 1793861852.8949835,
+        "legs": 0,
+        "samples": 7506,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 4.000025446306283,
+      "tx_gap_max_ms": 5.458500003442168,
+      "tx_gap_p95_ms": 4.299500025808811
+    },
+    {
+      "run": "native2-a",
+      "mode": "native",
+      "axes": 2,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.149844,
+          "avg_ms": 0.09125033333333334
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6759,
+          "max_ms": 0.11161,
+          "avg_ms": 0.028378800266311593
+        },
+        "python-timing:axis_1_model": {
+          "count": 6759,
+          "max_ms": 0.181447,
+          "avg_ms": 0.0701341901168812
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6759,
+          "max_ms": 0.032199,
+          "avg_ms": 0.009549525225625091
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6759,
+          "max_ms": 0.257011,
+          "avg_ms": 0.10806251560881788
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13518,
+          "max_ms": 0.074699,
+          "avg_ms": 0.013780620949844651
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13518,
+          "max_ms": 2.393315,
+          "avg_ms": 0.12918494940079894
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13518,
+          "max_ms": 0.034668,
+          "avg_ms": 0.010672598387335402
+        },
+        "python-timing:exchange_send": {
+          "count": 13518,
+          "max_ms": 0.024283,
+          "avg_ms": 0.006686866474330523
+        },
+        "python-timing:exchange_request": {
+          "count": 13518,
+          "max_ms": 2.469662,
+          "avg_ms": 0.16032503521230948
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6759,
+          "max_ms": 0.080106,
+          "avg_ms": 0.020804780440893622
+        },
+        "python-timing:axis_0_model": {
+          "count": 6759,
+          "max_ms": 1.106013,
+          "avg_ms": 0.022897265127977514
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6759,
+          "max_ms": 1.000058,
+          "avg_ms": 0.008981638260097648
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6759,
+          "max_ms": 2.186177,
+          "avg_ms": 0.052683683828968784
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6770,
+          "max_ms": 0.128631,
+          "avg_ms": 0.05427034342688332
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6770,
+          "max_ms": 5.487853,
+          "avg_ms": 3.971493870014771
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6770,
+          "max_ms": 5.475837,
+          "avg_ms": 3.959130860709011
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6770,
+          "max_ms": 0.128631,
+          "avg_ms": 0.05427034342688332
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6770,
+          "max_ms": 0.090974,
+          "avg_ms": 0.0364615364844904
+        },
+        "simulator-timing:post_reply": {
+          "count": 6770,
+          "max_ms": 0.090974,
+          "avg_ms": 0.0364615364844904
+        },
+        "simulator-timing:route": {
+          "count": 6770,
+          "max_ms": 0.013481,
+          "avg_ms": 0.0004337332348596749
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6770,
+          "max_ms": 5.524202,
+          "avg_ms": 3.9999974793205317
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6770,
+          "max_ms": 0.054344,
+          "avg_ms": 0.017808806942392907
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13540,
+          "max_ms": 0.009142,
+          "avg_ms": 0.00038834874446085646
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6770,
+          "max_ms": 5.450087,
+          "avg_ms": 3.9442929412112253
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.094025,
+          "avg_ms": 0.0608752962962963
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861853.0951324,
+        "end": 1793861883.215929,
+        "legs": 28,
+        "samples": 7530,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 4.000026347940592,
+      "tx_gap_max_ms": 6.164700025692582,
+      "tx_gap_p95_ms": 4.331099975388497
+    },
+    {
+      "run": "native2-b",
+      "mode": "native",
+      "axes": 2,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.102619,
+          "avg_ms": 0.08633948148148149
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6759,
+          "max_ms": 0.05382,
+          "avg_ms": 0.020447830004438526
+        },
+        "python-timing:axis_0_model": {
+          "count": 6759,
+          "max_ms": 0.052859,
+          "avg_ms": 0.01785466903388075
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6759,
+          "max_ms": 0.031384,
+          "avg_ms": 0.008439651427725996
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6759,
+          "max_ms": 0.113028,
+          "avg_ms": 0.046742150466045296
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13517,
+          "max_ms": 0.068054,
+          "avg_ms": 0.013535112968854034
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13517,
+          "max_ms": 0.351494,
+          "avg_ms": 0.12508293741214768
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13517,
+          "max_ms": 0.036092,
+          "avg_ms": 0.010618778723089445
+        },
+        "python-timing:exchange_send": {
+          "count": 13517,
+          "max_ms": 0.029247,
+          "avg_ms": 0.0067968320633276635
+        },
+        "python-timing:exchange_request": {
+          "count": 13517,
+          "max_ms": 0.439925,
+          "avg_ms": 0.15603366116741882
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6758,
+          "max_ms": 0.06024,
+          "avg_ms": 0.027863324948209534
+        },
+        "python-timing:axis_1_model": {
+          "count": 6758,
+          "max_ms": 0.173809,
+          "avg_ms": 0.06999357221071321
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6758,
+          "max_ms": 0.031624,
+          "avg_ms": 0.009490469517608761
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6758,
+          "max_ms": 0.245194,
+          "avg_ms": 0.1073473666765315
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6767,
+          "max_ms": 0.113766,
+          "avg_ms": 0.05574553627900104
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6767,
+          "max_ms": 6.510516,
+          "avg_ms": 3.9711223926407575
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6767,
+          "max_ms": 6.500738,
+          "avg_ms": 3.9590316818383333
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6767,
+          "max_ms": 0.113766,
+          "avg_ms": 0.05574553627900104
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6767,
+          "max_ms": 0.069295,
+          "avg_ms": 0.03678015161814689
+        },
+        "simulator-timing:post_reply": {
+          "count": 6767,
+          "max_ms": 0.069295,
+          "avg_ms": 0.03678015161814689
+        },
+        "simulator-timing:route": {
+          "count": 6767,
+          "max_ms": 0.004917,
+          "avg_ms": 0.00044742766366188854
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6767,
+          "max_ms": 6.537267,
+          "avg_ms": 3.9999356661740797
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6767,
+          "max_ms": 0.04846,
+          "avg_ms": 0.018965384660854137
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13534,
+          "max_ms": 0.0095,
+          "avg_ms": 0.0003879066055859316
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6767,
+          "max_ms": 6.489825,
+          "avg_ms": 3.9421847569085267
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.089318,
+          "avg_ms": 0.06167077777777777
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862143.5756652,
+        "end": 1793862173.6076767,
+        "legs": 0,
+        "samples": 7508,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 4.000038119335895,
+      "tx_gap_max_ms": 6.53680000687018,
+      "tx_gap_p95_ms": 4.3391999788582325
+    },
+    {
+      "run": "native2-b",
+      "mode": "native",
+      "axes": 2,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.114634,
+          "avg_ms": 0.0866552962962963
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6761,
+          "max_ms": 0.062073,
+          "avg_ms": 0.02778035187102499
+        },
+        "python-timing:axis_1_model": {
+          "count": 6761,
+          "max_ms": 0.185591,
+          "avg_ms": 0.07010266425085047
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6761,
+          "max_ms": 0.031445,
+          "avg_ms": 0.009450784647241531
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6761,
+          "max_ms": 0.267431,
+          "avg_ms": 0.10733380076911703
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 13522,
+          "max_ms": 0.066407,
+          "avg_ms": 0.013662793077947051
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 13522,
+          "max_ms": 1.256004,
+          "avg_ms": 0.12805986362964059
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 13522,
+          "max_ms": 0.032298,
+          "avg_ms": 0.010619688803431443
+        },
+        "python-timing:exchange_send": {
+          "count": 13522,
+          "max_ms": 0.031802,
+          "avg_ms": 0.006779660553172609
+        },
+        "python-timing:exchange_request": {
+          "count": 13522,
+          "max_ms": 1.29452,
+          "avg_ms": 0.1591220060641917
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6761,
+          "max_ms": 0.078886,
+          "avg_ms": 0.02051766632155006
+        },
+        "python-timing:axis_0_model": {
+          "count": 6761,
+          "max_ms": 0.056371,
+          "avg_ms": 0.022833313267268153
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6761,
+          "max_ms": 0.027864,
+          "avg_ms": 0.008628089779618401
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6761,
+          "max_ms": 0.125524,
+          "avg_ms": 0.051979069368436624
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6765,
+          "max_ms": 0.15064,
+          "avg_ms": 0.05458829283074649
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6765,
+          "max_ms": 5.188733,
+          "avg_ms": 3.9711834845528453
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6765,
+          "max_ms": 5.174046,
+          "avg_ms": 3.9590857534368067
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6765,
+          "max_ms": 0.15064,
+          "avg_ms": 0.05458829283074649
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6765,
+          "max_ms": 0.128065,
+          "avg_ms": 0.03644932727272728
+        },
+        "simulator-timing:post_reply": {
+          "count": 6765,
+          "max_ms": 0.128065,
+          "avg_ms": 0.03644932727272728
+        },
+        "simulator-timing:route": {
+          "count": 6765,
+          "max_ms": 0.013443,
+          "avg_ms": 0.00044314737620103464
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6765,
+          "max_ms": 5.220178,
+          "avg_ms": 3.999872873170732
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6765,
+          "max_ms": 0.05167,
+          "avg_ms": 0.018138965558019218
+        },
+        "simulator-timing:slave_routine": {
+          "count": 13530,
+          "max_ms": 0.013684,
+          "avg_ms": 0.00039030007390983
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6765,
+          "max_ms": 5.160643,
+          "avg_ms": 3.9437026073909838
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.100107,
+          "avg_ms": 0.06687448148148148
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862173.80803,
+        "end": 1793862203.9078846,
+        "legs": 28,
+        "samples": 7525,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 12,
+      "tx_gap_mean_ms": 3.9999789767434506,
+      "tx_gap_max_ms": 5.221600004006177,
+      "tx_gap_p95_ms": 4.356199991889298
+    },
+    {
+      "run": "native4-a",
+      "mode": "native",
+      "axes": 4,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.118023,
+          "avg_ms": 0.10793048148148149
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.053923,
+          "avg_ms": 0.027423958549222797
+        },
+        "python-timing:axis_3_model": {
+          "count": 6755,
+          "max_ms": 0.12409,
+          "avg_ms": 0.06656093367875647
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 6755,
+          "max_ms": 0.153478,
+          "avg_ms": 0.009001824574389344
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.318831,
+          "avg_ms": 0.10298671680236864
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 27017,
+          "max_ms": 0.054146,
+          "avg_ms": 0.01252436665803013
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 27017,
+          "max_ms": 0.391133,
+          "avg_ms": 0.12080392393678055
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 27017,
+          "max_ms": 0.066641,
+          "avg_ms": 0.00993840215419921
+        },
+        "python-timing:exchange_send": {
+          "count": 27017,
+          "max_ms": 0.030786,
+          "avg_ms": 0.006326898360291669
+        },
+        "python-timing:exchange_request": {
+          "count": 27017,
+          "max_ms": 0.439584,
+          "avg_ms": 0.1495935911093016
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.058552,
+          "avg_ms": 0.01994268862896062
+        },
+        "python-timing:axis_0_model": {
+          "count": 6754,
+          "max_ms": 0.042575,
+          "avg_ms": 0.017174873408350607
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6754,
+          "max_ms": 0.027541,
+          "avg_ms": 0.00835025362748001
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.106674,
+          "avg_ms": 0.045467815664791245
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.065407,
+          "avg_ms": 0.02746064095350903
+        },
+        "python-timing:axis_1_model": {
+          "count": 6754,
+          "max_ms": 0.157699,
+          "avg_ms": 0.06966455966834469
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6754,
+          "max_ms": 0.030068,
+          "avg_ms": 0.00913963369854901
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.227917,
+          "avg_ms": 0.10626483432040273
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.051587,
+          "avg_ms": 0.01969020076991413
+        },
+        "python-timing:axis_2_model": {
+          "count": 6754,
+          "max_ms": 0.054814,
+          "avg_ms": 0.01656678975421972
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 6754,
+          "max_ms": 0.027942,
+          "avg_ms": 0.008124655907610304
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.088805,
+          "avg_ms": 0.04438164643174414
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6764,
+          "max_ms": 0.225775,
+          "avg_ms": 0.09053893849793021
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6764,
+          "max_ms": 6.074282,
+          "avg_ms": 3.963568062536961
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6764,
+          "max_ms": 6.058827,
+          "avg_ms": 3.951788170461266
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6764,
+          "max_ms": 6.051291,
+          "avg_ms": 3.9416635057658205
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6764,
+          "max_ms": 6.043781,
+          "avg_ms": 3.932362013157895
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6764,
+          "max_ms": 0.225775,
+          "avg_ms": 0.09053893849793021
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6764,
+          "max_ms": 0.155224,
+          "avg_ms": 0.062377249852158485
+        },
+        "simulator-timing:post_reply": {
+          "count": 6764,
+          "max_ms": 0.155224,
+          "avg_ms": 0.062377249852158485
+        },
+        "simulator-timing:route": {
+          "count": 6764,
+          "max_ms": 0.00331,
+          "avg_ms": 0.000628995860437611
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6764,
+          "max_ms": 6.106047,
+          "avg_ms": 3.9999857489651087
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6764,
+          "max_ms": 0.070551,
+          "avg_ms": 0.028161688645771732
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27056,
+          "max_ms": 0.00709,
+          "avg_ms": 0.00031400432436428136
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6764,
+          "max_ms": 6.025367,
+          "avg_ms": 3.908266268332348
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.097511,
+          "avg_ms": 0.06775377777777779
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861886.9408376,
+        "end": 1793861916.9702811,
+        "legs": 0,
+        "samples": 7507,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 3.9999226721719356,
+      "tx_gap_max_ms": 6.311099976301193,
+      "tx_gap_p95_ms": 4.319900006521493
+    },
+    {
+      "run": "native4-a",
+      "mode": "native",
+      "axes": 4,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.125271,
+          "avg_ms": 0.10863677777777775
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.064034,
+          "avg_ms": 0.027576014211695043
+        },
+        "python-timing:axis_3_model": {
+          "count": 6755,
+          "max_ms": 0.16068,
+          "avg_ms": 0.0672258355292376
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 6755,
+          "max_ms": 0.031219,
+          "avg_ms": 0.009140529089563289
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.234936,
+          "avg_ms": 0.10394237883049597
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 27018,
+          "max_ms": 0.054746,
+          "avg_ms": 0.012635123806351319
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 27018,
+          "max_ms": 0.347436,
+          "avg_ms": 0.12365764882670811
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 27018,
+          "max_ms": 0.032186,
+          "avg_ms": 0.0099762079724628
+        },
+        "python-timing:exchange_send": {
+          "count": 27018,
+          "max_ms": 0.031454,
+          "avg_ms": 0.0063271380931231025
+        },
+        "python-timing:exchange_request": {
+          "count": 27018,
+          "max_ms": 0.420807,
+          "avg_ms": 0.15259611869864537
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.054508,
+          "avg_ms": 0.020141774833456704
+        },
+        "python-timing:axis_0_model": {
+          "count": 6755,
+          "max_ms": 0.056239,
+          "avg_ms": 0.021839111917098447
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6755,
+          "max_ms": 0.024851,
+          "avg_ms": 0.008576510288675055
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.112575,
+          "avg_ms": 0.0505573970392302
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.060063,
+          "avg_ms": 0.027343825288717802
+        },
+        "python-timing:axis_1_model": {
+          "count": 6754,
+          "max_ms": 0.170859,
+          "avg_ms": 0.07001006351791533
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6754,
+          "max_ms": 0.030097,
+          "avg_ms": 0.009057763695587799
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.24604,
+          "avg_ms": 0.10641165250222087
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.077565,
+          "avg_ms": 0.01956620669233047
+        },
+        "python-timing:axis_2_model": {
+          "count": 6754,
+          "max_ms": 0.050933,
+          "avg_ms": 0.020950848978383185
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 6754,
+          "max_ms": 0.041951,
+          "avg_ms": 0.00825202783535683
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.108802,
+          "avg_ms": 0.04876908350607047
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6764,
+          "max_ms": 0.451899,
+          "avg_ms": 0.08974843140153756
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6764,
+          "max_ms": 5.657189,
+          "avg_ms": 3.963683543317563
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6764,
+          "max_ms": 5.647293,
+          "avg_ms": 3.9519201252217626
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6764,
+          "max_ms": 5.639127,
+          "avg_ms": 3.9419357053518618
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6764,
+          "max_ms": 5.631265,
+          "avg_ms": 3.932474978415139
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6764,
+          "max_ms": 0.451899,
+          "avg_ms": 0.08974843140153756
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6764,
+          "max_ms": 0.411496,
+          "avg_ms": 0.062200229597871096
+        },
+        "simulator-timing:post_reply": {
+          "count": 6764,
+          "max_ms": 0.411496,
+          "avg_ms": 0.062200229597871096
+        },
+        "simulator-timing:route": {
+          "count": 6764,
+          "max_ms": 0.00908,
+          "avg_ms": 0.0006267291543465405
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6764,
+          "max_ms": 5.688229,
+          "avg_ms": 3.999919937906564
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6764,
+          "max_ms": 0.071146,
+          "avg_ms": 0.027548201803666465
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27056,
+          "max_ms": 0.014669,
+          "avg_ms": 0.00032084247486694243
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6764,
+          "max_ms": 5.599908,
+          "avg_ms": 3.90891908397398
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.089637,
+          "avg_ms": 0.06563159259259259
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793861917.1707685,
+        "end": 1793861947.286607,
+        "legs": 28,
+        "samples": 7529,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 3.9999742196859347,
+      "tx_gap_max_ms": 5.709999997634441,
+      "tx_gap_p95_ms": 4.346199973952025
+    },
+    {
+      "run": "native4-b",
+      "mode": "native",
+      "axes": 4,
+      "phase": "stationary",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.124721,
+          "avg_ms": 0.10897907407407408
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.045046,
+          "avg_ms": 0.01918899437453738
+        },
+        "python-timing:axis_2_model": {
+          "count": 6755,
+          "max_ms": 0.050866,
+          "avg_ms": 0.016685988156920798
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 6755,
+          "max_ms": 0.02879,
+          "avg_ms": 0.008095551591413768
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.098316,
+          "avg_ms": 0.04397053412287194
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 27019,
+          "max_ms": 0.059734,
+          "avg_ms": 0.012699002220659538
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 27019,
+          "max_ms": 0.373981,
+          "avg_ms": 0.1209508474036789
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 27019,
+          "max_ms": 0.032112,
+          "avg_ms": 0.01007491739146527
+        },
+        "python-timing:exchange_send": {
+          "count": 27019,
+          "max_ms": 0.032875,
+          "avg_ms": 0.00640941852030053
+        },
+        "python-timing:exchange_request": {
+          "count": 27019,
+          "max_ms": 0.436702,
+          "avg_ms": 0.15013418553610425
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.09754,
+          "avg_ms": 0.026648110436713546
+        },
+        "python-timing:axis_3_model": {
+          "count": 6755,
+          "max_ms": 0.190143,
+          "avg_ms": 0.0664436635085122
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 6755,
+          "max_ms": 0.030584,
+          "avg_ms": 0.0088141763138416
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.318267,
+          "avg_ms": 0.10190595025906737
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.049603,
+          "avg_ms": 0.019820513249444855
+        },
+        "python-timing:axis_0_model": {
+          "count": 6755,
+          "max_ms": 0.054921,
+          "avg_ms": 0.01741598845299778
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6755,
+          "max_ms": 0.033071,
+          "avg_ms": 0.008508927313101407
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.105832,
+          "avg_ms": 0.04574542901554404
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6754,
+          "max_ms": 0.059305,
+          "avg_ms": 0.027434796713058936
+        },
+        "python-timing:axis_1_model": {
+          "count": 6754,
+          "max_ms": 0.200515,
+          "avg_ms": 0.07094845587799824
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6754,
+          "max_ms": 0.028715,
+          "avg_ms": 0.009128330026650873
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6754,
+          "max_ms": 0.269453,
+          "avg_ms": 0.10751158261770802
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6767,
+          "max_ms": 0.201517,
+          "avg_ms": 0.0920369172454559
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6767,
+          "max_ms": 5.378418,
+          "avg_ms": 3.962980117186346
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6767,
+          "max_ms": 5.36876,
+          "avg_ms": 3.951106956849417
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6767,
+          "max_ms": 5.350768,
+          "avg_ms": 3.9408209546327773
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6767,
+          "max_ms": 5.349489,
+          "avg_ms": 3.9311240758090733
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6767,
+          "max_ms": 0.201517,
+          "avg_ms": 0.0920369172454559
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6767,
+          "max_ms": 0.161266,
+          "avg_ms": 0.06359351854588444
+        },
+        "simulator-timing:post_reply": {
+          "count": 6767,
+          "max_ms": 0.161266,
+          "avg_ms": 0.06359351854588444
+        },
+        "simulator-timing:route": {
+          "count": 6767,
+          "max_ms": 0.012707,
+          "avg_ms": 0.0006334783508201567
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6767,
+          "max_ms": 5.419854,
+          "avg_ms": 3.9999864934239695
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6767,
+          "max_ms": 0.071568,
+          "avg_ms": 0.02844339869957145
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27068,
+          "max_ms": 0.013498,
+          "avg_ms": 0.0003209933870252694
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6767,
+          "max_ms": 5.308924,
+          "avg_ms": 3.9067567150879277
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.109448,
+          "avg_ms": 0.06775533333333333
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862079.8654106,
+        "end": 1793862109.8905797,
+        "legs": 0,
+        "samples": 7506,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 4.000052224885701,
+      "tx_gap_max_ms": 5.365099990740418,
+      "tx_gap_p95_ms": 4.3120000045746565
+    },
+    {
+      "run": "native4-b",
+      "mode": "native",
+      "axes": 4,
+      "phase": "moving",
+      "windows": {
+        "python-timing": 27,
+        "simulator-timing": 27
+      },
+      "metrics": {
+        "python-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.117963,
+          "avg_ms": 0.10960681481481481
+        },
+        "python-timing:axis_3_rxpdo": {
+          "count": 6756,
+          "max_ms": 0.070716,
+          "avg_ms": 0.02732058496151569
+        },
+        "python-timing:axis_3_model": {
+          "count": 6756,
+          "max_ms": 0.166149,
+          "avg_ms": 0.06814367199526346
+        },
+        "python-timing:axis_3_txpdo": {
+          "count": 6756,
+          "max_ms": 0.030526,
+          "avg_ms": 0.00905395367081113
+        },
+        "python-timing:axis_3_cycle_core": {
+          "count": 6756,
+          "max_ms": 0.24522,
+          "avg_ms": 0.10451821062759027
+        },
+        "python-timing:exchange_json_decode": {
+          "count": 27024,
+          "max_ms": 0.055478,
+          "avg_ms": 0.01279109291740675
+        },
+        "python-timing:exchange_dispatch": {
+          "count": 27024,
+          "max_ms": 0.388458,
+          "avg_ms": 0.12447809347246887
+        },
+        "python-timing:exchange_json_encode": {
+          "count": 27024,
+          "max_ms": 0.045079,
+          "avg_ms": 0.01018884458259325
+        },
+        "python-timing:exchange_send": {
+          "count": 27024,
+          "max_ms": 0.039159,
+          "avg_ms": 0.0064761007992895185
+        },
+        "python-timing:exchange_request": {
+          "count": 27024,
+          "max_ms": 0.467006,
+          "avg_ms": 0.15393413177175846
+        },
+        "python-timing:axis_0_rxpdo": {
+          "count": 6757,
+          "max_ms": 0.050939,
+          "avg_ms": 0.019635922598786448
+        },
+        "python-timing:axis_0_model": {
+          "count": 6757,
+          "max_ms": 0.079017,
+          "avg_ms": 0.0221586732277638
+        },
+        "python-timing:axis_0_txpdo": {
+          "count": 6757,
+          "max_ms": 0.031493,
+          "avg_ms": 0.008555925706674558
+        },
+        "python-timing:axis_0_cycle_core": {
+          "count": 6757,
+          "max_ms": 0.124611,
+          "avg_ms": 0.050350521533224814
+        },
+        "python-timing:axis_1_rxpdo": {
+          "count": 6756,
+          "max_ms": 0.093039,
+          "avg_ms": 0.027389050917702787
+        },
+        "python-timing:axis_1_model": {
+          "count": 6756,
+          "max_ms": 0.189184,
+          "avg_ms": 0.07130633407341622
+        },
+        "python-timing:axis_1_txpdo": {
+          "count": 6756,
+          "max_ms": 0.028852,
+          "avg_ms": 0.009208775014801655
+        },
+        "python-timing:axis_1_cycle_core": {
+          "count": 6756,
+          "max_ms": 0.273857,
+          "avg_ms": 0.10790416000592064
+        },
+        "python-timing:axis_2_rxpdo": {
+          "count": 6755,
+          "max_ms": 0.045083,
+          "avg_ms": 0.01941946839378238
+        },
+        "python-timing:axis_2_model": {
+          "count": 6755,
+          "max_ms": 0.0601,
+          "avg_ms": 0.021445638193930427
+        },
+        "python-timing:axis_2_txpdo": {
+          "count": 6755,
+          "max_ms": 0.033045,
+          "avg_ms": 0.008365264988897112
+        },
+        "python-timing:axis_2_cycle_core": {
+          "count": 6755,
+          "max_ms": 0.112866,
+          "avg_ms": 0.049230371576609915
+        },
+        "simulator-timing:frame_busy": {
+          "count": 6765,
+          "max_ms": 0.194481,
+          "avg_ms": 0.0913459767923134
+        },
+        "simulator-timing:ipc_async_axis_0": {
+          "count": 6765,
+          "max_ms": 7.247717,
+          "avg_ms": 3.9631636397634886
+        },
+        "simulator-timing:ipc_async_axis_1": {
+          "count": 6765,
+          "max_ms": 7.230233,
+          "avg_ms": 3.951378175461936
+        },
+        "simulator-timing:ipc_async_axis_2": {
+          "count": 6764,
+          "max_ms": 7.222318,
+          "avg_ms": 3.941404861620343
+        },
+        "simulator-timing:ipc_async_axis_3": {
+          "count": 6764,
+          "max_ms": 7.2141,
+          "avg_ms": 3.9322720189237144
+        },
+        "simulator-timing:pdo_frame_busy": {
+          "count": 6765,
+          "max_ms": 0.194481,
+          "avg_ms": 0.0913459767923134
+        },
+        "simulator-timing:pdo_post_reply": {
+          "count": 6765,
+          "max_ms": 0.130664,
+          "avg_ms": 0.06300600502586845
+        },
+        "simulator-timing:post_reply": {
+          "count": 6765,
+          "max_ms": 0.130664,
+          "avg_ms": 0.06300600502586845
+        },
+        "simulator-timing:route": {
+          "count": 6765,
+          "max_ms": 0.007174,
+          "avg_ms": 0.0006244016260162601
+        },
+        "simulator-timing:rx_gap": {
+          "count": 6765,
+          "max_ms": 7.286427,
+          "avg_ms": 3.999985954175904
+        },
+        "simulator-timing:rx_to_reply": {
+          "count": 6765,
+          "max_ms": 0.071074,
+          "avg_ms": 0.02833997176644495
+        },
+        "simulator-timing:slave_routine": {
+          "count": 27060,
+          "max_ms": 0.014638,
+          "avg_ms": 0.0003198713599408718
+        },
+        "simulator-timing:socket_read_wait": {
+          "count": 6765,
+          "max_ms": 7.191774,
+          "avg_ms": 3.907385547376201
+        },
+        "simulator-timing:timing_log": {
+          "count": 27,
+          "max_ms": 0.103683,
+          "avg_ms": 0.06831318518518519
+        }
+      },
+      "ipc_failures": 0,
+      "master": {
+        "start": 1793862110.0907893,
+        "end": 1793862140.200156,
+        "legs": 28,
+        "samples": 7528,
+        "wkc_mismatches": 0,
+        "faults": 0
+      },
+      "expected_wkc": 18,
+      "tx_gap_mean_ms": 4.000003002128093,
+      "tx_gap_max_ms": 7.301000005099922,
+      "tx_gap_p95_ms": 4.343600012362003
+    }
+  ],
+  "summary": [
+    {
+      "mode": "docker",
+      "axes": 2,
+      "phase": "stationary",
+      "reply_avg_ms": 0.01807460385723786,
+      "reply_max_ms": 0.064294,
+      "busy_avg_ms": 0.05350784733614128,
+      "busy_max_ms": 0.138969,
+      "model_sum_avg_ms": 0.09445034608297648,
+      "ipc_avg_ms": 3.965913846412474,
+      "ipc_max_ms": 6.421313,
+      "master_samples": 15010,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 0,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 6.446900020819157
+    },
+    {
+      "mode": "docker",
+      "axes": 2,
+      "phase": "moving",
+      "reply_avg_ms": 0.01829494673069819,
+      "reply_max_ms": 0.069443,
+      "busy_avg_ms": 0.0538650424824529,
+      "busy_max_ms": 0.141181,
+      "model_sum_avg_ms": 0.10036018450523929,
+      "ipc_avg_ms": 3.965793298189878,
+      "ipc_max_ms": 9.145113,
+      "master_samples": 15068,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 56,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 11.386899976059794
+    },
+    {
+      "mode": "docker",
+      "axes": 4,
+      "phase": "stationary",
+      "reply_avg_ms": 0.027873487693103702,
+      "reply_max_ms": 0.074237,
+      "busy_avg_ms": 0.08826789570552146,
+      "busy_max_ms": 0.220318,
+      "model_sum_avg_ms": 0.17887404649465535,
+      "ipc_avg_ms": 3.9486649817798805,
+      "ipc_max_ms": 7.061502,
+      "master_samples": 15014,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 0,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 7.085399993229657
+    },
+    {
+      "mode": "docker",
+      "axes": 4,
+      "phase": "moving",
+      "reply_avg_ms": 0.027035439772391368,
+      "reply_max_ms": 0.084855,
+      "busy_avg_ms": 0.08679176950931126,
+      "busy_max_ms": 0.373638,
+      "model_sum_avg_ms": 0.19013786928514512,
+      "ipc_avg_ms": 3.9491954890444867,
+      "ipc_max_ms": 7.193918,
+      "master_samples": 15076,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 56,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 7.216199999675155
+    },
+    {
+      "mode": "native",
+      "axes": 2,
+      "phase": "stationary",
+      "reply_avg_ms": 0.01886941256002955,
+      "reply_max_ms": 0.050588,
+      "busy_avg_ms": 0.05565735323236055,
+      "busy_max_ms": 0.123736,
+      "model_sum_avg_ms": 0.08802785105457538,
+      "ipc_avg_ms": 3.965127957185076,
+      "ipc_max_ms": 6.510516,
+      "master_samples": 15014,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 0,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 6.53680000687018
+    },
+    {
+      "mode": "native",
+      "axes": 2,
+      "phase": "moving",
+      "reply_avg_ms": 0.017973825267824158,
+      "reply_max_ms": 0.054344,
+      "busy_avg_ms": 0.05442925940155154,
+      "busy_max_ms": 0.15064,
+      "model_sum_avg_ms": 0.09298370931952663,
+      "ipc_avg_ms": 3.965223525009235,
+      "ipc_max_ms": 5.487853,
+      "master_samples": 15055,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 56,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 6.164700025692582
+    },
+    {
+      "mode": "native",
+      "axes": 4,
+      "phase": "stationary",
+      "reply_avg_ms": 0.028302574902076712,
+      "reply_max_ms": 0.071568,
+      "busy_avg_ms": 0.09128809393245142,
+      "busy_max_ms": 0.225775,
+      "model_sum_avg_ms": 0.17073063958910206,
+      "ipc_avg_ms": 3.946926639217353,
+      "ipc_max_ms": 6.074282,
+      "master_samples": 15013,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 0,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 6.311099976301193
+    },
+    {
+      "mode": "native",
+      "axes": 4,
+      "phase": "moving",
+      "reply_avg_ms": 0.02794411604701013,
+      "reply_max_ms": 0.071146,
+      "busy_avg_ms": 0.09054726313844336,
+      "busy_max_ms": 0.451899,
+      "model_sum_avg_ms": 0.18154026059524248,
+      "ipc_avg_ms": 3.9472791211985765,
+      "ipc_max_ms": 7.247717,
+      "master_samples": 15057,
+      "wkc_mismatches": 0,
+      "faults": 0,
+      "legs": 56,
+      "ipc_failures": 0,
+      "tx_gap_max_ms": 7.301000005099922
+    }
+  ]
+}

@@ -1,0 +1,51 @@
+{
+  "axes": 2,
+  "cycle_ms": 4,
+  "seconds": 30.0,
+  "phases": {
+    "stationary": {
+      "start": 1793862207.8248544,
+      "end": 1793862237.854111,
+      "legs": 0,
+      "samples": 7507,
+      "wkc_mismatches": 0,
+      "faults": 0
+    },
+    "moving": {
+      "start": 1793862238.055414,
+      "end": 1793862268.1620543,
+      "legs": 28,
+      "samples": 7526,
+      "wkc_mismatches": 0,
+      "faults": 0
+    }
+  },
+  "identities": [
+    {
+      "name": "FestoCMMT",
+      "man": 29,
+      "id": 8067733,
+      "rev": 36111
+    },
+    {
+      "name": "CPX-AP-I-EC-M12",
+      "man": 0,
+      "id": 8086609,
+      "rev": 4
+    },
+    {
+      "name": "CMMT-AS software model (limited test fix",
+      "man": 29,
+      "id": 8067733,
+      "rev": 36120
+    },
+    {
+      "name": "CMMT-AS software model (limited test fix",
+      "man": 29,
+      "id": 8067733,
+      "rev": 36120
+    }
+  ],
+  "expected_wkc": 12,
+  "passed": true
+}
