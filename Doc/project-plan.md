@@ -267,3 +267,8 @@ Linux 이미지 빌드, 4축 모델 초기화, 분리된 네트워크에서 Slav
 - src/ethercat_slave 및 src/functional_model로 이관하고 CiA402 프로파일·F-KR Internal 어댑터·동작 모델을 분리했다. CMMT identity·ESI·확장 정보는 device_descriptions에 둔다.
 - 외부 Motion Server 모델 스냅샷 런타임 의존과 --model-root를 제거했다. 운영 .env와 저장 파라미터는 유지했다.
 - Windows/Linux Python 회귀, 800-cycle 이전 출력 비교, CTest 2개, 4축 IPC, Docker 저장값 검증·분리 network 시작/정상 종료를 통과했다. 실제 EtherCAT 혼합 라인·WKC·이동 시험은 미수행이며 RF-016을 완료로 표시하지 않는다.
+
+
+## RF-014 완료 (2026-11-05)
+
+[RF-014](RF/RF-014-dynamic-pdo-mapping.md)의 PRE-OP 개별 SDO 재매핑, Slave 전용 매핑 저장·복원, OD 기반 IPC, 오류 격리 및 PP 재개 조건을 구현·검증했다. F-KR/Copley 혼합 검증과 수정 이미지 적용 후 사용자 Motion Server/Axis Panel 수동 정상 동작 확인으로 완료 처리했다. 2026-09-22의 계획/미착수 기록을 대체하는 현재 상태다. 매핑 정보는 기능 모델 IPC로 전달하지 않는다.

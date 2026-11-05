@@ -50,3 +50,10 @@ target_link_libraries(test_mapping_store PRIVATE kickcat_simulation)
 add_test(NAME durable_mapping_store COMMAND test_mapping_store)
 # Assertions must remain active in Release test builds.
 target_compile_options(test_dynamic_mapping PRIVATE -UNDEBUG)
+
+add_executable(test_mapping_store_failures tests/integration/test_mapping_store_failures.cc)
+target_include_directories(test_mapping_store_failures PRIVATE src/ethercat_slave/process_data)
+target_compile_features(test_mapping_store_failures PRIVATE cxx_std_17)
+target_link_libraries(test_mapping_store_failures PRIVATE kickcat_simulation)
+target_link_options(test_mapping_store_failures PRIVATE "-Wl,--wrap=write" "-Wl,--wrap=fsync" "-Wl,--wrap=rename")
+add_test(NAME mapping_storage_failure_boundaries COMMAND test_mapping_store_failures)

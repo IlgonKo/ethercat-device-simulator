@@ -193,10 +193,22 @@ int main(int argc,char** argv) {
                 }
             };
         }
-        if(std::string(argv[1])=="--self-test") {
+        if(std::string(argv[1])=="--self-test" || std::string(argv[1])=="--motion-self-test") {
             auto require=[](bool ok,char const* text){if(!ok)throw std::runtime_error(text);};
             for(size_t i=0;i<slaves.size();++i) {
                 auto& sim=*slaves[i];auto mapping=mappings[i];
+                if(std::string(argv[1])=="--motion-self-test" && mapping->active()) {
+                    auto const& restored=mapping->configuration().tx;
+                    require(restored.size()==3 && restored[0].word()==8*(i+1) &&
+                            restored[1].word()==0x60410010 && restored[2].word()==0x60640020,
+                            "Per-axis mapping did not restore independently");
+                }
+
+                if(!mapping_diagnostics[i].is_null()) {
+                    require(!mapping->active() && mapping->read(0x1c12,0)==0 && mapping->read(0x1c13,0)==0,
+                            "Invalid restored mapping was partially applied");
+                }
+
                 auto exchange=[&](bool active,json values) {
                     json reads=json::array();
                     for(auto const& e:contracts[i].at("entries"))if(e.value("tx",false))reads.push_back({{"index",e.at("index")},{"subindex",e.at("subindex")}});
@@ -241,6 +253,107 @@ int main(int argc,char** argv) {
                 w(0x1a00,1,0x60640020,true);w(0x1a00,2,0x60410010,true);
                 w(0x1a00,3,8,true);w(0x1a00,0,3,true);
                 w(0x1c13,1,0x1a00,true);w(0x1c13,0,1,true);
+                // Exercise the actual ESM transition, not only prepare() rejection.
+                auto transition=[&](uint16_t state) {
+                    requested=state;sim.esc->processDatagram(&al,&requested,&count);sim.slave->routine();
+                };
+                auto readRegister=[&](uint16_t address) {
+                    uint16_t value=0,wkc=0;DatagramHeader d{};
+                    d.command=Command::BRD;d.address=uint32_t(address)<<16;d.len=2;
+                    sim.esc->processDatagram(&d,&value,&wkc);
+                    require(wkc==1,"AL register read failed");return value;
+                };
+                auto readCandidate=[&](uint16_t index,uint8_t sub) {
+                    auto reply=sdo(index,sub,0x40,0);
+                    require(reply[8]!=0x80,"Candidate upload failed");
+                    uint32_t value=0;std::memcpy(&value,reply.data()+12,sub?4:1);return value;
+                };
+                auto layoutWords=[](cmmt::DynamicMapping::Configuration const& c) {
+                    json result={{"rx",json::array()},{"tx",json::array()}};
+                    for(auto const& e:c.rx)result["rx"].push_back(e.word());
+                    for(auto const& e:c.tx)result["tx"].push_back(e.word());
+                    return result;
+                };
+                auto persisted=[&]() {
+                    json result=json::object();
+                    auto root=std::getenv("DEVICE_SIMULATOR_STATE_DIR");
+                    for(auto const& entry:std::filesystem::directory_iterator(
+                            std::filesystem::path(root?root:"state")/"pdo-mappings")) {
+                        if(entry.path().extension()!=".json")continue;
+                        std::ifstream f(entry.path());result[entry.path().filename().string()]=
+                            std::string(std::istreambuf_iterator<char>(f),{});
+                    }
+                    return result;
+                };
+                transition(State::SAFE_OP);
+                require(readRegister(reg::AL_STATUS)==State::SAFE_OP,"Baseline SAFE-OP failed");
+                transition(State::PRE_OP);
+                for(int failure=0;failure<4;++failure) {
+                    auto saved=persisted();auto active=layoutWords(mapping->configuration());
+                    uint16_t assign=(failure==1 || failure==3)?0x1c13:0x1c12;
+                    uint16_t object=assign==0x1c12?0x1600:0x1a00;
+                    w(assign,0,0,true);
+                    if(failure<2) {
+                        w(object,0,0,true);w(object,2,16,true); // same size padding replaces required OD
+                        w(object,0,object==0x1600?2:3,true);w(assign,0,1,true);
+                    }
+                    transition(State::SAFE_OP);
+                    require(readRegister(reg::AL_STATUS)==(State::PRE_OP|State::ERROR_ACK),
+                            "Invalid mapping did not stay PRE-OP with AL error");
+                    require(readRegister(reg::AL_STATUS_CODE)==StatusCode::INVALID_OUTPUT_MAPPING,
+                            "Unexpected mapping AL status code");
+                    require(!mapping_diagnostics[i].is_null() &&
+                            mapping_diagnostics[i]["definition"]["code"]=="PDO_MAPPING_INVALID",
+                            "Missing mapping diagnostic");
+                    require(persisted()==saved,"Rejected configuration changed persisted mapping");
+                    require(layoutWords(mapping->configuration())==active,"Rejected configuration changed active mapping");
+                    require(readCandidate(failure<2?object:assign,failure<2?2:0)==uint32_t(failure<2?16:0),
+                            "Candidate readback lost rejected whole configuration");
+                    require(exchange(false,json::array()).at("values").is_array(),"Model did not survive rejection");
+                    // Repeating SAFE-OP without AL acknowledgement must remain blocked.
+                    transition(State::SAFE_OP);
+                    require(readRegister(reg::AL_STATUS)==(State::PRE_OP|State::ERROR_ACK),"AL error cleared without acknowledgement");
+                    transition(State::PRE_OP|State::ERROR_ACK);
+                    require(readRegister(reg::AL_STATUS)==State::PRE_OP,"PRE-OP error acknowledgement failed");
+                    if(failure<2) {
+                        w(assign,0,0,true);w(object,0,0,true);
+                        w(object,2,object==0x1600?0x60400010:0x60410010,true);
+                        w(object,0,object==0x1600?2:3,true);
+                    }
+                    w(assign,0,1,true);
+                    transition(State::SAFE_OP);
+                    require(readRegister(reg::AL_STATUS)==State::SAFE_OP && readRegister(reg::AL_STATUS_CODE)==0,
+                            "Corrected mapping could not enter SAFE-OP");
+                    require(mapping_diagnostics[i].is_null(),"Corrected mapping diagnostic not resolved");
+                    require(readCandidate(assign,0)==1,"Corrected assignment readback failed");
+                    transition(State::PRE_OP);
+                    std::cout<<"MAPPING_REJECTION_RECOVERY axis="<<i<<" case="<<failure<<" passed"<<std::endl;
+                }
+                // Force a real open() failure only in this isolated self-test store.
+                auto id=fleet?expected.at("devices").at(i).at("device").at("id").get<std::string>():"axis-0";
+                auto root=std::getenv("DEVICE_SIMULATOR_STATE_DIR");
+                auto blocked=std::filesystem::path(root?root:"state")/"pdo-mappings"/(hex(id.data(),id.size())+".json.tmp");
+                auto savedBeforeFailure=persisted();
+                auto activeBeforeFailure=layoutWords(mapping->configuration());
+                w(0x1c12,0,0,true);w(0x1600,0,0,true);w(0x1600,1,16,true);
+                w(0x1600,0,2,true);w(0x1c12,0,1,true);setSm(2,0x1800,4,0x64);
+                require(std::filesystem::create_directory(blocked),"Cannot install isolated storage failure");
+                transition(State::SAFE_OP);
+                require(readRegister(reg::AL_STATUS)==(State::PRE_OP|State::ERROR_ACK),"Save failure allowed SAFE-OP");
+                require(mapping_diagnostics[i]["definition"]["code"]=="PDO_MAPPING_SAVE_FAILED","Missing storage diagnostic");
+                require(persisted()==savedBeforeFailure && layoutWords(mapping->configuration())==activeBeforeFailure,
+                        "Storage failure changed durable or active mapping");
+                require(readCandidate(0x1600,1)==16,"Save failure lost candidate");
+                require(exchange(false,json::array()).at("values").is_array(),"Model failed after storage error");
+                std::filesystem::remove(blocked);
+                transition(State::PRE_OP|State::ERROR_ACK);transition(State::SAFE_OP);
+                require(readRegister(reg::AL_STATUS)==State::SAFE_OP && mapping_diagnostics[i].is_null(),
+                        "Storage correction did not recover");
+                require(cmmt::DynamicMapping::bytes(mapping->configuration().rx)==4,"New mapping not activated after retry");
+                transition(State::PRE_OP);
+                w(0x1c12,0,0,true);w(0x1600,0,0,true);w(0x1600,1,8,true);
+                w(0x1600,0,2,true);w(0x1c12,0,1,true);setSm(2,0x1800,3,0x64);
+                std::cout<<"MAPPING_STORAGE_RECOVERY axis="<<i<<" passed"<<std::endl;
                 require(sim.pdo->configure()==0,"PDO configure failed");
                 auto rc=sim.pdo->configureMapping(*sim.dictionary);
                 if(rc!=StatusCode::ECAT_NO_ERROR)throw std::runtime_error("Dynamic configure hook failed: "+std::to_string(rc));
@@ -258,6 +371,77 @@ int main(int argc,char** argv) {
                 }
                 require(request(i,{{"op","read"},{"index",0x6081},{"subindex",0}}).at("data")==before,"Omitted velocity changed");
                 exchange(false,json::array());
+                if(std::string(argv[1])=="--motion-self-test") {
+                    auto readValue=[&](size_t axis,uint16_t index) {
+                        auto data=request(axis,{{"op","read"},{"index",index},{"subindex",0}}).at("data").get<std::string>();
+                        int32_t value=0;decode(data,&value,data.size()/2);return value;
+                    };
+                    auto otherSnapshot=[&]() {
+                        json snapshot=json::object();
+                        for(size_t j=0;j<slaves.size();++j)if(j!=i) {
+                            json od=json::object();for(uint16_t index:{0x607a,0x6081,0x6064,0x6041})od[std::to_string(index)]=readValue(j,index);
+                            snapshot[std::to_string(j)]={{"layout",layoutWords(mappings[j]->configuration())},{"od",od},
+                                {"state",slaves[j]->slave->state()}};
+                        }
+                        auto files=persisted();
+                        auto id=expected.at("devices").at(i).at("device").at("id").get<std::string>();
+                        files.erase(hex(id.data(),id.size())+".json");snapshot["files"]=files;return snapshot;
+                    };
+                    auto others=otherSnapshot();
+                    auto writeValue=[&](uint16_t index,int32_t value,size_t size) {
+                        auto result=request(i,{{"op","write"},{"index",index},{"subindex",0},{"data",hex(&value,size)}});
+                        require(!result.contains("error"),"Motion setup SDO rejected");
+                    };
+                    auto cycle=[&](uint16_t cw) {
+                        std::this_thread::sleep_for(std::chrono::milliseconds(2));
+                        exchange(true,json::array({{{"index",0x6040},{"subindex",0},{"data",hex(&cw,2)}}}));
+                        require(!(readValue(i,0x6041)&8),"Unexpected drive Fault in PP test");
+                        return readValue(i,0x6064);
+                    };
+                    sim.slave->validateOutputData();transition(State::OPERATIONAL);
+                    require(sim.slave->state()==State::OPERATIONAL,"Motion test OP transition failed");
+                    bool internal=expected.at("devices").at(i).at("device").at("model").at("type")=="f_kr_cmmt";
+                    if(internal) {
+                        writeValue(0x6060,6,1);for(uint16_t cw:{6,7,15,31})cycle(cw);
+                        for(int n=0;n<100 && !(readValue(i,0x6041)&0x8000);++n)cycle(31);
+                        require(readValue(i,0x6041)&0x8000,"Homing did not reference F-KR");
+                        cycle(15);
+                    }
+                    writeValue(0x6060,1,1);writeValue(0x6081,1,4);
+                    for(uint16_t cw:{6,7,15})cycle(cw);
+                    writeValue(0x607a,10000,4);cycle(0x3f);
+                    for(int n=0;n<20;++n)cycle(15);
+                    auto moving=readValue(i,0x6064);
+                    require(moving>0 && moving<10000,"PP did not begin an unfinished move");
+                    writeValue(0x607a,-10000,4);
+                    for(int n=0;n<20;++n)cycle(15);
+                    require(readValue(i,0x6064)>moving && readValue(i,0x6064)<10000,"SDO target redirected active move");
+                    require(readValue(i,0x607a)==-10000,"SDO target not retained");
+                    cycle(0x3f); // leave start high across the actual remapping boundary
+                    transition(State::PRE_OP);exchange(false,json::array());inactive_confirmed[i]=true;
+                    auto stopped=readValue(i,0x6064);
+                    w(0x1c13,0,0,true);w(0x1a00,0,0,true);
+                    w(0x1a00,1,uint32_t(8*(i+1)),true);w(0x1a00,2,16,true);w(0x1a00,3,0x60640020,true);
+                    w(0x1a00,0,3,true);w(0x1c13,0,1,true);setSm(3,0x1c00,uint16_t(i+7),0x20);
+                    transition(State::SAFE_OP);
+                    require(readRegister(reg::AL_STATUS)==(State::PRE_OP|State::ERROR_ACK),"Missing SW remap unexpectedly succeeded");
+                    require(otherSnapshot()==others,"Failed remap changed another axis");
+                    transition(State::PRE_OP|State::ERROR_ACK);
+                    w(0x1c13,0,0,true);w(0x1a00,0,0,true);w(0x1a00,2,0x60410010,true);
+                    w(0x1a00,0,3,true);w(0x1c13,0,1,true);
+                    transition(State::SAFE_OP);require(sim.slave->state()==State::SAFE_OP,"New per-axis mapping failed");
+                    sim.slave->validateOutputData();transition(State::OPERATIONAL);
+                    require(sim.slave->state()==State::OPERATIONAL,"Remapped OP failed");
+                    for(uint16_t cw:{0x16,0x17,0x3f})require(cycle(cw)==stopped,"Held start moved on re-enable");
+                    for(int n=0;n<20;++n)require(cycle(0x3f)==stopped,"Held start resumed motion");
+                    cycle(15);cycle(0x3f);
+                    for(int n=0;n<30;++n)cycle(15);
+                    require(readValue(i,0x6064)<stopped,"Fresh start did not apply new target");
+                    require(otherSnapshot()==others,"Successful remap/move changed another axis");
+                    exchange(false,json::array());transition(State::PRE_OP);
+                    std::cout<<"PP_REMAP_ISOLATION axis="<<i<<" model="<<(internal?"f_kr_cmmt":"copley")
+                        <<" tx_bytes="<<cmmt::DynamicMapping::bytes(mapping->configuration().tx)<<" passed"<<std::endl;
+                }
                 std::cout<<"DYNAMIC_MAPPING_SELF_TEST axis="<<i<<" passed"<<std::endl;
             }
             return 0;
@@ -271,8 +455,6 @@ int main(int argc,char** argv) {
             return 0;
         }
         EmulatedNetwork network(escs);
-        auto [socket,unused]=createSockets(argv[1],"");
-        socket->setTimeout(std::chrono::milliseconds(10));
         for(size_t i=0;i<slaves.size();++i) {
             auto& sim=*slaves[i];
             sim.slave->start();
@@ -334,6 +516,105 @@ int main(int argc,char** argv) {
                     sim.pdo->updateInput();
             }
         };
+        // Shared by the physical frame loop and NIC-free transition tests.
+        auto runRoutine=[&](size_t i) {
+            auto& sim=*slaves[i];
+                uint16_t control=0;sim.esc->read(reg::AL_CONTROL,&control,sizeof(control));
+                bool wait_for_inactive=sim.slave->state()==State::PRE_OP && (control & 0x0f)==State::SAFE_OP
+                    && !host_failed && (!inactive_confirmed[i] || pending[i].valid());
+                if(!wait_for_inactive)sim.slave->routine();
+        };
+        if(std::string(argv[1]).rfind("--ipc-self-test-",0)==0) {
+            auto scenario=std::string(argv[1]).substr(16);
+            auto require=[](bool ok,char const* text){if(!ok)throw std::runtime_error(text);};
+            auto& sim=*slaves[0];auto mapping=mappings[0];
+            auto regWrite=[&](uint16_t address,void* data,uint16_t len) {
+                DatagramHeader d{};d.command=Command::BWR;d.address=uint32_t(address)<<16;d.len=len;
+                uint16_t wkc=0;sim.esc->processDatagram(&d,data,&wkc);require(wkc==1,"Register write failed");
+            };
+            auto setSm=[&](int index,int address,int length,int control) {
+                SyncManager::Register sm{};sm.start_address=address;sm.length=length;sm.control=control;sm.activate=1;
+                regWrite(reg::SYNC_MANAGER+index*sizeof(sm),&sm,sizeof(sm));
+            };
+            auto setState=[&](uint16_t state){regWrite(reg::AL_CONTROL,&state,2);};
+            setSm(0,0x1000,128,0x26);setSm(1,0x1400,128,0x22);
+            setSm(2,0x1800,2,0x64);setSm(3,0x1c00,2,0x20);
+            setState(State::PRE_OP);runRoutine(0);
+            require(sim.slave->state()==State::PRE_OP,"PRE-OP setup failed");
+            for(auto pair:{std::pair{0x1600,0x60400010u},std::pair{0x1a00,0x60410010u}}) {
+                mapping->write(pair.first,1,pair.second,true);mapping->write(pair.first,0,1,true);
+                int a=pair.first==0x1600?0x1c12:0x1c13;
+                mapping->write(a,1,pair.first,true);mapping->write(a,0,1,true);
+            }
+            inactive_confirmed[0]=true;setState(State::SAFE_OP);runRoutine(0);
+            require(sim.slave->state()==State::SAFE_OP,"Baseline mapping activation failed");
+            setState(State::PRE_OP);runRoutine(0);
+            mapping->write(0x1c13,0,0,true);mapping->write(0x1a00,0,0,true);
+            mapping->write(0x1a00,1,8,true);mapping->write(0x1a00,2,0x60410010,true);
+            mapping->write(0x1a00,3,0x60640020,true);mapping->write(0x1a00,0,3,true);
+            mapping->write(0x1c13,0,1,true);setSm(3,0x1c00,7,0x20);
+            auto durableSnapshot=[&]() {
+                json result=json::object();auto root=std::getenv("DEVICE_SIMULATOR_STATE_DIR");
+                for(auto const& f:std::filesystem::directory_iterator(std::filesystem::path(root)/"pdo-mappings"))
+                    if(f.path().extension()==".json") {
+                        std::ifstream in(f.path());result[f.path().filename().string()]=std::string(std::istreambuf_iterator<char>(in),{});
+                    }
+                return result;
+            };
+            auto oldStore=durableSnapshot();auto oldFeedback=feedback[0];
+            auto submitExchange=[&](bool active) {
+                json reads=json::array();
+                for(auto const& e:contracts[0].at("entries"))if(e.value("tx",false))reads.push_back({{"index",e.at("index")},{"subindex",e.at("subindex")}});
+                json msg={{"op","exchange"},{"active",active},{"values",json::array()},
+                    {"reads",reads},{"session",session},{"request_id",++request_ids[0]}};
+                if(fleet)msg["slave_index"]=0;
+                pending_active[0]=active;pending_since[0]=cmmt::TimingClock::now();pending[0]=model.submit(msg);
+            };
+            // A previous active exchange is still outstanding when SAFE-OP is requested.
+            inactive_confirmed[0]=false;submitExchange(true);setState(State::SAFE_OP);
+            auto begin=std::chrono::steady_clock::now();unsigned routed=0,blocked=0;
+            bool inactiveSubmitted=false,activeCompleted=false;
+            while(std::chrono::steady_clock::now()-begin<std::chrono::milliseconds(350)) {
+                pump();
+                if(!host_failed && !pending[0].valid() && !inactiveSubmitted) {
+                    require(!inactive_confirmed[0],"Active response incorrectly confirmed deactivation");
+                    require(cmmt::DynamicMapping::bytes(mapping->configuration().tx)==2,"Old response used new mapping");
+                    activeCompleted=true;submitExchange(false);inactiveSubmitted=true;
+                }
+                bool waiting=!host_failed && (!inactive_confirmed[0] || pending[0].valid());
+                runRoutine(0);
+                if(waiting) {
+                    require(sim.slave->state()==State::PRE_OP,"SAFE-OP entered before inactive completion");
+                    require(cmmt::DynamicMapping::bytes(mapping->configuration().tx)==2,"Mapping activated before barrier");
+                    require(durableSnapshot()==oldStore,"Mapping persisted before barrier");++blocked;
+                }
+                Frame frame;uint16_t status=0;frame.addDatagram(0,Command::BRD,uint32_t(reg::AL_STATUS)<<16,&status,2);
+                frame.finalize();require(network.route(frame),"Frame routing stopped");frame.resetContext();
+                auto [h,d,wkc]=frame.peekDatagram();(void)h;(void)d;
+                require(wkc && *wkc==slaves.size(),"ESC response lost during IPC fault");++routed;
+                std::this_thread::sleep_for(std::chrono::milliseconds(1));
+            }
+            require(routed>50 && blocked>0,"No transition wait/routing coverage");
+            if(scenario=="delay") {
+                require(activeCompleted && inactiveSubmitted && inactive_confirmed[0] && !host_failed,"Delayed barrier did not finish");
+                require(sim.slave->state()==State::SAFE_OP && cmmt::DynamicMapping::bytes(mapping->configuration().tx)==7,
+                        "New mapping not applied after inactive completion");
+            }else {
+                require(host_failed && sim.slave->state()==State::PRE_OP,"Host failure did not block transition");
+                require(cmmt::DynamicMapping::bytes(mapping->configuration().tx)==2 && durableSnapshot()==oldStore,
+                        "Host failure changed active/durable mapping");
+                require(feedback[0].at({0x6064,0})==oldFeedback.at({0x6064,0}),"Late/stale position applied");
+                uint16_t sw=0;decode(feedback[0].at({0x6041,0}),&sw,2);require((sw&0x6f)==8,"Host Fault not reflected in statusword");
+                // Master-side reset bits cannot undo the separately latched Host failure.
+                uint16_t reset=0x80;std::memcpy(sim.output.data(),&reset,2);
+                setState(State::PRE_OP|State::ERROR_ACK);runRoutine(0);setState(State::SAFE_OP);runRoutine(0);pump();
+                require(host_failed && sim.slave->state()==State::PRE_OP,"Reset cleared Host fault");
+            }
+            std::cout<<"IPC_REMAP_TEST scenario="<<scenario<<" frames="<<routed<<" blocked="<<blocked<<" passed"<<std::endl;
+            return 0;
+        }
+        auto [socket,unused]=createSockets(argv[1],"");
+        socket->setTimeout(std::chrono::milliseconds(10));
         while(running) {
             timing.due();
             pump();
@@ -372,10 +653,7 @@ int main(int argc,char** argv) {
             for(size_t i=0;i<slaves.size();++i) {
                 auto& sim=*slaves[i];
                 auto routine_start=cmmt::TimingClock::now();
-                uint16_t control=0;sim.esc->read(reg::AL_CONTROL,&control,sizeof(control));
-                bool wait_for_inactive=sim.slave->state()==State::PRE_OP && (control & 0x0f)==State::SAFE_OP
-                    && !host_failed && (!inactive_confirmed[i] || pending[i].valid());
-                if(!wait_for_inactive)sim.slave->routine();
+                runRoutine(i);
                 timing.add("slave_routine",routine_start,cmmt::TimingClock::now());
                 auto state=sim.slave->state();
                 if(state==State::SAFE_OP && pdo[i])sim.slave->validateOutputData();

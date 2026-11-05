@@ -42,12 +42,15 @@ class FKrCmmtAdapter:
     def deactivate(self):
         target = self.od.read(0x607A)
         self.model.stop_at_current_position()
+        # Complete the disable transition now. Otherwise the next enable sequence
+        # disables an internally still-enabled drive and overwrites the saved target.
+        self.od.write_internal(0x6040, 0)
+        self.model.process_cycle()
         self.od.write_internal(0x607A, target)
         self.model._last_target_position_command = target
         self.model.previous_controlword = 0
         self.model.pp_active = False
         self.model.pp_setpoint_ack = False
-        self.od.write_internal(0x6040, 0)
 
     def step(self, dt):
         self.model.cycle_time = dt

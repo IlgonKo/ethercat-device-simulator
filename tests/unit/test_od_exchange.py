@@ -60,3 +60,20 @@ class ODExchangeTests(unittest.TestCase):
         description = Model().describe()
         for key in ('rx', 'tx', 'rx_size', 'tx_size', 'pdo', 'mapping'):
             self.assertNotIn(key, description)
+
+    def test_fkr_inactive_disable_transition_preserves_target_through_enable(self):
+        m = Model()
+        self.addCleanup(m.close)
+        m.adapter.model.homing_referenced = True
+        def cycle(cw):
+            m.dispatch(dict(op='exchange', active=True, values=[
+                dict(index=0x6040, subindex=0, data=cw.to_bytes(2, 'little').hex())]))
+        for cw in (6, 7, 15): cycle(cw)
+        self.assertEqual(m.adapter.model.sm.get_statusword(), 0x27)
+        m.dispatch(dict(op='write', index=0x607A, subindex=0, data='f0d8ffff'))
+        m.dispatch(dict(op='exchange', active=False))
+        self.assertNotEqual(m.adapter.model.sm.get_statusword(), 0x27)
+        for cw in (0x16, 0x17, 0x3f):
+            cycle(cw)
+            self.assertEqual(m.adapter.od.read(0x607A), -10000)
+        self.assertFalse(m.adapter.model.pp_active)

@@ -1,0 +1,21 @@
+{
+  "image": "ethercat-device-simulator:rf014-verified",
+  "image_id": "sha256:e98e42e25076a556dedcf282298565fe2bb27383560e2a6c28e36431138177b6",
+  "ctest": "6/6",
+  "python": {
+    "run": 57,
+    "passed": 56,
+    "skipped": 1
+  },
+  "copley_fmu": "8/8",
+  "pp_remap_isolation": [
+    "PP_REMAP_ISOLATION axis=0 model=f_kr_cmmt tx_bytes=7 passed",
+    "PP_REMAP_ISOLATION axis=1 model=f_kr_cmmt tx_bytes=8 passed",
+    "PP_REMAP_ISOLATION axis=2 model=copley tx_bytes=9 passed",
+    "PP_REMAP_ISOLATION axis=3 model=copley tx_bytes=10 passed",
+    "PP_REMAP_ISOLATION axis=0 model=f_kr_cmmt tx_bytes=7 passed",
+    "PP_REMAP_ISOLATION axis=1 model=f_kr_cmmt tx_bytes=8 passed",
+    "PP_REMAP_ISOLATION axis=2 model=copley tx_bytes=9 passed",
+    "PP_REMAP_ISOLATION axis=3 model=copley tx_bytes=10 passed"
+  ]
+}

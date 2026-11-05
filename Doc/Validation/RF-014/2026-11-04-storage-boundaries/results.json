@@ -1,0 +1,18 @@
+{
+  "storage_boundaries": 7,
+  "restore_validation": 3,
+  "ctest": "6/6",
+  "integration_results": [
+    "MAPPING_STORAGE_RECOVERY axis=0 passed",
+    "MAPPING_STORAGE_RECOVERY axis=1 passed",
+    "MAPPING_STORAGE_RECOVERY axis=2 passed",
+    "MAPPING_STORAGE_RECOVERY axis=3 passed",
+    "MAPPING_STORAGE_RECOVERY axis=0 passed",
+    "MAPPING_STORAGE_RECOVERY axis=1 passed",
+    "MAPPING_STORAGE_RECOVERY axis=2 passed",
+    "MAPPING_STORAGE_RECOVERY axis=3 passed",
+    "STORAGE_STARTUP case=schema passed",
+    "STORAGE_STARTUP case=checksum passed",
+    "STORAGE_STARTUP case=logical passed"
+  ]
+}

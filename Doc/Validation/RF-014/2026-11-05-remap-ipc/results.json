@@ -1,0 +1,22 @@
+{
+  "f_kr_four_axes": [
+    "IPC_REMAP_TEST scenario=delay frames=324 blocked=48 passed",
+    "IPC_REMAP_TEST scenario=timeout frames=326 blocked=92 passed",
+    "IPC_REMAP_TEST scenario=stop frames=328 blocked=92 passed",
+    "IPC_REMAP_TEST scenario=terminate frames=329 blocked=4 passed",
+    "IPC_REMAP_TEST scenario=stale-session frames=329 blocked=1 passed",
+    "IPC_REMAP_TEST scenario=stale-request frames=329 blocked=1 passed",
+    "IPC_REMAP_TEST scenario=inactive-timeout frames=327 blocked=93 passed",
+    "IPC_REMAP_TEST scenario=inactive-stop frames=327 blocked=92 passed"
+  ],
+  "copley_f_kr_mixed": [
+    "IPC_REMAP_TEST scenario=delay frames=324 blocked=48 passed",
+    "IPC_REMAP_TEST scenario=timeout frames=325 blocked=91 passed",
+    "IPC_REMAP_TEST scenario=stop frames=325 blocked=91 passed",
+    "IPC_REMAP_TEST scenario=terminate frames=328 blocked=7 passed",
+    "IPC_REMAP_TEST scenario=stale-session frames=329 blocked=1 passed",
+    "IPC_REMAP_TEST scenario=stale-request frames=329 blocked=1 passed",
+    "IPC_REMAP_TEST scenario=inactive-timeout frames=325 blocked=92 passed",
+    "IPC_REMAP_TEST scenario=inactive-stop frames=326 blocked=92 passed"
+  ]
+}

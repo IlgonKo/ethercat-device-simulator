@@ -19,14 +19,16 @@ COPY tests /workspace/tests
 COPY .env.example /workspace/.env.example
 COPY docker/service.py /workspace/docker/service.py
 RUN cmake -S . -B build/timing -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/opt/deps \
- && cmake --build build/timing --target cmmt_simulator test_fixed_mapping test_multi_slave test_async_fault test_sdo_gateway test_dynamic_mapping test_mapping_store --parallel 2 \
+ && cmake --build build/timing --target cmmt_simulator test_fixed_mapping test_multi_slave test_async_fault test_sdo_gateway test_dynamic_mapping test_mapping_store test_mapping_store_failures --parallel 2 \
  && ctest --test-dir build/timing --output-on-failure
 COPY scripts /workspace/scripts
 RUN python3 scripts/linux/build-copley-fmu.py --source docker/inputs/CopleyDriveSim-source.fmu --output model_artifacts/CopleyDriveSim-linux.fmu
 ENV PYTHONPATH=/workspace/src:/workspace
 RUN python3 -m unittest discover -s tests/unit -v \
  && COPLEY_TEST_FMU=/workspace/model_artifacts/CopleyDriveSim-linux.fmu python3 -m unittest tests.integration.test_copley_fmu -v \
- && python3 tests/integration/run_dynamic_mapping.py --axes 4 --fmu-dir /workspace/model_artifacts
+ && python3 tests/integration/run_dynamic_mapping.py --axes 4 --fmu-dir /workspace/model_artifacts --storage-startup \
+ && python3 tests/integration/run_remap_ipc.py --fmu-dir /workspace/model_artifacts \
+ && python3 tests/integration/run_dynamic_mapping.py --axes 4 --fmu-dir /workspace/model_artifacts --motion
 
 FROM ${BASE_IMAGE} AS runtime
 ENV PYTHONUNBUFFERED=1 PYTHONDONTWRITEBYTECODE=1 PATH=/opt/fmi/bin:$PATH
