@@ -30,7 +30,7 @@ EtherCAT Slave와 Functional Model을 분리하고 기능 모델을 CiA402 profi
 
 - [구조 이관·baseline·오프라인 성능 기록](../Validation/RF-016/history-through-20261028.md).
 - [RF-011](RF-011-device-configuration.md), [RF-010](RF-010-parameter-persistence.md), [RF-018](RF-018-diagnostic-fault.md).
-- [ADR-007](../Design/ADR-007-cia402-profile-adapters.md), [소스 출처](../Design/RF-016-source-provenance.json).
+- [ADR-007](../Design/ADR-007-cia402-profile-adapters.md), [소스 출처](../Validation/RF-016/source-provenance.json).
 
 FMU 연결은 RF-017, 동적 PDO·IO·모델 동작 변경은 RF-014/013/015다. 이번 정리는 새 코드 변경이나 물리 시험 기록이 아니다.
 

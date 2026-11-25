@@ -33,7 +33,7 @@ FMU 실행·Copley 연결·CMMT FMU는 후속. BUS는 axis:cia402-drive로 전�
 - 기능 모델을 cia402_drive/profile, cia402_drive/adapter, cia402_drive/behaviour_model/f_kr_cmmt, runtime, ipc, storage, diagnostics로 분리했다. 모델 OD가 유일한 값 저장소이며 어댑터는 같은 OD를 사용한다.
 - CMMT identity·원본 ESI·통신/제조사 확장 및 저장 명령 처리는 device_descriptions/cmmt_as로 분리했다. 공통 PDO 매핑 이름 motion_server_default와 외부 cmmt_as contract label은 유지한다.
 - 공통 어댑터는 profile/od/capabilities와 read_sdo, write_sdo, apply_outputs, step, read_inputs를 요구한다. 모델별 model/bridge 내부 속성은 공통 계약에 포함하지 않는다. 현재 F-KR Internal 지원 모드는 1/3/6/8/-3이며 0은 미선택 값으로 허용한다. 미지원 모드는 모델 적용 전에 거부한다. 실제 동작 알고리즘은 변경하지 않았다.
-- 자체 모델 소스와 상태 머신을 저장소로 이관했다. 역할 인덱스 최적화는 유지한다. 출처와 원본 SHA-256은 [source provenance](../../Design/RF-016-source-provenance.json)에 기록했다. MODEL_SOURCE와 --model-root 및 기존 snapshot export 도구를 제거했다.
+- 자체 모델 소스와 상태 머신을 저장소로 이관했다. 역할 인덱스 최적화는 유지한다. 출처와 원본 SHA-256은 [source provenance](source-provenance.json)에 기록했다. MODEL_SOURCE와 --model-root 및 기존 snapshot export 도구를 제거했다.
 - .env 및 state JSON identity/schema/parameter_set은 유지했다. 기존 4개 저장 파일을 Docker에서 로드했다. 소스가 바뀌어 source/contract hash는 바뀌며 이는 파라미터 호환성 키가 아니다.
 - Windows unittest: 총 53개, 47개 통과·Linux shell 전용 6개 skip. Linux: integration 33개 통과, unit 18개 중 17개 통과·pysoem 미설치 Windows SDO 모듈 1개 skip. Windows에서는 해당 SDO 시험 통과.
 - 이관 전 commit 92f3df2에서 확보한 baseline과 linear/rotary × PP/PV/Homing/CSP/JOG 총 10조합·800 PDO cycle 출력, OD/PDO contract 및 영구 파라미터 값 일치. source/contract hash는 비교에서 제외했다.
