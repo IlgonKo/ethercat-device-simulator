@@ -8,17 +8,17 @@
 
 2026-10-26 운영 변경: 이 문서에 기록된 native/Board/Windows 통합 런처는 Docker 전환으로 삭제됐다. 해당 명령은 과거 시험 이력이며 현재 실행은 scripts/docker/start.sh [--build], stop.sh를 사용한다. 유지·삭제 목록은 scripts/README.md를 참조한다.
 
-2026-10-26 갱신: 현재 구성은 .env 단일 형식이며 DT-005를 따른다. 아래 JSON 관련 설계·시험 기록은 당시 이력이다. 수동 실행 명령은 현재 --env-file 경로로 갱신했다.
+2026-10-26 갱신: 현재 구성은 .env 단일 형식이며 ADR-005를 따른다. 아래 JSON 관련 설계·시험 기록은 당시 이력이다. 수동 실행 명령은 현재 --env-file 경로로 갱신했다.
 
 - 등록일: 2026-09-15
-- 설계: [DT-005](../../Design/DT-005-device-configuration.md)
+- 설계: [ADR-005](../../Design/ADR-005-device-configuration.md)
 - 연계: RF-005 혼합 버스, RF-006 ID 매핑, RF-010 영구 파라미터
 
 ## 현재 작업 범위
 
 가상축만 구현한다. JSON 로더, 필수 slave_index와 영구 id, 장치 type, model.type·mode, parameter_set 연결을 구현한다. 우선 CMMT-AS 4축의 독립 모델·OD·PDO 동작을 검증한다. Motion Server 파일/소스/로더 의존과 .env 병행 지원은 없다.
 
-파라미터 공간 신규 생성·기존 복원은 RF-010과 연계한다. role·counts_per_unit·initial_parameters는 현 합의 형식에 포함하지 않는다. 상세 규칙은 DT-005를 따른다.
+파라미터 공간 신규 생성·기존 복원은 RF-010과 연계한다. role·counts_per_unit·initial_parameters는 현 합의 형식에 포함하지 않는다. 상세 규칙은 ADR-005를 따른다.
 
 ## 완료 기준
 
@@ -63,7 +63,7 @@
 - configuration.py: 엄격 JSON·중복 키·필수/미지원 필드·연속 정수 Slave 번호·중복 ID/저장 공간·축 타입/model/mode 검증과 상대 경로 해석.
 - model_service.py: 축별 모델·OD·브리지·cycle counter, slave_index를 필수로 받는 다축 IPC, 축별 ESI/계약 생성.
 - cmmt_simulator.cc: 다중 ESC·OD 콜백·고정 PDO 재설정 상태를 축별 보관하고 EmulatedNetwork에 순서대로 연결. FMMU에 해당하는 축만 PDO 모델을 진행한다. 현재 고정 byte-aligned 24-byte RxPDO가 한 datagram에 모두 포함되는 구성이 지원 범위다.
-- parameter_store.py: RF-010 기본 저장/복원 경계, 기존 공간 호환성 확인, 원자적 교체·체크섬·단독 잠금. 영구화 범위와 미완료 사항은 DT-005/RF-010 참조.
+- parameter_store.py: RF-010 기본 저장/복원 경계, 기존 공간 호환성 확인, 원자적 교체·체크섬·단독 잠금. 영구화 범위와 미완료 사항은 ADR-005/RF-010 참조.
 
 ## 검증 결과
 

@@ -2,7 +2,9 @@
 
 ## 현재 상태 요약
 
-상태 기준: **예정 / 진행 중 / 보류 / 완료**. 완료는 각 RF에 명시한 합의 범위를 기준으로 하며 후속 항목의 완료를 의미하지 않는다. 개별 문서의 제목 바로 아래에 현재 상태와 상세 범위를 표시한다. 날짜별 계측 보고서는 요구사항 상태 대신 **검증 기록**으로 표시하고 상위 RF로 연결한다.
+설계 결정은 [ADR 목록](../Design/README.md), 전체 작업 순서는 [프로젝트 계획](../project-plan.md)을 따른다.
+
+제품 작업 상태: **예정 / 진행 중 / 보류 / 완료**. **범위 외**는 외부 구상 참고 이력이며 제품 미완료 작업으로 집계하지 않는다. 완료는 각 RF에 명시한 합의 범위를 기준으로 하며 후속 항목의 완료를 의미하지 않는다. 개별 문서의 제목 바로 아래에 현재 상태와 상세 범위를 표시한다. 날짜별 계측 보고서는 요구사항 상태 대신 **검증 기록**으로 표시하고 상위 RF로 연결한다.
 
 | RF | 내용 | 현재 상태 |
 | --- | --- | --- |
@@ -12,21 +14,41 @@
 | [RF-003](RF-003-cmmt-model-integration.md) | VirtualOdBridge 및 CMMT 가상 서보 모델 연결 | **완료** |
 | [RF-004](RF-004-motion-server-axis-panel.md) | Motion Server 및 Axis Panel 통합 테스트 | **완료** |
 | [RF-005](RF-005-mixed-bus-feasibility.md) | 혼합 EtherCAT 버스 및 기존 서버 호환성 검증 | **완료** |
-| [RF-006](RF-006-command-feedback-router.md) | 명령·리드백 라우터 | **예정** |
-| [RF-007](RF-007-mode-switching.md) | 모델 상태 초기화 및 모드 전환 | **예정** |
-| [RF-008](RF-008-omniverse-sync.md) | Omniverse 축·IO 상태 동기화 | **예정** |
-| [RF-009](RF-009-parameter-sync.md) | 실제·가상 장치 양방향 파라미터 동기화 | **예정** |
 | [RF-010](RF-010-parameter-persistence.md) | 가상장치 파라미터 영구 저장 및 복원 | **완료** |
 | [RF-011](RF-011-device-configuration.md) | 독립 장치 구성 및 다중 가상축 | **완료** |
 | [RF-012](RF-012-docker-deployment.md) | Simulator Docker 패키징 및 실행 검증 | **진행 중** |
-| [RF-013](RF-013-virtual-io.md) | 가상 IO 및 IO-Link 시뮬레이션 | **보류** |
+| [RF-013](RF-013-virtual-io.md) | Modular Device Profile 기반 Remote I/O·모델 연결 | **진행 중** |
 | [RF-014](RF-014-dynamic-pdo-mapping.md) | 동적 PDO 매핑 지원 | **완료** |
-| [RF-015](RF-015-axis-model-semantics.md) | 가상축 위치 제한 및 회전 경로 동작 정리 | **예정** |
+| [RF-015](RF-015-axis-model-semantics.md) | 직선축 동작·위치 제한 검증 | **진행 중** |
 | [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **완료** |
 | [RF-017](RF-017-copley-fmu.md) | Copley FMU 초기 연동 | **완료** |
 | [RF-018](RF-018-diagnostic-fault.md) | 공통 Diagnostic 및 모델 장애 격리 | **완료** |
 | [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **예정** |
 | [RF-020](RF-020-parameter-history.md) | 파라미터 revision 및 변경 이력 관리 | **예정** |
+
+## 외부 연동 구상 — Soft ESC 범위 외 참고 이력
+
+아래 문서는 과거 요구를 보존하며 외부 프로젝트의 진행 상태를 의미하지 않는다. Soft ESC 완료 기준에 포함하거나 후속 구현 목록으로 실행하지 않는다.
+
+| RF | 내용 | 현재 분류 |
+| --- | --- | --- |
+| [RF-006](RF-006-command-feedback-router.md) | 명령·리드백 라우터 | **범위 외** |
+| [RF-007](RF-007-mode-switching.md) | 외부 모드 전환 구상(참고 이력) | **범위 외** |
+| [RF-008](RF-008-omniverse-sync.md) | Omniverse 축·IO 상태 동기화 | **범위 외** |
+| [RF-009](RF-009-parameter-sync.md) | 실제·가상 장치 양방향 파라미터 동기화 | **범위 외** |
+
+## 2026-11-25 독립 제품 범위 반영
+
+총 21개 문서 중 **제품 범위 17개: 완료 12 / 진행 중 3 / 예정 2**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
+
+- RF-013: Modular Remote I/O·모델 어댑터·Digital IO 구현. Loader는 검증용 동작 모델 사례이며 현재 코드 구현은 미완료.
+- RF-015: 기존 직선축 지원 대조·회귀. 3축은 Demo 요구에서 가져온 시험 구성.
+- RF-012: 새 Linux PC와 축+IO 독립 배포·복원·통신 확인. Edge #2는 배포 사례.
+- RF-019/020: 후속 제품 기능. 이번 IO 지원의 필수 조건으로 확대하지 않음.
+
+DT/Sync·Pairing·정렬 절차·ROS2/Omniverse는 제품 실행 의존성이 아니다. Analog/IO-Link·회전 확장·NIC 추가 시험은 기존 후속/보류 경계를 유지한다. 기존 완료 검증을 보존하고 변경 영향만 회귀한다. [제품 정의](../Design/ADR-001-system-architecture.md), [프로젝트 계획](../project-plan.md)를 따른다.
+
+이하 날짜별 상태표와 잔여 항목은 당시 이력이다. 현재 판정은 위 요약과 개별 RF의 최신 범위를 우선한다.
 
 ## 2026-10-28 기존 검증 근거 대조
 

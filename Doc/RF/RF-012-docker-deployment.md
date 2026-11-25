@@ -1,7 +1,12 @@
 # RF-012 — Simulator Docker 패키징 및 실행 검증
 
 - 현재 상태: **진행 중**
-- 상태 상세: 독립 Docker 운영·혼합 물리 통신·저장 복원·모델 장애 격리 확인. Slave 자체 장애 정리·재연결 복구도 확인. 다단계 빌드 새 이미지의 사용자 수동 정상 동작 확인; NIC 추가 검증 보류(필요 시 별도 RF), Omniverse 연동은 추후 진행. 2026-11-05 Docker/native 동일 조건 비교 완료. 새 PC 확인·동일 Edge 배치 조건 잔여.
+- 상태 상세: 기존 Docker·다단계 빌드·혼합 축·저장/장애 복구·Docker/native 비교 완료. 2026-11-25 Demo Edge #2 및 3축+IO 배포 검증으로 잔여 범위 조정. 동일 Edge 배치는 장기 옵션, NIC 추가 검증은 보류.
+
+
+## 독립 제품 배포 기준
+
+CiA402 Drive와 Modular Remote I/O를 동작 모델에 연결하는 단독 패키지의 배포를 검증한다. DT/Orchestrator/ROS2/Omniverse 및 Motion Server 파일/소스는 실행 의존성이 아니다. Edge #2·3축+IO는 새 장치 구성/PC 시험 사례이며 제품 전용 조건이 아니다. IO 포함 이미지·설정 검증은 RF-013의 구현을 전제로 별도 수행한다.
 
 ## 현재 구현
 
@@ -23,26 +28,27 @@ Linux 단일 컨테이너에서 EtherCAT Slave와 Functional Model을 별도 프
 | 비컨테이너 대비 주기 지연 | 완료 | 2026-11-05 동일 모델 조합·PDO·4ms 설정, 2축/4축 정지/PP 반복 비교. Python/컴파일러 환경 차이가 있어 순수 컨테이너 오버헤드 수치로 해석하지 않음 |
 | .env 다축 구성 전달 | 완료 | .env 전환 회귀와 운영 4축 생성 |
 | 저장·컨테이너 재생성·새 이미지 적용 | 완료 | RF-010 스키마 이관/새 이미지, SDO 111/123 저장·재생성 복원, 58개 전체 대조·저장 오류 시험 |
-| 외부 DT/엔지니어링 경로 분리 | 후속 작업 | 관리 연결 운영 근거 유지. Omniverse DT 연동 및 별도 PC 경로 검증은 사용자 결정에 따라 추후 진행. RF-008 연계 |
-| Master/Simulator 동일 Edge 배치 | 미검증 | Windows Master + Linux Simulator 시험으로 대체하지 않음 |
+| 엔지니어링 경로 분리 | 배포 확인 | Soft ESC 운영 접근과 EtherCAT 통신 경로 확인. 외부 ROS2/DT 경로는 이 RF 완료 조건이 아님 |
+| Master/Simulator 동일 Edge 배치 | 장기 옵션 | 미검증이며 Demo 완료 조건에서 제외. Edge #1/#2 분리 배치 적용 |
 | 운영·업데이트·백업·복구 절차 | 완료 | scripts, RF-010 백업/이관, RF-018 수동 복구. 임의 구버전 rollback 호환성 보장은 아님 |
 
 모델 장애 시 통신 유지가 미구현이라는 과거 문구는 RF-018 완료로 대체한다. healthcheck는 OP/PDO/WKC 정상의 보장이 아니다. 모델 재시작은 진행 동작 복원이 아니며 Master 초기화의 Enable과 구분한다.
 
-## 실제 남은 항목
+## 실제 남은 항목 — 2026-11-25 독립 배포와 IO 확장
 
-1. 배포 묶음을 실제 새 Linux PC/OS에서 확인. 의존성 고정·묶음 생성·복원·재빌드 절차는 구현했다. 호스트 compiler는 필요 없다. OS·Docker 설치 패키지는 묶음에 포함하지 않는다.
-2. 동일 Edge의 Master/Simulator 동시 배치 확인. 현재 구성의 실패가 아니라 아직 시험하지 않은 배치 조건이다.
+1. 배포 묶음을 실제 Edge #2 새 Linux PC/OS에 적용하고 재부팅 후 구성·파라미터·매핑 복원 확인. 호스트 compiler는 필요 없고 OS/Docker 설치 자체는 묶음에 포함하지 않는다.
+2. RF-013/015의 가상 3직선축+IO 구성과 실제 장치 혼합 운전·장애 복구 확인.
+3. Soft ESC의 엔지니어링 접근과 EtherCAT 통신 경로 분리 확인. 외부 Orchestrator/ROS2/Omniverse 통합은 이 RF의 작업·완료 조건에서 제외한다.
 
-NIC 권한·플래그 추가 검증은 보류하며 필요성이 생길 때 별도 RF로 분리한다. 지금 새 RF를 발행하거나 시험을 시작하지 않는다. Omniverse DT 연동 및 외부 PC 경로 검증도 추후 작업으로 두며 현재 다음 단계로 추진하지 않는다.
+동일 Edge Master/Simulator 배치는 장기 옵션으로 이동해 Demo 완료를 막지 않는다. NIC 권한·플래그 추가 검증은 보류하며 필요 시 별도 RF로 분리한다. 기존 완료 근거를 유지하고 새 구성의 영향 범위만 회귀한다. 반복 시간·합격 수치는 별도 합의한다. [프로젝트 계획](../project-plan.md)를 따른다.
 
-일반 혼합 연결·SDO/PDO·저장 복원·모델 종료 시험을 다시 요구하지 않는다. 위 기존 완료 기준이 남아 RF 전체는 진행 중이다. 신규 시험 시간·합격 수치는 이번 정리에서 정하지 않는다.
+이하 날짜별 기록의 당시 잔여 조건·보류 판단은 이 절의 최신 범위로 대체한다.
 
 ## 근거
 
 - [RF-010](RF-010-parameter-persistence.md), [RF-018](RF-018-diagnostic-fault.md).
 - [과거 Docker 구현·검증 기록](../Validation/RF-012/history-through-20261028.md): 당시 JSON·미구현 표시는 현재 판정이 아니다.
-- [DT-006](../Design/DT-006-docker-deployment.md), [운영 스크립트](../../scripts/README.md).
+- [ADR-006](../Design/ADR-006-docker-deployment.md), [운영 스크립트](../../scripts/README.md).
 
 ## 2026-11-03 Slave 장애 시험
 

@@ -47,4 +47,4 @@
 
 고정 revision/hash, Linux 빌드·오프라인 재현 명령 및 시험 수치는 [이전 기록](../Validation/RF-017/history-through-20261028.md)에 보존했다. 운영 미반영·장애 격리 미구현 문구는 당시 이력이다.
 
-관련: [RF-010](RF-010-parameter-persistence.md), [RF-018](RF-018-diagnostic-fault.md), [DT-008](../Design/DT-008-diagnostic-fault.md). 이번 정리는 새 물리 시험이나 실행 환경 변경을 포함하지 않는다.
+관련: [RF-010](RF-010-parameter-persistence.md), [RF-018](RF-018-diagnostic-fault.md), [ADR-008](../Design/ADR-008-diagnostic-fault.md). 이번 정리는 새 물리 시험이나 실행 환경 변경을 포함하지 않는다.

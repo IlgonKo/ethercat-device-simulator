@@ -72,7 +72,7 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 ## 2026-09-15 — DT 연동 구조 및 전환 정책 문서화
 
 - 사용자 합의: Motion Server 독립 패키지 유지, 단일 서버·동일 버스의 실제/가상 그룹을 외부 명령·리드백 라우터로 선택한다. NIC 전환·서버 두 개 방식은 현재 채택하지 않는다.
-- [DT-001](Design/DT-001-system-architecture.md), [DT-002](Design/DT-002-mode-switching.md), [DT-003](Design/DT-003-model-interface.md)를 추가했다.
+- [ADR-001](Design/ADR-001-system-architecture.md), [ADR-002](Design/ADR-002-mode-switching.md), [ADR-003](Design/ADR-003-model-interface.md)를 추가했다.
 - 정지 상태에서 실제→가상 모델 초기화, 가상→실제 현재 상태 수용을 확정했다. 실제 자동 위치 이동과 진행 명령 인계는 하지 않는다.
 - Omniverse는 선택된 피드백을 표현하고 장치 계산은 기존 가상축·가상 IO가 담당한다. FMI는 향후 호환 방향이며 상세 사양은 미결정이다.
 - [RF 목록](RF/README.md)에 RF-005~008을 미착수로 등록하고 전체 계획과 README를 연결했다. 혼합 버스·서버 그룹 제어는 아직 미검증이며 기존 feasibility 완료와 구분한다.
@@ -80,21 +80,21 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 
 ## 2026-09-15 — 양방향 파라미터 동기화·영구 저장 요구 추가
 
-- 사용자 요청에 따라 실제→가상 및 가상→실제 파라미터 동기화와 가상장치 재시작 시 설정 유지 요구를 [DT-004](Design/DT-004-parameter-sync-persistence.md)에 등록했다.
+- 사용자 요청에 따라 실제→가상 및 가상→실제 파라미터 동기화와 가상장치 재시작 시 설정 유지 요구를 [ADR-004](Design/ADR-004-parameter-sync-persistence.md)에 등록했다.
 - [RF-009](RF/RF-009-parameter-sync.md), [RF-010](RF/RF-010-parameter-persistence.md)을 미착수로 등록했다.
 - 배포 기본값·장치별 영구 파라미터·실행 상태를 구분하고 build/임시 폴더 밖에 저장한다. 저장 형식·경로 상세는 미결정이다.
 - 기존 서버 공개 API 지원과 초기화 재기입 충돌을 RF-005 확인 항목에 추가했다. 문서만 변경했으며 실제 파라미터 읽기·쓰기 또는 기능 구현은 수행하지 않았다.
 
 ## 2026-09-15 — 독립 .env 구성 및 실제·가상 버스 매핑 문서화
 
-- [DT-005](Design/DT-005-device-configuration.md) 추가: 설정 문법은 Motion Server와 맞추되 파일·로더 의존을 만들지 않는다. 자동 .env 페어링 옵션은 제외한다.
+- [ADR-005](Design/ADR-005-device-configuration.md) 추가: 설정 문법은 Motion Server와 맞추되 파일·로더 의존을 만들지 않는다. 자동 .env 페어링 옵션은 제외한다.
 - 실제 축 Slave 0~4·IO 5, 가상 축 6~10·IO 11 / Simulator 로컬 0~5 예시와 서버 Axis·IO ID·영구 장치 ID의 차이를 기록했다.
 - [RF-011](RF/RF-011-device-configuration.md)을 등록하고 RF-005/006 및 계획·문서 목록을 연결했다.
 - 문서만 변경했다. 설정 예시는 미구현 규격이며 12 Slave 혼합 통신이나 CPX 모델이 검증됐다는 의미가 아니다.
 
 ## 2026-09-15 — Docker 배포 방향 및 Edge NIC 구성 문서화
 
-- [DT-006](Design/DT-006-docker-deployment.md)과 [RF-012](RF/RF-012-docker-deployment.md)을 추가했다. Linux Docker Engine에서 KickCAT C++/Python 모델 단일 컨테이너, host 네트워크, 명시적 NIC 선택, 필요한 capability를 기준으로 한다.
+- [ADR-006](Design/ADR-006-docker-deployment.md)과 [RF-012](RF/RF-012-docker-deployment.md)을 추가했다. Linux Docker Engine에서 KickCAT C++/Python 모델 단일 컨테이너, host 네트워크, 명시적 NIC 선택, 필요한 capability를 기준으로 한다.
 - 외부 read-only 설정 파일, 영구 파라미터 볼륨, 임시 Unix 소켓을 구분했다. 시험용 stdin 의존 supervisor 대신 서비스용 시작·종료·실패 관리자를 계획했다.
 - Edge NIC 3개 및 별도 Omniverse PC, 실제 체인 마지막에 Simulator 연결하는 배치를 기록했다.
 - 링크 및 Windows/Linux 문서 일치를 검증한다. 이번 변경은 문서뿐이며 Docker 빌드·배포·실제 장비 시험은 수행하지 않았다.
@@ -130,20 +130,20 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 
 ## 2026-09-22 — Simulator JSON 구성 채택
 
-- 사용자 결정에 따라 기존 동일 .env 문법 채택을 대체하고 [DT-005](Design/DT-005-device-configuration.md)를 JSON 단일 형식으로 갱신했다. 과거 작업 일지의 .env 기록은 결정 이력으로 유지한다.
-- DT-001/006, RF-011/012, 문서 목록·전체 계획을 일치시켰다. 장치 배열 순서·영구 ID·독립 패키지·별도 파라미터 저장 원칙을 기록했다.
+- 사용자 결정에 따라 기존 동일 .env 문법 채택을 대체하고 [ADR-005](Design/ADR-005-device-configuration.md)를 JSON 단일 형식으로 갱신했다. 과거 작업 일지의 .env 기록은 결정 이력으로 유지한다.
+- ADR-001/006, RF-011/012, 문서 목록·전체 계획을 일치시켰다. 장치 배열 순서·영구 ID·독립 패키지·별도 파라미터 저장 원칙을 기록했다.
 - 상세 JSON 예시는 초안임을 명시했다. 이번 작업은 문서 변경이며 설정 로더·Docker·장치 코드는 변경하지 않았다.
 
 ## 2026-09-22 — JSON slave_index 명시 결정
 
-- 사용자 합의에 따라 DT-005 예시에 slave_index를 추가하고 RF-011·전체 계획을 수정했다. 배열 순서 기반 초안은 대체한다.
+- 사용자 합의에 따라 ADR-005 예시에 slave_index를 추가하고 RF-011·전체 계획을 수정했다. 배열 순서 기반 초안은 대체한다.
 - 0부터 연속인 필수 정수로 검증하고 해당 값 순으로 생성한다. 영구 id와 전체 버스 번호는 구분한다. 상세 JSON의 나머지 제안 필드는 아직 확정 전이다.
 - 문서만 변경했으며 코드나 실행 중 장비에는 변경이 없다.
 
 ## 2026-09-22 — 가상축 범위 확정 및 IO 보류
 
 - 사용자 요청에 따라 RF-011을 가상축으로 제한하고 [RF-013](RF/RF-013-virtual-io.md)에 IO/IO-Link 관련 논의를 Pending으로 등록했다. 센서별 ID·저장소 제안은 확정하지 않았다.
-- DT-005·DT-004에 최근 축 JSON 및 parameter_set 저장 공간 규칙을 반영했다. initial preset·별도 스케일은 현 계약에서 제외하고 쓰기/저장을 분리했다.
+- ADR-005·ADR-004에 최근 축 JSON 및 parameter_set 저장 공간 규칙을 반영했다. initial preset·별도 스케일은 현 계약에서 제외하고 쓰기/저장을 분리했다.
 - 실제 CPX 혼합 시험 이력과 장기 IO 목표는 유지한다. 문서만 변경했으며 IO 또는 축 코드를 구현하지 않았다.
 
 ## 2026-09-22 — RF-014 동적 PDO 매핑 등록
@@ -165,7 +165,7 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 
 ## 2026-09-22 — RF-011 확정 계약 및 4축 초기 구현
 
-- 합의한 linear 2축/rotary 2축, PDO 필드 제거, --config, storage.directory 상대 경로, 시작 시 검증·구성, 마지막 저장 파라미터 복원 및 운전 상태 초기화를 DT-005/RF-011에 반영했다.
+- 합의한 linear 2축/rotary 2축, PDO 필드 제거, --config, storage.directory 상대 경로, 시작 시 검증·구성, 마지막 저장 파라미터 복원 및 운전 상태 초기화를 ADR-005/RF-011에 반영했다.
 - 모델 위치 제한/회전 경로 개선은 RF-015로 분리했다. 기존 모델 동작은 변경하지 않았다.
 - JSON 로더, 축별 Python 모델/OD/PDO와 C++ 다중 ESC·IPC 라우팅, RF-010 기본 저장/복원을 구현했다. 실제 CMMT 오류 응답 TD-001 및 임의 PDO RF-014 범위는 유지했다.
 - Python 회귀/4축 모드·저장 검증, Linux 빌드·C++ 메모리 내 4 ESC 라우팅, C++/Python 4축 계약 검증을 수행했다. Linux 전체 Python discovery는 Windows 진단 테스트의 pysoem 미설치로 실패했으며 변경 관련 테스트를 별도로 통과했다.
@@ -222,8 +222,8 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 
 - 사용자 합의로 Co-Simulation을 채택했다. KickCAT Slave와 Model Host를 별도 프로세스로 유지하고 어댑터는 재사용 라이브러리, FMU는 Host 내부에서 로드하는 라이브러리로 정의했다. 별도 FMU Runner와 추가 IPC는 초기 범위에서 제외한다.
 - 모델 코드·어댑터·FMU 충돌 또는 응답 중단에도 Slave 프로세스를 유지하는 것이 목적이다. IPC 시간 제한, 오래된 피드백의 정상 표시 금지, 장애 노출 및 명시적 복구·자동 운전 재개 금지를 설계 원칙으로 기록했다. 구체적 오류 코드·timeout·복구 계약과 구현은 후속이다.
-- DT-003에 책임 경계, CiA402 상태 머신 중복 실행 금지, SDO 적용 결과 반영 및 기존 자체 모델의 대체 경로를 기록했다. DT-001·DT-006·전체 계획·README에 연결했다. 단일 컨테이너와 Motion Server 독립 패키지 원칙은 유지한다.
-- 앞선 CopleyDriveSim Linux 단독 검증(원본 자체 검사 14개, Python FMI 호출 4인스턴스·8 ms 계산 간격·PP 이동·Fault 입력/복구)을 DT-003에 기록했다. 실제 EtherCAT 연동·실시간 성능·Host 장애 격리 검증으로 확대 해석하지 않는다.
+- ADR-003에 책임 경계, CiA402 상태 머신 중복 실행 금지, SDO 적용 결과 반영 및 기존 자체 모델의 대체 경로를 기록했다. ADR-001·ADR-006·전체 계획·README에 연결했다. 단일 컨테이너와 Motion Server 독립 패키지 원칙은 유지한다.
+- 앞선 CopleyDriveSim Linux 단독 검증(원본 자체 검사 14개, Python FMI 호출 4인스턴스·8 ms 계산 간격·PP 이동·Fault 입력/복구)을 ADR-003에 기록했다. 실제 EtherCAT 연동·실시간 성능·Host 장애 격리 검증으로 확대 해석하지 않는다.
 - 이번 변경은 문서만 수정했으며 통합 코드나 실행 중인 장비·프로세스는 변경하지 않았다.
 
 ## 2026-10-26 — Docker 및 .env 기반 실행 초기 구현
@@ -233,7 +233,7 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 - 기존 Linux 바이너리와 모델 스냅샷을 이미지에 포함해 실행 중 Motion Server 체크아웃 마운트를 제거했다. 소스 빌드 및 모델 패키지 독립 배포 완료로 해석하지 않는다.
 - Edge-ubuntu에서 이미지 빌드·NIC 없는 4축 초기화, 물리 버스와 분리된 네트워크에서 4축 Slave 시작·healthcheck·점유 NIC 거부·docker stop 종료 코드 0, 관리 NIC 거부를 확인했다. 실제 enp1s0 시작·정상 종료도 관측했으나 Master/PDO/WKC 시험은 하지 않았다. 테스트 컨테이너는 종료·제거했다.
 - 설정 및 healthcheck 관련 단위 테스트 5개 통과. 기존 장치 JSON·영구 파라미터는 보존하고 별도 build/docker-validation 저장소에서 시험했다.
-- DT-003의 모델 장애 격리는 부분 설계 상태다. 실행 관리자는 모델 종료만으로 살아 있는 Slave를 즉시 종료하지 않지만 기존 C++는 IPC 오류 시 종료한다. 완전한 Slave 유지·Fault/AL 노출·명시적 복구와 물리 회귀는 RF-012 후속으로 기록했다. 커밋·푸시는 하지 않았다.
+- ADR-003의 모델 장애 격리는 부분 설계 상태다. 실행 관리자는 모델 종료만으로 살아 있는 Slave를 즉시 종료하지 않지만 기존 C++는 IPC 오류 시 종료한다. 완전한 Slave 유지·Fault/AL 노출·명시적 복구와 물리 회귀는 RF-012 후속으로 기록했다. 커밋·푸시는 하지 않았다.
 
 ## 2026-10-26 — Motion Server와 환경 변수 명명 규칙 통일
 
@@ -247,7 +247,7 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 - Compose env_file로 모든 장치 설정을 전달하고 모델 서비스가 환경 변수에서 직접 구성 객체를 만든다. 임시 구성 JSON도 제거했다. native 런처/검증 도구는 --env-file로 전환했다. 파라미터 저장 및 KickCAT 내부 JSON은 유지한다.
 - Linux에서 설정·다중 축·저장/복원 22개 및 서비스 검사 4개 통과. 환경 변수만으로 이미지 빌드·4축 초기화 통과. 잘못된 .env와 미지원 JSON은 자동 fallback하지 않는다.
 - Linux 기존 .env가 가리키던 사용자 JSON을 읽어 현재 2축의 ID·모드·저장 공간과 실행 설정값을 보존해 이관했다. 이관 후 2축 모델 초기화도 NIC 접근 없이 통과했다. 이전 .env는 build/env-before-all-settings.env에 백업했다. 사용자 영구 파라미터는 변경하지 않았다.
-- DT-005·DT-006·RF-011·RF-012·README·계획과 목록을 갱신했다. 기존 JSON 예제는 .env 예제로 교체했다. 물리 통신 재시험·서비스 재시작 및 커밋·푸시는 하지 않았다.
+- ADR-005·ADR-006·RF-011·RF-012·README·계획과 목록을 갱신했다. 기존 JSON 예제는 .env 예제로 교체했다. 물리 통신 재시험·서비스 재시작 및 커밋·푸시는 하지 않았다.
 
 ## 2026-10-26 — 축 설정을 Motion Server 방식의 목록으로 구조화
 
@@ -283,12 +283,12 @@ RF-003 구현 전에 CMMT ESI/PDO, C++·Python 연결, OD 단일 기준, 모델 
 
 - 공통 CiA402 Drive 프로파일과 F-KR Internal 어댑터를 첫 구현 범위로 확정했다.
 - FMI 실행 표준과 모델 의미 매핑을 구분하고 향후 공통 FMU 어댑터·모델별 매핑 방향을 기록했다.
-- DT-007에 Copley 제약, identity 호환성 및 전체 폴더 구조 제안을 작성하고 RF-016을 등록했다. 코드/설정/폴더의 실제 이관과 물리 시험은 수행하지 않았다.
+- ADR-007에 Copley 제약, identity 호환성 및 전체 폴더 구조 제안을 작성하고 RF-016을 등록했다. 코드/설정/폴더의 실제 이관과 물리 시험은 수행하지 않았다.
 
 ### 2026-10-26 가상 디바이스·기능 모델 폴더 구조 확정
 
 - 가상 디바이스 = EtherCAT Slave + 기능 모델, 기능 모델 = CiA402 Drive + 모델별 어댑터 + 동작 모델로 합의했다.
-- src/ethercat_slave와 src/functional_model, 루트 device_descriptions·protocols/ipc를 확정하고 DT-007·DT-003·RF-016·전체 계획을 갱신했다.
+- src/ethercat_slave와 src/functional_model, 루트 device_descriptions·protocols/ipc를 확정하고 ADR-007·ADR-003·RF-016·전체 계획을 갱신했다.
 - 기존 simulator/model_coupler 목표 구조 제안을 대체한다. 두 프로세스 실행 및 기존 CMMT identity 호환성은 유지한다. 이번 작업은 문서만 변경했으며 실제 폴더 이동·코드 구현·서버 재시작은 수행하지 않았다.
 
 ### 2026-10-26 RF-016 최초 구조 구현
@@ -349,39 +349,39 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 
 ## 2026-10-28 — Diagnostic/Fault 설계 합의 반영
 
-- DT-008에 Motion Server와 동일한 데이터 계약·수명 주기, 오류별 검출 책임/영향 범위/상태 반영/Resolve 조건을 기록. RF-018에 후속 작업 등록.
+- ADR-008에 Motion Server와 동일한 데이터 계약·수명 주기, 오류별 검출 책임/영향 범위/상태 반영/Resolve 조건을 기록. RF-018에 후속 작업 등록.
 - 미지원 요청과 지속 Fault, 모델 자체 Fault와 내부 실행 장애, 축 단위와 Host 단위 장애를 구분.
 - 구현 전 남은 결정: 관리 인터페이스와 Fault Reset 범위, 피드백·재Enable, 검출 수치 및 잘못된 PDO, 이벤트 소유권/전달, 이력 보관. 32ms 제한이나 자동 복구는 미확정.
 - 문서만 수정. 실행 코드·컨테이너·사용자 설정·저장 파라미터 변경 없음.
 
 ### 2026-10-28 — Fault Reset 및 Recovery 역할 보완
 
-- DT-008/RF-018에 어댑터·모델 드라이브 Fault를 처리하는 축 Fault Reset, Model Recovery, Master의 EtherCAT AL 오류 확인·상태 복구, Slave Recovery 및 전체 Restart의 역할을 기록했다.
+- ADR-008/RF-018에 어댑터·모델 드라이브 Fault를 처리하는 축 Fault Reset, Model Recovery, Master의 EtherCAT AL 오류 확인·상태 복구, Slave Recovery 및 전체 Restart의 역할을 기록했다.
 - 축 Reset으로 공유 Slave를 재시작하지 않으며, 복구 성공 후 자동 Enable·이전 이동 명령 재실행을 금지한다. SDO Abort는 Reset 대상에서 제외한다.
 - 다음 논의는 장애·복구 중 피드백 유효성 및 위치 재동기화·재Enable 조건이다. 관리 인터페이스, Reset의 acknowledge 연계와 어댑터 Fault 세부 코드는 미확정이다.
 - 문서만 변경했으며 실행 코드·컨테이너·설정·저장 파라미터는 변경하지 않았다.
 
 ### 2026-10-28 — 장애 피드백 정책 및 재동기화 검토
 
-- DT-008/RF-018에 마지막 정상값 보관·피드백 유효성 분리, Master에 Fault 표시, 모델 준비와 운전 가능 상태 분리, 위치 불일치 시 Enable 차단 정책을 합의 내용으로 반영했다.
+- ADR-008/RF-018에 마지막 정상값 보관·피드백 유효성 분리, Master에 Fault 표시, 모델 준비와 운전 가능 상태 분리, 위치 불일치 시 Enable 차단 정책을 합의 내용으로 반영했다.
 - 복구된 모델 위치를 새 기준으로 수락하고 Master/DT 재조회 후 새 명령으로 재개하는 절차는 미확정 제안으로 기록했다. Copley의 0 초기화와 상태 복원 제약, 좌표 offset의 한계를 명시했다.
 - 문서만 변경. 실행 코드·컨테이너·설정·저장 파라미터 변경 없음.
 
 ### 2026-10-28 — 복구 모델 위치 수락 방식 확정
 
-- DT-008/RF-018의 재동기화 방식을 제안에서 합의로 변경했다. 사용자가 복구된 모델의 위치를 새 기준으로 수락하며, Copley 재생성 시 위치 0을 기준으로 재개한다.
+- ADR-008/RF-018의 재동기화 방식을 제안에서 합의로 변경했다. 사용자가 복구된 모델의 위치를 새 기준으로 수락하며, Copley 재생성 시 위치 0을 기준으로 재개한다.
 - 이전 위치로 자동 이동, 좌표 offset, 이전 모델 상태 주입은 1차 구현 범위에서 제외한다.
 - 다음 결정은 수락 대상 세션과 Master/DT 재조회 확인, 필요한 Reset·재Enable 및 이전 PDO 명령 재실행 방지 조건이다. 구현·실행 환경은 변경하지 않았다.
 
 ### 2026-10-28 — 복구 위치 수락 거부·보류 정책 합의
 
-- DT-008/RF-018에 수락하지 않은 축의 재동기화 대기·Enable/이동 차단과 EtherCAT 통신·진단 조회 유지 정책을 기록했다.
+- ADR-008/RF-018에 수락하지 않은 축의 재동기화 대기·Enable/이동 차단과 EtherCAT 통신·진단 조회 유지 정책을 기록했다.
 - 나중에 수락, Model Recovery 재시도, 시험 종료를 선택할 수 있다. 수락 대기는 새로운 모델 오류가 아니며 모델 복구 성공과 별도 상태로 표시한다.
 - 자동 수락·이전 위치 자동 이동은 하지 않는다. 관련 예정 검증을 추가했으며 문서 외 실행 환경은 변경하지 않았다.
 
 ### 2026-10-28 — 운전 재개 정책 및 Motion Server PP 순서 확인
 
-- 위치 수락의 세션 제한, 원인 해소 후 Reset, 새 Enable·PP 요청 요구, 이전 명령 폐기 및 관련 진단만 acknowledge하는 정책을 DT-008/RF-018에 반영했다.
+- 위치 수락의 세션 제한, 원인 해소 후 Reset, 새 Enable·PP 요청 요구, 이전 명령 폐기 및 관련 진단만 acknowledge하는 정책을 ADR-008/RF-018에 반영했다.
 - Motion Server HEAD 1c159b6의 로컬 소스에서 Reset bit7 low/high/low 후 0x0006→0x0007, Enable 0x000F, PP 0x000F→0x003F→0x000F 및 SW bit12 ACK 대기를 확인했다. 서버 코드는 변경하지 않았다.
 - Reset 펄스에 이전 운동 비트가 남는 문제를 시뮬레이터 명령 차단으로 처리하고, 준비 이후 새 bit4 edge를 수락하는 조건을 정리했다. 상태 확인 없이 Reset 완료 응답만 신뢰하지 않는다.
 - 서버의 전체 축 Fault 검사 때문에 다른 축 신규 위치 명령도 차단될 수 있으며, 외부 클라이언트에 남은 요청은 PDO만으로 발행 시점을 식별할 수 없음을 기록했다.
@@ -389,7 +389,7 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 
 ### 2026-10-28 — 관리 인터페이스·실행 중 복구 보류
 
-- 사용자 요청에 따라 관리 API/CLI, Model/Slave Recovery, 위치 수락·재동기화 기능을 후속으로 미뤘다. 기존 설계는 보관하고 현재 범위가 우선함을 DT-008/RF-018에 명시했다.
+- 사용자 요청에 따라 관리 API/CLI, Model/Slave Recovery, 위치 수락·재동기화 기능을 후속으로 미뤘다. 기존 설계는 보관하고 현재 범위가 우선함을 ADR-008/RF-018에 명시했다.
 - 현재 복구는 Motion Server를 통한 축 Fault Reset과 수동 Docker 재시작으로 한정한다. 일반 축 Reset에는 위치 수락 API를 요구하지 않으며 모델 재생성·공유 Slave 재시작을 수행하지 않는다.
 - Docker 재시작 후 버스 재연결/초기화·새 위치 확인·명시적 Enable·새 명령은 수동 절차다. 장애 시 EtherCAT Slave 유지 목표는 별도로 유지한다.
 - 문서만 변경했으며 코드 구현·컨테이너 재시작은 수행하지 않았다.
@@ -402,14 +402,14 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - Windows 회귀 80개 중 67개 통과/13개 플랫폼·FMU skip, Linux 실제 FMU 포함 78개 중 77개 통과/1개 skip. 최종 피드백 유효성 보완 후 관련 15개 재검증 통과. CTest 3개 및 실제 FMU/비동기 mailbox 검증 통과.
 - 격리 Docker + veth + PySOEM으로 F-KR 2축/Copley 2축 OP, 축 Fault·Reset·재Enable·PP ACK 확인. Host SIGSTOP/SIGKILL 각각 80주기 WKC=12/12, 전체 축 Fault 유지, 0x6041 조회·다른 모델 SDO Abort, 늦은 응답/Reset으로 Host Fault가 풀리지 않음 검증. 최종 이미지에서도 재통과했다.
 - Linux 바이너리 및 ethercat-device-simulator:dev 이미지 반영. 실제 NIC·사용자 파라미터 파일은 시험에 사용하지 않았고 운영 컨테이너를 자동 재시작하지 않았다. 최종 확인 시 운영 이름의 컨테이너는 존재하지 않았다. Motion Server/Axis Panel 실제 물리 라인 검증은 남아 있다.
-- DT-008/RF-018에 구현 범위·설정·제약·수동 적용 절차를 기록했다. 관리 API·Model Recovery·위치 수락은 구현하지 않았다. 커밋·푸시는 요청되지 않아 수행하지 않았다.
+- ADR-008/RF-018에 구현 범위·설정·제약·수동 적용 절차를 기록했다. 관리 API·Model Recovery·위치 수락은 구현하지 않았다. 커밋·푸시는 요청되지 않아 수행하지 않았다.
 
 
 ### 2026-10-28 — JOG Fault 복원 수동 시험 확인 및 변경사항 정리
 
 - Motion Server 「프로젝트 설계 및 의사결정」 스레드의 개별 축 Fault 대응 구현을 참조했다. Fault 검출 시 지령 정리·운전 허가 제거 및 Jog/Homing 이전 모드 PDO 복원을 수행하며, 자동 Reset/Enable과 다축 연계 정지는 하지 않는다.
 - 사용자가 Copley virtual-axis-2에서 JOG 미지원 Fault를 발생시킨 뒤 PP 복원과 Motion Server 축 Fault Reset으로 정상 복귀함을 확인했다. 시뮬레이터에 JOG Reset 예외 처리는 추가하지 않았다.
-- DT-008/RF-018에 수동 시험 결과와 확인 범위를 기록했다. Host timeout/단절·Docker 재시작의 물리 검증 및 수동 시험 WKC/시간/주기는 이번 성공 보고에 포함하지 않았다.
+- ADR-008/RF-018에 수동 시험 결과와 확인 범위를 기록했다. Host timeout/단절·Docker 재시작의 물리 검증 및 수동 시험 WKC/시간/주기는 이번 성공 보고에 포함하지 않았다.
 - 이번 저장 범위는 시뮬레이터 저장소의 RF-018 Fault/Reset·비차단 IPC 구현, 테스트 및 관련 문서다. 별도 Motion Server 저장소의 변경은 포함하지 않는다.
 
 
@@ -513,7 +513,7 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 사용자 합의로 관리 API RF-019, 양방향 동기화 기존 RF-009, revision/변경 이력 RF-020으로 분리했다. RF-010 현재 범위 완료 기준을 재정리하고 각 항목 근거를 연결했다.
 - Linux 격리 Docker에서 부분 기록/replace 전/replace 후 실제 writer SIGKILL, 잠금 회수·재저장, 백업 복원·명시적 초기화 시험 추가. 관련 회귀 30개 통과. 전원 차단 시험이 아님을 명시했다.
 - 실제 Motion Server를 통해 가상축 4개의 전체 저장 항목 58개를 SDO로 읽고 파일과 바이트 단위 일치 확인(불일치 0), WKC 18/18. 운영 저장값·실제 축·컨테이너는 이번 검증에서 수정/재시작하지 않았다.
-- 초기화 시 쓰기 대상과 저장 목록을 대조하고 0x6081 readback→PDO 경로, 프로파일/실행 상태 경계, 파일 부재와 손상의 차이, 백업 복원·초기화 절차를 RF-010/DT-004에 기록했다.
+- 초기화 시 쓰기 대상과 저장 목록을 대조하고 0x6081 readback→PDO 경로, 프로파일/실행 상태 경계, 파일 부재와 손상의 차이, 백업 복원·초기화 절차를 RF-010/ADR-004에 기록했다.
 - RF-010 현재 범위를 완료 처리했다. 실제 축 A0의 이전 Fault를 이번 결과로 정상 복귀했다고 간주하지 않는다. 커밋/푸시는 아직 수행하지 않았다.
 
 
@@ -787,3 +787,52 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - RF-016 완료. RF-012는 Docker/native 비교 완료, 새 PC/동일 Edge 배치 잔여. 비RT 지터 원인 추가 조사 없음.
 - 원래 운영4축 컨테이너를 같은 이미지로 재시작하고 healthy 확인. .env 해시 불변, 운영 저장소와 분리된 시험 저장소 사용. Motion Server는 사용자 재연결 대기.
 - [보고서](Validation/RF-016/runtime-comparison-20261105/README.md). 2026-11-05 사용자 요청에 따라 결과·문서를 커밋/푸시 대상으로 정리했다.
+
+
+## 2026-11-05 RF-015 보류
+
+- 사용자가 다음 작업으로 제안한 RF-015를 보류했다. RF 본문과 목록 상태를 보류로 변경했다. 기존 모델 동작 및 구현 범위는 변경하지 않았다.
+
+
+## 2026-11-25 — DT Demo 범위 반영 및 기존 문서 정합성 리뷰
+
+- 사용자 업로드 Gap Analysis와 DT Demo 시스템 사양 v1.1을 기준으로 ADR-001~009, RF 목록/관련 RF, 프로젝트 계획과 README를 정리했다. Gap Analysis는 v0.2로 반영했다.
+- Soft ESC 가상장치 책임과 Orchestrator의 DT/Sync·Pairing·State Alignment·Sequence·ROS2 책임을 구분했다. Omniverse는 항상 가상 피드백이며 내부 상태 덮어쓰기 API는 Demo에서 제외했다.
+- RF-013은 Digital IO·Loader 설계, RF-015는 직선축 대조·검증으로 재개했다. Analog/IO-Link·회전 확장·NIC 추가 검증은 보류한다. 완료 RF는 다시 열지 않았다.
+- RF-012 잔여 범위를 Edge #2 및 3축+IO 배포로 조정했다. 동일 Edge는 장기 옵션이고 RF-019/020은 Demo 선행 조건이 아니다.
+- 다음 단계는 최신 Motion Server API·OD/PDO·IO 요구 대조 후 CPX 형번/모듈/밸브/채널/Loader 동작·장애 계약 확정이다.
+- 문서만 수정. 코드·.env·저장 파라미터·실행 컨테이너를 변경하지 않았고 신규 물리 시험·커밋·푸시는 수행하지 않았다. 과거 검증 기록은 보존했다.
+
+- 문서 확인: 변경 Markdown의 상대 링크 누락 없음, `git diff --check` 통과. RF 본문 상태 집계와 목록의 완료 12 / 진행 중 3 / 예정 6 일치.
+
+## 2026-11-25 — 사용자 지적에 따른 문서 범위 정정
+
+이전 정리에서 외부 Orchestrator 정책·전체 Demo 통합을 Soft ESC 계획/완료 기준으로 확대했다. 사용자 요청은 Demo 논의를 입력으로 Soft ESC 구현 범위·기능을 조정하는 것이므로 해당 확대를 정정했다.
+
+- ADR-001/002/009를 Soft ESC 내부 구조·지원 기능·제외 기능 중심으로 재작성했다.
+- RF-006~009는 기존 외부 연동 구상 이력으로 보존하며 Soft ESC 구현 목록에서 제외했다. 외부 프로젝트 진행 상태를 여기서 판정하지 않는다.
+- RF-013/015/012의 완료 기준에서 외부 Alignment/Pairing/ROS2/전체 Demo 기능 검증을 제외하고 가상장치 SDO/PDO·동작·피드백·배포 검증으로 한정했다.
+- 신규 Digital IO·Loader, 비-CiA402 공통 처리 확장, 기존 직선축 요구 대조·회귀가 실제 변경 범위다. 업로드 분석 자료는 입력 참조이며 ADR-009가 이 저장소 범위의 기준이다.
+- 문서만 변경했으며 코드·운영 설정·컨테이너·외부 프로젝트는 수정하지 않았다.
+
+## 2026-11-25 — 독립 Soft ESC 제품 정의 확정 및 문서 재정리
+
+사용자 합의: Soft ESC는 FMU 또는 다른 형식의 동작 모델을 EtherCAT 장치 프로파일에 연결하는 독립 실행 패키지이며 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 모두 제품 범위로 한다. “첫 지원 대상”으로 제품 범위를 한정하지 않고 구현·검증 상태를 별도로 표시한다.
+
+- README·ADR-001에 제품 정의와 외부 시스템 비의존성 명시. 장치 프로파일·제품 설명·어댑터·동작 모델 책임 분리.
+- ADR-003/007의 미래 FMU·축 전용 설명을 기존 F-KR/Copley/Fault 구현 근거와 맞추고 IO 확장 지점을 구분. 동작 모델이 제공하는 상태 머신을 중복 구현하지 않는 원칙 유지.
+- ADR-004/005/006/008 및 계획 문서에 독립 구성·저장·배포·프로파일별 진단 경계 반영. 기존 .env·저장 파일·코드 경로를 변경하지 않음.
+- RF-013에 MDP 모듈 식별/구성·OD/PDO·모델 어댑터·채널 독립성·오류 처리를 명시. 실제 CPX 형번·모듈/채널·밸브/모델 계약은 아직 미결정이며 IO 코드 구현 완료로 표시하지 않음.
+- DT Demo의 3축·Loader·Edge #2는 요구·시험 사례로 구분. 제품 전용 조건이나 외부 기능의 구현 책임으로 가져오지 않음.
+- RF-006~009는 범위 외 참고 이력으로 분류. 제품 RF 17개(완료12/진행중3/예정2), 외부 이력4개. 기존 완료 RF/Validation 근거는 유지.
+- 현재 로더의 cia402-drive 전용 검사와 기존 프로파일/어댑터/FMI 디렉터리를 읽기 확인. 이번 작업은 문서만 수정했으며 구현·실행/물리 시험·커밋·푸시는 수행하지 않음.
+
+- 문서 검증: 변경 파일의 상대 링크/제목 앵커 및 저장소에서 변경 문서로 들어오는 앵커 확인, `git diff --check` 통과. 기존 완료 RF 12개의 완료 판정 유지와 제품/외부 이력 집계 일치 확인.
+
+## 2026-11-25 — 결정 기록 접두어 ADR 전환 및 계획 분리
+
+- 사용자 동의에 따라 결정 문서 접두어를 DT에서 ADR로 변경하고 Doc/Design 폴더는 유지했다. 번호 001~008은 기존 주제를 유지하고 제목·파일명·본문 참조·링크를 함께 변경했다.
+- ADR-009에는 독립 Soft ESC 제품 범위와 외부 시스템 경계의 배경·결정·이유·영향을 기록했다. 기존 로드맵의 구현 현황 표·구조 변경 작업·Demo 사용 사례·다음 작업·미결정 항목은 project-plan.md로 이동했다. 각 작업의 완료 기준은 RF에 유지한다.
+- Doc/Design/README.md에 ADR 목록과 ADR/계획/RF/검증/일지의 역할을 정리했다. 결정의 채택과 기능 구현 완료를 분리했다.
+- README·RF·기존 검증 기록·작업 일지의 참조를 새 이름으로 연결했다. DT Demo 분석 자료의 명칭은 사용 사례이므로 유지했다.
+- 기존 구현 내용·RF 완료 판정·시험 결과는 변경하지 않았으며 코드·운영 파일·컨테이너를 수정하거나 커밋·푸시하지 않았다.

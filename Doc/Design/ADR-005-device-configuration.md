@@ -1,8 +1,18 @@
-# DT-005 — .env 장치 구성과 혼합 버스 번호 매핑
+# ADR-005 — .env 장치 구성과 혼합 버스 번호 매핑
 
+- 결정 상태: **채택** (현행 범위 기준; 본문의 보류·과거 제안은 구분)
 - 최초 결정: 2026-09-15
 - 현재 형식 결정: 2026-10-26 (.env 단일 설정으로 전환)
-- 상태: 환경 설정 로더 및 다중 가상축 검증 완료, 물리 회귀는 후속
+- 구현 상태: RF-011 축 구성·물리 검증 완료. CiA402 Drive와 Modular Remote I/O가 제품 범위이며 IO 설정 구현은 RF-013에서 진행.
+
+
+## 2026-11-25 프로파일별 독립 구성
+
+Soft ESC는 DT와 무관한 자체 장치 구성을 소유한다. CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 같은 버스에 구성할 수 있도록 확장한다. 제품 범위와 달리 현재 로더는 축만 허용하므로 아래 AXIS 목록 규칙은 현재 축 계약이다.
+
+IO는 장치·모듈/슬롯/채널과 선택 동작 모델의 입출력 연결을 구분한다. Loader/3축은 구성 사례이며 하드코딩하지 않는다. IO에서 AXIS 목록을 요구하지 않도록 검증을 프로파일별로 분리하고, 기존 축 설정 호환성을 유지한다. 키 이름·지원 모듈·모델 연결 스키마는 RF-013에서 확정하며 현재 미구현 설정 예제를 배포하지 않는다.
+
+BUS의 프로파일 선택과 동작 모델 선택은 분리한다. 모듈·채널 배치와 PRE-OP PDO mapping/assignment는 별개이며 .env 초기 PDO 매핑 옵션을 재도입하지 않는다. 구체적인 IO 매핑 계약은 선정 장치 요구와 RF-014 기반을 대조해 결정한다.
 
 ## 현재 결정과 이전 결정 대체
 
@@ -17,7 +27,7 @@ Motion Server는 독립 패키지다. 명명 규칙은 유사하게 사용하지
 | Motion Server 전체 버스 | Motion Server 자체 .env |
 | Simulator 실행·가상장치 | Simulator 자체 .env |
 | 장치 영구 파라미터 | 별도 저장소; 안정적인 ID와 PARAMETER_SET 기준 |
-| 실제/가상/논리 장치/DT 대응 | 연동 패키지의 독립 매핑 |
+| 실제/가상/논리 장치/DT 대응 | Orchestrator의 독립 Pairing 설정 |
 
 ## 축 설정
 
@@ -33,12 +43,12 @@ DEVICE_SIMULATOR_AXIS_PARAMETER_SETS=0:axis-0,1:axis-1
 
 - BUS의 명시적 숫자는 로컬 Slave 번호다. 입력 나열 순서와 무관하게 정렬하고 중복·누락·음수·비정수를 거부한다.
 - AXIS_IDS/MODELS/MODES/PARAMETER_SETS 목록은 필수다. 각 목록의 번호 집합은 BUS와 정확히 같아야 하며 중복 번호와 누락을 거부한다. ID는 순서와 독립적인 영구 식별자다.
-- 현재 타입은 cia402-drive, 모델은 f_kr_cmmt, 모드는 linear/rotary를 지원한다. FMU는 후속이며 가상 IO는 RF-013 보류다.
+- 현재 축 타입은 cia402-drive이며 F-KR CMMT와 Copley 모델을 지원한다(RF-016/017). Demo는 f_kr_cmmt의 linear 3축 X1/Y/Z를 우선 사용한다. X2 Drive는 추가하지 않는다. IO의 .env 스키마는 RF-013에서 하드웨어 대조 후 확정한다.
 - PARAMETER_SET은 저장 공간의 논리 이름이며 파일 경로가 아니다. 공간이 없으면 기본값으로 만들고 있으면 호환성을 검증한다. 기본 모델 preset은 linear_mm/rotary_deg다.
 - PDO 매핑 선택·counts_per_unit·scale은 추가하지 않는다. 단위·스케일은 장치 파라미터 기준이고 동적 PDO는 RF-014다.
 - 값은 한 줄의 리터럴로 작성한다. 따옴표와 주석은 지원한다. 제품 설정에 셸 명령·변수 치환을 사용하지 않는다. native 로더는 중복 키를 거부한다. Compose env_file의 문법 처리는 Compose가 담당한다.
 
-## 장기 목표의 번호와 ID 대응 (IO 부분은 RF-013 보류)
+## 과거 장기 목표의 번호와 ID 예시 — Demo 실제 버스 구성 아님
 
 | 대상 | 전체 Slave 번호 | Simulator 내부 순서 | 서버 Axis 번호 | 서버 IO ID |
 | --- | --- | --- | --- | --- |
@@ -59,12 +69,12 @@ DEVICE_SIMULATOR_AXIS_PARAMETER_SETS=0:axis-0,1:axis-1
 
 설정 파일만으로 혼합 버스 물리 연결이 생성되지는 않는다. 실제 Slave 뒤에 Linux KickCAT을 연결했을 때 반환 경로, 다중 가상 Slave 검색·identity·PDO·OP 및 IO 모델이 동작하는지는 RF-011의 축 확장과 RF-013의 IO 확장에서 검증해야 한다. 12 Slave 예시는 합의한 목표이며 현재 통신 검증 결과가 아니다.
 
-관련: [전체 구조](DT-001-system-architecture.md), [영구 파라미터](DT-004-parameter-sync-persistence.md), [구성 구현 RF-011](../RF/RF-011-device-configuration.md).
+관련: [전체 구조](ADR-001-system-architecture.md), [영구 파라미터](ADR-004-parameter-sync-persistence.md), [구성 구현 RF-011](../RF/RF-011-device-configuration.md).
 
 
 ## Docker 설정 전달
 
-Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트와 DEVICE_SIMULATOR_CONFIG_FILE은 제거한다. 어댑터는 환경 변수에서 구성 객체를 만들고 모델에 전달한다. 임시 장치 구성 JSON도 생성하지 않는다. 호스트 DEVICE_SIMULATOR_STATE_DIR를 /state로 마운트하고 컨테이너에서는 같은 변수의 값을 /state로 고정해 /state에 저장한다. native 실행의 상대 STATE_DIR는 .env 파일 디렉터리를 기준으로 한다. [DT-006](DT-006-docker-deployment.md)을 참조한다.
+Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트와 DEVICE_SIMULATOR_CONFIG_FILE은 제거한다. 어댑터는 환경 변수에서 구성 객체를 만들고 모델에 전달한다. 임시 장치 구성 JSON도 생성하지 않는다. 호스트 DEVICE_SIMULATOR_STATE_DIR를 /state로 마운트하고 컨테이너에서는 같은 변수의 값을 /state로 고정해 /state에 저장한다. native 실행의 상대 STATE_DIR는 .env 파일 디렉터리를 기준으로 한다. [ADR-006](ADR-006-docker-deployment.md)을 참조한다.
 
 명시적 번호 원칙은 유지한다. DEVICE_SIMULATOR_BUS의 숫자가 slave_index이며 0부터 연속이어야 한다. 순서를 바꿀 때 해당 네 가지 AXIS 목록의 번호도 함께 옮기되 ID와 PARAMETER_SET은 유지한다.
 
@@ -78,7 +88,7 @@ Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트
 - 위치·속도·Controlword·Enable·Homing 완료 상태·진행 중 명령은 복원하지 않는다. 새 모델의 초기 정지 상태에서 시작한다. DT 위치 동기화는 RF-007의 별도 절차다.
 - RF-011은 다중 구성·분리에 집중한다. 기존 모델의 제한 처리와 회전 경로 계산은 변경하지 않고 [RF-015](../RF/RF-015-axis-model-semantics.md)에서 논의한다.
 
-## 초기 구현과 운영
+## 초기 구현 이력 — 현행 저장/장애 정책은 RF-010/018 우선
 
 - 구성 예시는 [.env.example](../../.env.example). 기존 단일 축 시험 도구의 명시적 무설정 경로는 유지하지만 잘못된 .env에서 이 경로로 fallback하지 않는다.
 - RF-016에서 자체 모델을 src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt로 이관했다. --model-root와 외부 Motion Server 스냅샷 런타임 의존은 제거했고, 기존 .env 및 영구 파라미터 identity는 유지한다.

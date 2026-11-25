@@ -7,7 +7,7 @@
 
 
 - 등록일: 2026-09-15
-- 설계: [DT-006](../../Design/DT-006-docker-deployment.md)
+- 설계: [ADR-006](../../Design/ADR-006-docker-deployment.md)
 - 연계: RF-003/004 기존 단축 통신, RF-005 혼합 버스, RF-010 저장, RF-011 구성
 
 ## 작업 범위
@@ -19,7 +19,7 @@ Linux Docker Engine용 이미지와 배포 구성을 작성한다. C++ KickCAT�
 - [ ] 선택한 Linux/CPU 환경에서 재현 가능한 이미지 빌드 및 의존성·버전·배포 조건 기록.
 - [ ] Motion Server 소스/설정 마운트 없이 Simulator를 독립 실행.
 - [ ] 터미널 입력 없이 지속 실행, docker stop 신호 처리 및 자식 프로세스·소켓 정리 검증.
-- [ ] 모델 실패 시 Slave 생존·장애 노출, 통신 프로세스 실패 시 서비스 실패·정리 및 readiness 검증 (DT-003의 2026-10-26 결정).
+- [ ] 모델 실패 시 Slave 생존·장애 노출, 통신 프로세스 실패 시 서비스 실패·정리 및 readiness 검증 (ADR-003의 2026-10-26 결정).
 - [ ] 전용 NIC 선택·중복 사용 거부·기본 경로 NIC 검사, 실제 권한 및 NIC 플래그 영향 기록.
 - [ ] 실제 PySOEM 검색·SDO 정상 경로·OP·PDO 회귀와 WKC, 주기 지연을 비컨테이너 기준과 비교.
 - [ ] RF-011 .env 장치 구성 전달 및 모델 생성 검증.
@@ -89,7 +89,7 @@ docker compose down
 - docker/service.py는 표준입력 EOF와 무관하게 지속 실행하고 SIGTERM/SIGINT로 종료한다. 두 자식 프로세스 로그는 docker logs로 수집하며 회전 한도는 10 MB × 3이다. run-id는 로그 라벨이며 이전 cmmt-session의 진단 폴더와 같은 의미는 아니다.
 - 호스트 네트워크, NET_RAW/NET_ADMIN/DAC_OVERRIDE, 읽기 전용 루트, 임시 /run/simulator·/tmp를 사용한다. setcap 수동 재실행은 Docker 경로에서 필요 없다. 기본 경로 NIC, carrier 및 기존 EtherCAT 소켓을 확인한다. 사용자 요청으로 관리 NIC 변수와 그 검사는 제거했다. 호스트 전체에 대한 원자적 NIC 예약을 보장하는 기능은 아니다.
 - healthcheck는 실행 관리자 heartbeat와 자식 생존을 확인한다. Master 연결·OP·WKC 정상이나 모델의 진행 상태까지 보증하지 않는다.
-- Model Host 종료만으로 실행 관리자가 살아 있는 Slave를 즉시 종료하지는 않는다. 그러나 현재 C++는 IPC 단절/timeout 시 종료하므로 DT-003의 완전한 Slave 생존·오류 상태 유지·명시적 복구는 아직 미구현이다. 이를 해결하려면 IPC 오류 처리와 장치 상태 계약을 함께 변경해야 한다.
+- Model Host 종료만으로 실행 관리자가 살아 있는 Slave를 즉시 종료하지는 않는다. 그러나 현재 C++는 IPC 단절/timeout 시 종료하므로 ADR-003의 완전한 Slave 생존·오류 상태 유지·명시적 복구는 아직 미구현이다. 이를 해결하려면 IPC 오류 처리와 장치 상태 계약을 함께 변경해야 한다.
 
 ## 이번 검증 범위
 

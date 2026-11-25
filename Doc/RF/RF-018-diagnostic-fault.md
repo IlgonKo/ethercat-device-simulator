@@ -4,7 +4,7 @@
 - 상태 상세: 완료 — 현재 합의 범위의 Fault/Reset·Host 장애 격리 및 물리 복구 검증 완료 (2026-10-28); 관리·자동 복구 등 후속 범위 제외
 
 - 등록일: 2026-10-28
-- 설계 기준: [DT-008](../Design/DT-008-diagnostic-fault.md)
+- 설계 기준: [ADR-008](../Design/ADR-008-diagnostic-fault.md)
 
 ## 목적
 
@@ -48,13 +48,13 @@ Motion Server와 동일한 Diagnostic 데이터 구조·수명 주기를 사용�
 ### 공통 원칙 및 후속 복구 설계
 
 - Definition/Source/History/Status, normal/alarm/fault, acknowledge/resolve/clear 규칙.
-- 오류별 검출 책임·영향 범위·상태 반영·Resolve 조건은 DT-008 표를 따른다.
+- 오류별 검출 책임·영향 범위·상태 반영·Resolve 조건은 ADR-008 표를 따른다.
 - SDO 요청 거부와 장치/모델 Fault 분리. 모델 자체 Fault와 실행 장애의 합성 Fault 중복 금지.
 - 공유 Host 장애와 개별 축 실행 오류의 영향 범위를 구분한다.
 - Diagnostic 통합 관리와 Slave의 즉시 보호 조치는 분리한다.
 - 축 Fault Reset은 어댑터 Fault와 모델 드라이브 Fault를 원인별로 처리한다. 실행 기반 복구는 Model Recovery, NIC·소켓 등 공유 통신부 복구는 Slave Recovery로 분리한다.
 - Master의 EtherCAT AL 오류 확인·상태 복구는 CiA402 축 Fault Reset과 별개다. 축 Reset으로 공유 Slave를 재시작하지 않는다.
-- Reset/Recovery/Restart 후 자동 Enable 및 이전 이동 명령 재실행을 금지한다. 사용자 동작별 역할은 DT-008의 합의 표를 따른다.
+- Reset/Recovery/Restart 후 자동 Enable 및 이전 이동 명령 재실행을 금지한다. 사용자 동작별 역할은 ADR-008의 합의 표를 따른다.
 
 - 피드백 정책 합의: 모델 출력 무효 시 마지막 정상값과 시각을 보관하고 유효성을 별도 표시한다. Master에는 CiA402 Fault, 상세 정보는 시뮬레이터 진단 조회로 제공한다.
 - 모델 준비와 운전 가능 상태를 구분하며, 위치 불일치 시 재동기화 전 Enable을 차단한다. 필요한 Reset·위치 확인 후 명시적 Enable 및 새 명령으로 재개한다.
@@ -66,9 +66,9 @@ Motion Server와 동일한 Diagnostic 데이터 구조·수명 주기를 사용�
 
 현재 우선 검토·구현 대상은 축 Reset 가능한 Fault/재시작 필요한 Fault의 분류, 원인 해소 판정, Motion Server Reset·Enable·PP 순서의 실제 검증 및 장애 격리 조건이다. 아래 관리 인터페이스·위치 수락 관련 상세 결정은 보류한다.
 
-운전 재개 정책 합의 및 Motion Server 코드 검토를 DT-008에 반영했다. 위치 수락의 세션 제한, Reset 후 새 Enable, PP bit4 새 edge, 관련 진단만 acknowledge하는 정책을 따른다. 기존 서버의 Reset(펄스 후 0x0006→0x0007), Enable(0x000F), PP(0x000F→0x003F→0x000F) 순서를 시뮬레이터에서 검증한다. 구현·물리 검증 완료를 의미하지 않는다.
+운전 재개 정책 합의 및 Motion Server 코드 검토를 ADR-008에 반영했다. 위치 수락의 세션 제한, Reset 후 새 Enable, PP bit4 새 edge, 관련 진단만 acknowledge하는 정책을 따른다. 기존 서버의 Reset(펄스 후 0x0006→0x0007), Enable(0x000F), PP(0x000F→0x003F→0x000F) 순서를 시뮬레이터에서 검증한다. 구현·물리 검증 완료를 의미하지 않는다.
 
-다음은 관리 명령 인터페이스와 세션·위치 확인 계약이다. 이어 비PP 모드 재개 조건, 어댑터 Fault 코드·Resolve 조건, 응답 기한, 잘못된 PDO 처리, 프로세스 간 이벤트 전달, 이력 보관 정책을 확정한다. Motion Server의 전체 축 Fault 검사와 외부 클라이언트 대기 요청 식별 불가 제약은 DT-008을 따른다.
+다음은 관리 명령 인터페이스와 세션·위치 확인 계약이다. 이어 비PP 모드 재개 조건, 어댑터 Fault 코드·Resolve 조건, 응답 기한, 잘못된 PDO 처리, 프로세스 간 이벤트 전달, 이력 보관 정책을 확정한다. Motion Server의 전체 축 Fault 검사와 외부 클라이언트 대기 요청 식별 불가 제약은 ADR-008을 따른다.
 
 ## 예정 검증
 

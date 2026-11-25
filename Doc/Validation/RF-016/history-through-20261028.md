@@ -7,11 +7,11 @@
 
 
 - 등록일: 2026-10-26
-- 설계: [DT-007](../../Design/DT-007-cia402-profile-adapters.md)
+- 설계: [ADR-007](../../Design/ADR-007-cia402-profile-adapters.md)
 
 ## 범위
 
-공통 CiA402 Drive 프로파일, 기존 CMMT-AS 장치 설명 분리, F-KR CMMT 어댑터 및 기존 Model Host 연결. 현재 Motion Server 무수정, CMMT identity와 PDO, 기존 모델 계산·상태 전이·파라미터를 유지한다. 폴더 구조는 DT-007로 확정했다. src/ethercat_slave와 src/functional_model로 분리하며, 기능 모델은 cia402_drive/profile + adapter + behaviour_model로 구성한다. 필요한 자체 모델·OD·codec·ESI 파서를 이관했으며 외부 Motion Server 스냅샷 런타임 의존을 제거했다.
+공통 CiA402 Drive 프로파일, 기존 CMMT-AS 장치 설명 분리, F-KR CMMT 어댑터 및 기존 Model Host 연결. 현재 Motion Server 무수정, CMMT identity와 PDO, 기존 모델 계산·상태 전이·파라미터를 유지한다. 폴더 구조는 ADR-007로 확정했다. src/ethercat_slave와 src/functional_model로 분리하며, 기능 모델은 cia402_drive/profile + adapter + behaviour_model로 구성한다. 필요한 자체 모델·OD·codec·ESI 파서를 이관했으며 외부 Motion Server 스냅샷 런타임 의존을 제거했다.
 
 ## 완료 기준
 

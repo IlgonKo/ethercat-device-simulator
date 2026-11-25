@@ -1,13 +1,91 @@
-# EtherCAT Device Simulator 설계 및 진행 계획
+# Soft ESC 설계 및 진행 계획
 
-## 현재 RF 판정 — 2026-10-28
+## 제품 범위 — 2026-11-25
 
-RF-011은 독립 .env·4축 구성/독립성·저장 공간 연결 범위 완료다. RF-012는 Docker 배포 재현성·Slave 자체 실패·배치 조건, RF-016은 현 구조 2축/4축 계측, RF-017은 세부 물리 이동/파라미터 효과·혼합 정량 성능만 남는다. 실제 축·IO와 F-KR/Copley 혼합 환경은 이미 계속 운전해 왔으며, 저장·모델 장애 격리는 RF-010/018 완료 근거를 재사용한다.
+Soft ESC는 FMU/기타 동작 모델을 EtherCAT Master가 사용할 수 있는 가상장치로 연결하는 독립 패키지다. **CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 모두 제품 범위**로 한다. [ADR-001](Design/ADR-001-system-architecture.md)이 정의와 책임 경계의 기준이다.
 
-현재 판정은 [RF 목록](RF/README.md)과 개별 RF를 따른다. 아래 날짜별 JSON/native 실행·미착수·미완료 설명은 당시 계획/기록이며 현재 상태를 덮어쓰지 않는다.
+DT Demo는 요구와 시험 사례를 제공하며 제품 실행 의존성이 아니다. X1/Y/Z 3축·Loader·Edge #2는 검증 구성이다. 라우팅·Pairing·정렬 절차·ROS2/Omniverse를 이 저장소에서 구현하지 않는다.
 
+## 기존 구현과 다음 작업
 
-현재 설정 계약 (2026-10-26): 실행·장치 구성을 Simulator 자체 .env 하나로 통합했다. 이전 JSON 및 .env+JSON 병행 결정은 DT-005의 최신 결정으로 대체한다. DEVICE_SIMULATOR_BUS와 AXIS_<번호>_*를 사용하며 JSON 구성 파일/CONFIG_FILE 옵션은 제거했다. 영구 파라미터 데이터 및 내부 ESI/IPC JSON은 유지한다. 아래 날짜별 이전 결정은 이력이다.
+기존 RF-001~005/002-1·010/011/014/016/017/018 완료 근거를 유지한다. 설정·저장·동적 PDO·F-KR/Copley·축 장애 격리 기반을 재사용한다. RF-013은 Modular Remote I/O·모델 연결, RF-015는 직선축 요구 대조·회귀, RF-012는 독립 배포 잔여 검증을 진행한다. RF-019/020은 후속 제품 기능이다.
+
+제품 범위 RF는 17개(완료 12 / 진행 중 3 / 예정 2), 외부 연동 구상 RF-006~009 4개는 범위 외 참고 이력이다. 현재 판정은 [RF 목록](RF/README.md)을 따른다.
+
+작업 순서: 장치/모듈·OD/PDO 요구 대조 → MDP·IO 어댑터/모델 계약 → IO 및 공통 기반 확장 → 축+IO·기존 모델 회귀 → 독립 배포 확인. 구체적 산출물과 순서는 아래 현행 계획을 따른다. 제품 경계 결정은 [ADR-009](Design/ADR-009-product-scope-and-boundaries.md)를 참조한다. [Demo 분석](DT-demo-gap-analysis.md)은 요구 입력 자료이며 외부 작업 계획을 Soft ESC 완료 조건으로 가져오지 않는다.
+
+설정은 독립 .env를 유지한다. 현재 BUS·AXIS 목록은 축 지원 계약이며 IO의 모듈/채널/모델 키는 RF-013에서 확정한다. 구성 JSON을 재도입하지 않고 영구 파라미터/매핑 JSON은 유지한다.
+
+## 계획과 결정 문서의 역할
+
+확정된 제품 범위·제약과 그 근거는 [ADR 목록](Design/README.md)에 기록한다. 구현 현황·작업 순서·미결정 항목은 이 문서에서 관리하고, 작업별 완료 기준·검증 근거는 RF를 따른다. 아래 현행 계획은 기존 구현 현황·확장 계획 문서에서 분리했다.
+
+## 기존 구현·검증과 추가 작업
+
+| 영역 | 현재 근거 | 이번 작업 |
+| --- | --- | --- |
+| KickCAT ESC·Mailbox·SDO/PDO·혼합 버스 | RF-001~005 및 002-1 완료 | 기존 통신 재사용, IO 추가 영향 회귀 |
+| 독립 .env·다축 구성 | RF-011 완료 | 프로파일별 구성 검증으로 확장; 모듈/슬롯/채널/모델 연결 계약 추가 |
+| CiA402·F-KR CMMT | RF-016 완료 | 기존 지원 유지, RF-015에서 필요한 명령·한계·정지·단위 대조 |
+| Copley FMU | RF-017 합의 범위 완료 | FMI3 Co-Simulation·PP/Reset 등 기존 범위 유지. 모든 FMU나 운전 모드 지원으로 확대 해석하지 않음 |
+| 파라미터 저장/복원 | RF-010 완료 | 기반 재사용, IO의 저장 대상·호환성은 RF-013에서 명세 |
+| 동적 PDO·매핑 저장 | RF-014 가상축 범위 완료 | 공통 처리 재사용, 필수 객체·모듈 구성 검증은 프로파일별로 분리 |
+| Fault/Reset·모델 장애 격리 | RF-018 축 범위 완료 | 공통 격리 기반 재사용, IO 진단·입출력 유효성·복구 의미 추가 |
+| 독립 Docker·빌드·2/4축 비교 | RF-012 부분 완료, RF-016 비교 완료 | 새 Linux PC와 축+IO 배포/복원·통신 회귀 |
+| Modular Remote I/O | 제품 범위 확정, 코드 구현 미완료 | RF-013에서 모듈형 프로파일·장치 설명·SDO/PDO 구현 |
+| IO 어댑터·동작 모델 | 구현 미완료 | 교체 가능한 모델 연결; Loader 밸브/실린더를 사용 사례로 구현·검증 |
+
+기존 완료 RF의 판정과 시험 자료는 유지한다. IO 지원을 추가한다고 기존 축 검증 전체가 미완료로 돌아가거나, 반대로 기존 축 시험이 IO 검증을 대신하지 않는다. 현재 설정 로더는 cia402-drive만 허용하고 Host·매핑 검증에 축 전용 처리가 있으므로 문서상 제품 범위와 실행 가능 범위를 구분한다.
+
+## 필요한 구조 변경
+
+1. 공통 EtherCAT/IPC/실행 기반과 프로파일별 OD·필수 PDO·상태·진단 규칙 분리. IO에 0x6040/0x6041 및 축 Fault 표현을 강제하지 않는다.
+2. Modular Device Profile의 장치·모듈 구성과 실제 장치 설명 분리. 선정 제품의 Identity·ESI·초기화 객체·모듈 식별·PDO 요구를 명세한다.
+3. IO 채널과 동작 모델 입출력 연결을 어댑터가 담당하도록 한다. 모델 형식은 FMU에 한정하지 않으며 Loader 이름이나 채널을 공통 Slave에 하드코딩하지 않는다.
+4. 자체 .env에 IO 장치·모듈/슬롯/채널·동작 모델 연결 설정을 추가한다. 실제 키/스키마는 설계 후 확정하며 미구현 키를 운영 예제로 제시하지 않는다.
+5. 장치당 논리 OD 하나, Slave의 mapping/assignment 저장, 기능 모델의 파라미터 저장, 매핑 없는 모델 IPC 원칙을 유지한다.
+
+현재 축의 CA·크기·정렬 제한은 검증된 범위다. IO에서 필요한 계약을 대조해 명시적으로 결정하며 이 문서만으로 기존 미지원 기능을 지원으로 바꾸지 않는다. 폴더/클래스 상세 변경은 RF-013 구현 설계에서 확정한다.
+
+## DT Demo에서 추출한 사용 사례
+
+| Demo 요구 | Soft ESC가 제공·검증할 기능 | 외부에 남는 책임 |
+| --- | --- | --- |
+| X1/Y/Z 직선 3축 | 기존 f_kr_cmmt linear 구성, 명령·피드백·파라미터 독립성 | 논리 축 Pairing·경로/Sequence |
+| Loader Remote I/O | DO → 어댑터/동작 모델 → 양단 DI, 중간·끝단 상태 | 공정 순서·완료 판단 |
+| 일반 PP/IO로 상태 정렬 | Enable·PP 이동/정지·도달 피드백, DO/DI 동작 | 실제 상태 읽기·정렬 순서·허용오차·실장비 이동 |
+| 파라미터 대응 | 지원 SDO 읽기/쓰기·readback·저장 및 PRE-OP PDO 재설정 | 실제↔가상 복사·비교·적용 정책 |
+| DT 표시 | 유효한 EtherCAT 장치 피드백 | ROS2/Omniverse 전송·표시·충돌 처리 |
+| Edge #2 사용 | 독립 Linux Docker·설정/저장 복원·EtherCAT 접근 | 시스템 전체 배치·운영 정책 |
+
+3축은 검증 구성이지 제품 최대 축 수가 아니다. X2용 별도 Drive가 필요 없다는 것은 Demo의 장치 구성이다. Copley/FMI 및 기존 회전축 기능을 제거하지 않는다. Loader는 Remote I/O에 연결할 동작 모델의 사례이며 패키지를 DT Demo 전용으로 만들지 않는다.
+
+## 다음 작업 순서
+
+1. 선정 IO 장치 설명/ESI와 외부 Master의 Identity·SDO·PDO·모듈 요구 대조. Motion Server는 현재 호환성 검증 대상이며 제품의 설정 원본은 아니다.
+2. MDP 기반 장치/모듈·채널 구성, 모델 어댑터, 초기/오류/저장 계약 확정.
+3. 공통 기반의 축 전용 가정 분리, Modular Remote I/O의 Digital IO 구현 및 Loader 모델 연결.
+4. 모듈 순서·채널 독립성·DO/DI·잘못된 구성·모델 지연/종료 검증, 기존 Drive/FMU·저장·매핑 회귀.
+5. RF-015 직선축 기능 대조·필요 보완 및 일반 SDO/PP/IO 지원 검증.
+6. RF-012 새 Linux PC 및 혼합 축+IO 배포·재시작·장애 복구 확인.
+
+외부 Orchestrator의 Pairing/Alignment·ROS2·전체 Demo 통합 구현은 이 프로젝트 완료 조건에 넣지 않는다. 모델/모듈별 지원 범위와 시험 조건을 남기고 실시간성·전체 표준 적합성을 과장하지 않는다.
+
+## 구현 전 확정할 항목
+
+- Remote I/O 구체 제품: CPX-E-EC / CPX-AP-I-EC 형번, 지원 모듈·슬롯·채널과 초기화·매핑 계약.
+- Loader 모델: 밸브 DO 수·극성, 상충 명령·출력 OFF 의미, 초기 상태와 이동 시간·양단 DI.
+- 공통 IO 경계: PRE-OP·버스 단절·Host 장애 시 출력 적용, 입력 유효성·진단·복구, 저장할 파라미터.
+
+## 이번 확장 범위와 후속
+
+RF-013은 Modular Remote I/O와 Digital IO·Loader 연결을 진행한다. Analog/IO-Link/IODD/ISDU·정밀 공압 모델은 후속 범위다. RF-015의 신규 검증은 직선축이며 회전 확장·CSP/보간은 포함하지 않는다. 관리 API/이력은 RF-019/020 후속, NIC 추가 시험은 보류다.
+
+RF-006~009는 외부 연동 구상 이력으로만 보존하며 Soft ESC 구현 목록·현행 진행률에서 구분한다. 기존 완료 RF를 재개하지 않고 변경 영향 부분만 회귀한다.
+
+## 날짜별 초기 계획 이력 — 현행 계약 아님
+
+아래 9~10월 JSON/native·미완료 설명 및 선택 리드백·내부 상태 초기화 초안은 당시 기록이다. 현행 범위는 ADR-001~009와 RF 최신 절을 우선하며 완료된 작업을 다시 미완료로 해석하지 않는다.
 
 정리 기준: 2026-09-15
 
@@ -35,7 +113,7 @@ Windows 로컬 경로: `C:\Users\Festo\Documents\ethercat-device-simulator`
 | 마스터 | 기존 PySOEMMaster를 유지한다. KickCAT 마스터로 교체하지 않는다. |
 | 통신 | 실제 NIC와 EtherCAT 케이블을 통해 마스터와 시뮬레이터를 연결한다. |
 | 시뮬레이션 엔진 | KickCAT으로 진행한다. acontis 검토는 보류하며, 기본 빌드·PDO 및 정상 SDO 경로는 검증했고, Abort 호환성은 TD-001로 보류한다. |
-| 장치 동작 | 기존 OD·CiA 402 모듈을 기본 경로로 유지한다. 2026-10-26 결정으로 별도 Model Host에서 Co-Simulation FMU를 대체 모델로 연결하는 방향을 채택했다. DT-003 참조. |
+| 장치 동작 | 기존 OD·CiA 402 모듈을 기본 경로로 유지한다. 2026-10-26 결정으로 별도 Model Host에서 Co-Simulation FMU를 대체 모델로 연결하는 방향을 채택했다. ADR-003 참조. |
 | 최종 마스터 구성 | 충분한 검증 후 PySOEMMaster 하나로 통일하는 것을 목표로 한다. |
 | 전환 기간 | MockMaster를 유지해 개발과 회귀 테스트에 사용한다. 지금 제거하거나 축소하지 않는다. |
 | 운영체제 | Windows PC가 Motion Server/PySOEM 마스터 역할을 하고, 별도 Linux PC에서 KickCAT 시뮬레이터를 실행한다. |
@@ -197,9 +275,9 @@ RF-004 기본 통합을 완료했다. [수동 런처와 검증 결과](RF/RF-004
 
 기본 타당성 검증에서 DT 연동 개발로 진행한다. 기존 1축 직결 벤치는 검증 이력으로 유지한다. 제품 목표는 Motion Server 한 인스턴스와 동일 버스의 실제·가상 장치 그룹, 외부 명령·리드백 라우터 및 Omniverse 연결부다. Motion Server는 수정 없는 독립 패키지로 유지한다.
 
-- [DT-001 전체 구조](Design/DT-001-system-architecture.md): 그룹별 장치 ID 매핑과 선택 리드백. 기본 3 Slave 혼합 버스와 서버 호환성은 RF-005에서 검증 완료.
-- [DT-002 전환 정책](Design/DT-002-mode-switching.md): 정지 전환, 실제→가상 모델 초기화, 가상→실제 현재 실제 상태 수용. 실제 장비 자동 이동 없음.
-- [DT-003 모델 경계](Design/DT-003-model-interface.md): 기존 가상축·가상 IO 재사용, 향후 FMI 어댑터. 장치 동작은 모델이 계산.
+- [ADR-001 전체 구조](Design/ADR-001-system-architecture.md): 그룹별 장치 ID 매핑과 선택 리드백. 기본 3 Slave 혼합 버스와 서버 호환성은 RF-005에서 검증 완료.
+- [ADR-002 전환 정책](Design/ADR-002-mode-switching.md): 정지 전환, 실제→가상 모델 초기화, 가상→실제 현재 실제 상태 수용. 실제 장비 자동 이동 없음.
+- [ADR-003 모델 경계](Design/ADR-003-model-interface.md): 기존 가상축·가상 IO 재사용, 향후 FMI 어댑터. 장치 동작은 모델이 계산.
 
 | 후속 항목 | 순서 및 완료 판단 |
 | --- | --- |
@@ -208,25 +286,25 @@ RF-004 기본 통합을 완료했다. [수동 런처와 검증 결과](RF/RF-004
 | [RF-007](RF/RF-007-mode-switching.md) | 모델 초기화 및 정지 상태 전환·실패 처리 |
 | [RF-008](RF/RF-008-omniverse-sync.md) | Omniverse 축·IO 표시와 전환 동기화 |
 
-RF-005 기본 검증은 완료했으며 RF-006~008은 계획/미착수다. FMI 실행 방식은 2026-10-26에 Co-Simulation 및 별도 Model Host로 결정했다(DT-003). 제품의 FMI 지원 버전 범위, Omniverse 전송 방식, 상세 상태 스키마는 미결정이다. MockMaster 유지 및 TD-001 보류 방침은 변경하지 않는다. 독립 패키징의 후속 Docker 결정은 13절을 참조한다.
+RF-005 기본 검증은 완료했으며 RF-006~008은 계획/미착수다. FMI 실행 방식은 2026-10-26에 Co-Simulation 및 별도 Model Host로 결정했다(ADR-003). 제품의 FMI 지원 버전 범위, Omniverse 전송 방식, 상세 상태 스키마는 미결정이다. MockMaster 유지 및 TD-001 보류 방침은 변경하지 않는다. 독립 패키징의 후속 Docker 결정은 13절을 참조한다.
 
 ## 11. 파라미터 동기화 및 영구 저장 (2026-09-15)
 
-[DT-004](Design/DT-004-parameter-sync-persistence.md)에 실제↔가상 파라미터 비교·선택 적용과 가상장치 영구 저장 요구를 기록했다. 모드 전환 상태 동기화와 분리한다. [RF-009](RF/RF-009-parameter-sync.md)는 양방향 적용·검증, [RF-010](RF/RF-010-parameter-persistence.md)은 안정적인 장치 ID 기반 저장·재시작 복원을 담당한다. RF-009는 미착수이며 RF-010은 RF-011 연계 기본 저장/복원을 구현하고 후속 검증 중이다. 저장소는 build·임시 폴더와 분리하며 기본값·영구 파라미터·실행 상태를 구분한다. 현재 저장 계약은 DT-005/RF-010의 schema 1 JSON, storage.directory, fsync 후 원자적 교체를 따른다.
+[ADR-004](Design/ADR-004-parameter-sync-persistence.md)에 실제↔가상 파라미터 비교·선택 적용과 가상장치 영구 저장 요구를 기록했다. 모드 전환 상태 동기화와 분리한다. [RF-009](RF/RF-009-parameter-sync.md)는 양방향 적용·검증, [RF-010](RF/RF-010-parameter-persistence.md)은 안정적인 장치 ID 기반 저장·재시작 복원을 담당한다. RF-009는 미착수이며 RF-010은 RF-011 연계 기본 저장/복원을 구현하고 후속 검증 중이다. 저장소는 build·임시 폴더와 분리하며 기본값·영구 파라미터·실행 상태를 구분한다. 현재 저장 계약은 ADR-005/RF-010의 schema 1 JSON, storage.directory, fsync 후 원자적 교체를 따른다.
 
 ## 12. 독립 설정과 혼합 장치 구성 (2026-09-15)
 
-[DT-005](Design/DT-005-device-configuration.md): 최초에는 같은 .env 문법을 선택했으나 2026-09-22 결정으로 Simulator는 독립 JSON 단일 형식, Motion Server는 기존 .env를 유지한다. Motion Server 설정 자동 읽기·1:1 생성 옵션은 채택하지 않는다. 전체 버스에 실제 축 Slave 0~4·IO 5, 가상 축 6~10·IO 11을 배치하는 예시를 확정했다. Simulator는 로컬 0~5만 생성하고 라우터가 번호 공간을 매핑한다. 기본 3 Slave 혼합 통신은 RF-005에서 완료했으며 12 Slave 확장은 후속이다. [RF-011](RF/RF-011-device-configuration.md)에 독립 JSON 로더·4축 생성 초기 구현과 오프라인 검증을 완료했으며 4축 기본 동작 확인 후 8 ms 주기 안정성 문제가 재현되어 개선이 필요하다.
+[ADR-005](Design/ADR-005-device-configuration.md): 최초에는 같은 .env 문법을 선택했으나 2026-09-22 결정으로 Simulator는 독립 JSON 단일 형식, Motion Server는 기존 .env를 유지한다. Motion Server 설정 자동 읽기·1:1 생성 옵션은 채택하지 않는다. 전체 버스에 실제 축 Slave 0~4·IO 5, 가상 축 6~10·IO 11을 배치하는 예시를 확정했다. Simulator는 로컬 0~5만 생성하고 라우터가 번호 공간을 매핑한다. 기본 3 Slave 혼합 통신은 RF-005에서 완료했으며 12 Slave 확장은 후속이다. [RF-011](RF/RF-011-device-configuration.md)에 독립 JSON 로더·4축 생성 초기 구현과 오프라인 검증을 완료했으며 4축 기본 동작 확인 후 8 ms 주기 안정성 문제가 재현되어 개선이 필요하다.
 
 ## 13. Docker 및 Edge 네트워크 배포 (2026-09-15)
 
-[DT-006](Design/DT-006-docker-deployment.md)에 Linux Docker Engine·단일 Simulator 컨테이너·host 네트워크·외부 설정/영구 저장소를 초기 배포 방향으로 기록했다. Edge에 LAN 카드를 추가해 Master·Simulator·일반 엔지니어링/DT용 NIC 3개를 사용하며 Omniverse는 별도 PC에서 실행한다. Simulator는 실제 장비 체인 끝에 연결하고 같은 NIC로 프레임을 반환한다. 중간 IN/OUT 전달 기능은 초기 범위에서 제외한다.
+[ADR-006](Design/ADR-006-docker-deployment.md)에 Linux Docker Engine·단일 Simulator 컨테이너·host 네트워크·외부 설정/영구 저장소를 초기 배포 방향으로 기록했다. Edge에 LAN 카드를 추가해 Master·Simulator·일반 엔지니어링/DT용 NIC 3개를 사용하며 Omniverse는 별도 PC에서 실행한다. Simulator는 실제 장비 체인 끝에 연결하고 같은 NIC로 프레임을 반환한다. 중간 IN/OUT 전달 기능은 초기 범위에서 제외한다.
 
 [RF-012](RF/RF-012-docker-deployment.md)에 서비스 진입점, 종료·오류 처리, 컨테이너 물리 통신 및 파라미터 복원 검증을 미착수로 등록했다. 기존 서버의 Linux Edge 동시 배치는 검증 전이며, Windows Master와 별도 Linux Simulator의 기본 혼합 버스 검증은 RF-005에서 완료했다. 모델 배포 의존성, 이미지·볼륨 상세와 재시작 정책은 후속 확정한다.
 
 ## 14. Simulator JSON 단일 형식 결정 (2026-09-22)
 
-장치별 ID·모델·초기 설정·IO 모듈을 묶어 관리하기 위해 [DT-005](Design/DT-005-device-configuration.md)를 JSON으로 변경했다. 각 장치의 필수 slave_index가 가상 Slave 순서를 결정하며 배열 나열 순서는 무관하다. 번호는 0부터 연속이고 영구 id는 별도다. Motion Server .env 자동 읽기와 두 형식 병행은 제외한다. 영구 파라미터는 별도 저장소를 유지한다. 현재 가상축 schema 1 로더를 구현했으며 확정 필드·검증 규칙은 DT-005와 RF-011을 따른다.
+장치별 ID·모델·초기 설정·IO 모듈을 묶어 관리하기 위해 [ADR-005](Design/ADR-005-device-configuration.md)를 JSON으로 변경했다. 각 장치의 필수 slave_index가 가상 Slave 순서를 결정하며 배열 나열 순서는 무관하다. 번호는 0부터 연속이고 영구 id는 별도다. Motion Server .env 자동 읽기와 두 형식 병행은 제외한다. 영구 파라미터는 별도 저장소를 유지한다. 현재 가상축 schema 1 로더를 구현했으며 확정 필드·검증 규칙은 ADR-005와 RF-011을 따른다.
 
 ## 15. 현재 구현은 가상축으로 제한 (2026-09-22)
 
@@ -256,11 +334,11 @@ OD 조회 최적화 이후 사용자가 4축 동작 테스트 정상을 확인�
 
 FMU 연결 전에 RF-012의 실행 구조를 우선 구현한다. compose.yaml·docker/Dockerfile·비대화형 서비스 실행 관리자를 추가하고 NIC, JSON 경로, 영구 저장 위치, 계측 및 진단 시간 제한을 .env에서 설정한다. 장치 정의 JSON과 영구 파라미터 저장 형식은 유지한다. Docker 경로의 NIC·저장 위치는 환경 설정이 우선하며 원본 JSON은 변경하지 않는다.
 
-Linux 이미지 빌드, 4축 모델 초기화, 분리된 네트워크에서 Slave 시작·healthcheck·docker stop, 관리/점유 NIC 거부와 설정 단위 테스트를 확인했다. 런타임 이미지에는 기존 빌드 바이너리·모델 스냅샷을 포함한다. 소스부터의 이미지 빌드, 물리 PDO/WKC·재생성 후 저장 복원 및 DT-003 모델 장애 시 Slave 유지의 완전한 구현은 후속이다. RF-012 전체 완료는 아니다.
+Linux 이미지 빌드, 4축 모델 초기화, 분리된 네트워크에서 Slave 시작·healthcheck·docker stop, 관리/점유 NIC 거부와 설정 단위 테스트를 확인했다. 런타임 이미지에는 기존 빌드 바이너리·모델 스냅샷을 포함한다. 소스부터의 이미지 빌드, 물리 PDO/WKC·재생성 후 저장 복원 및 ADR-003 모델 장애 시 Slave 유지의 완전한 구현은 후속이다. RF-012 전체 완료는 아니다.
 
 ## 다음 구현: CiA402 프로파일과 자체 모델 어댑터 (2026-10-26)
 
-[DT-007](Design/DT-007-cia402-profile-adapters.md)과 [RF-016](RF/RF-016-cia402-profile-adapter.md)을 따른다. 공통 프로파일 및 F-KR Internal 어댑터부터 분리하며 CMMT 호환 identity와 기존 모델 동작을 유지한다. FMU 연결은 후속이다. 폴더 구조는 src/ethercat_slave + src/functional_model로 확정했다. 기능 모델 내부에 CiA402 프로파일·어댑터·동작 모델을 두며 코드 이관은 아직 수행하지 않았다. 현재 운영 설정은 루트 .env 단일 형식이며 과거 JSON 계획을 대체한다.
+[ADR-007](Design/ADR-007-cia402-profile-adapters.md)과 [RF-016](RF/RF-016-cia402-profile-adapter.md)을 따른다. 공통 프로파일 및 F-KR Internal 어댑터부터 분리하며 CMMT 호환 identity와 기존 모델 동작을 유지한다. FMU 연결은 후속이다. 폴더 구조는 src/ethercat_slave + src/functional_model로 확정했다. 기능 모델 내부에 CiA402 프로파일·어댑터·동작 모델을 두며 코드 이관은 아직 수행하지 않았다. 현재 운영 설정은 루트 .env 단일 형식이며 과거 JSON 계획을 대체한다.
 
 ### 2026-10-26 RF-016 최초 구조 구현
 

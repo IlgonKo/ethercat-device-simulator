@@ -1,6 +1,8 @@
 # Soft ESC — DT Demo Gap Analysis & Development Roadmap
 
-**기준일:** 2026-11-25 · **버전:** 0.1 (검토 초안)
+**기준일:** 2026-11-25 · **버전:** 0.3 (독립 Soft ESC 제품 정의 및 적용 경계 반영)
+
+> 범위 정정: 이 문서는 Demo 전체 맥락을 담은 입력 분석 자료다. 외부 Orchestrator·Pairing·Alignment·전체 통합 관련 단계는 Soft ESC의 구현 목록이나 완료 조건이 아니다. 이 저장소의 실제 구현 범위와 순서는 [프로젝트 계획](project-plan.md)를 따른다.
 
 ## 1. 목적 및 분석 근거
 
@@ -18,25 +20,25 @@ Fieldbus-level Digital Twin Demo 구현을 위해 기존 Soft ESC의 개발 상�
 
 ## 2. 요약
 
-실질적 신규 개발은 Virtual IO 및 Loader Behavior Model(RF-013)이다. 기존 가상축 모델의 보완(RF-015), Docker 배포(RF-012), Parameter Pairing 및 시스템 통합 검증을 추가한다. 기존 RF-006~009의 정책 및 외부 연동은 최신 Demo 사양에 따라 Orchestrator가 담당한다.
+제품은 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 지원 대상으로 하는 독립 Soft ESC다. 신규 개발은 모듈형 Remote I/O와 어댑터/동작 모델 연결(RF-013)이며 Loader는 그 사용 사례다. 기존 가상축 모델의 보완(RF-015), Docker 배포(RF-012), Parameter Pairing 및 시스템 통합 검증을 추가한다. 기존 RF-006~009의 정책 및 외부 연동은 최신 Demo 사양에 따라 Orchestrator가 담당한다.
 
 ## 3. RF 현황
 
-총 21개(RF-002-1 포함) 중 완료 12개, 예정 7개, 진행 중 1개, 보류 1개이다.
+총 21개(RF-002-1 포함) 중 제품 범위는 17개(완료 12, 진행 중 3, 예정 2)다. RF-006~009 4개는 외부 구상 참고 이력으로 구분한다.
 
 | RF | 상태 | Demo 적용 |
 |---|---|---|
 | 001~005 및 002-1 | 완료 | 기존 통신 및 혼합 버스 재사용 |
-| 006 | 예정 | Command/Feedback Routing: Orchestrator |
-| 007 | 예정 | Mode Switching/Alignment: Orchestrator |
-| 008 | 예정 | Omniverse 연계: Orchestrator ROS2 |
-| 009 | 예정 | 기존 SDO 기반 Parameter Pairing |
+| 006 | 범위 외 | Command/Feedback Routing: Orchestrator |
+| 007 | 범위 외 | Mode Switching/Alignment: Orchestrator |
+| 008 | 범위 외 | Omniverse 연계: Orchestrator ROS2 |
+| 009 | 범위 외 | 기존 SDO 기반 Parameter Pairing |
 | 010 | 완료 | Parameter Persistence 재사용 |
 | 011 | 완료 | 다축 구성 재사용 |
 | 012 | 진행 중 | Demo 배포 잔여 검증 |
-| 013 | 보류 | 범위 재합의 후 신규 개발 |
+| 013 | 진행 중 | MDP 기반 Remote I/O·모델 연결; Digital IO·Loader 검증 사례 |
 | 014 | 완료 | Dynamic PDO Mapping 재사용 |
-| 015 | 예정 | 직선축 동작 검증·보완 |
+| 015 | 진행 중 | 직선축 대조·검증 준비; 회전 확장은 보류 |
 | 016~018 | 완료 | Profile Adapter, FMU, Fault 재사용 |
 | 019~020 | 예정 | 후속 Parameter API 및 History |
 
@@ -56,11 +58,11 @@ Orchestrator → Motion Server → 공통 EtherCAT Bus → 실제 장치 및 Sof
 
 ## 5. Priority 1 — RF-013 Virtual IO
 
-[기존 RF-013](https://github.com/IlgonKo/ethercat-device-simulator/blob/main/Doc/RF/RF-013-virtual-io.md)은 보류 상태이며 사용자 재합의 후 착수한다.
+[기존 RF-013](https://github.com/IlgonKo/ethercat-device-simulator/blob/main/Doc/RF/RF-013-virtual-io.md)은 2026-11-25 사용자 동의로 Digital IO·Loader 범위만 재개했다. 구현 전 하드웨어·채널·동작 계약을 확정한다.
 Remote IO Device Profile과 Loader Behavior Model을 분리한다. EtherCAT Master 기준 DO → Valve → Cylinder Behavior → 양단 DI 생성으로 구현하며 DO를 DI에 단순 복사하지 않는다. 기존 C++ Slave/Python IPC 구조에서 비-CiA402 Device Profile 수용 방식을 검토한다.
 
 **필수:** CPX Identity, 필요한 OD/SDO, DI/DO PDO, 모듈 구성, 밸브 및 실린더 모델, 양단 센서, 초기 상태, 이동 시간 설정, 오류 및 통신 경계 검증.
-**제외 제안:** Analog IO, IO-Link, IODD/ISDU, 범용 센서 모델, 정밀 공압 물리 모델.
+**이번 범위 제외:** Analog IO, IO-Link, IODD/ISDU, 범용 센서 모델, 정밀 공압 물리 모델.
 **미결정:** CPX-E-EC 또는 CPX-AP-I-EC 최종 형번, 모듈/채널 및 밸브 구성, 출력 해제 시 동작, 초기 상태 및 설정 스키마. 양단 OFF만으로 위치·방향을 확정하지 않는다. 별도 Loader 연속 위치 전송 인터페이스는 추가하지 않는다.
 
 ## 6. Priority 2 — RF-015 Axis Model Semantics
@@ -85,18 +87,17 @@ Remote IO Device Profile과 Loader Behavior Model을 분리한다. EtherCAT Mast
 
 PP Velocity/Acceleration/Deceleration, S/W Limit, RxPDO/TxPDO Mapping 및 Assignment의 실제↔가상 양방향 적용·읽기 검증. RF-010/014 재사용. 일반 SDO 적용과 EtherCAT 상태 전환 및 프로세스 이미지 갱신을 분리한다. 별도 RF-019/020 API는 필요하지 않다. 기존 Motion Server API의 지원 범위는 확인 필요.
 
-## 9. 개발 순서 및 완료 기준
+## 9. Demo 분석 당시 작업 흐름 — Soft ESC 완료 기준과 구분
 
-1. RF-013: IO 장치/밸브 확정, Profile/Behavior 설계, DI/DO 및 혼합 통신 시험.
-
-2. RF-015: 최신 Motion Server와 PP/PV/Jog/Homing/Limit/Stop 회귀 검증 및 필요한 보완.
-
-3. RF-012: Edge #2 배포, 3축+IO, 혼합 버스 및 복원 검증.
-
-4. DT-demo: Parameter Pairing, State Alignment, Manual/Auto/Sync, Omniverse 통합 시험.
+1. 최신 Motion Server 명령/API·OD/PDO·IO 모듈 지원 대조표 작성.
+2. RF-013: IO 장치/밸브·채널·초기/이동/장애 정책 및 Profile/동작 모델 계약 확정.
+3. RF-013: 최소 DI/DO·Loader 구현 및 혼합 통신 시험.
+4. RF-015: 직선축 PP/PV/Jog/Homing/Limit/Stop 회귀 및 확인된 부족분 보완.
+5. Parameter Pairing 및 일반 PP/IO 기반 State Alignment 검증.
+6. RF-012/DT-demo: Edge #2, 가상 3축+IO 배포·복원 및 Manual/Auto/Sync·Omniverse 통합.
 
 Auto는 최신 사양의 P1~P6 독립 PP 및 Dwell, PCB Loading/Unloading, Cycle Preparation, Repeat를 검증한다. 모든 대상의 도달·정지 및 필요한 센서 완료를 확인한다. 장애 후 자동 재개하지 않는다. Soft ESC는 Sequence 자체를 구현하지 않는다.
 
 ## 10. 다음 결정 및 문서 관리
 
-RF-013의 비-CiA402 Profile 수용 구조와 실제 IO 하드웨어 확정을 우선 논의한다. RF-006~009 및 019~020은 기존 제품 장기 계획으로 유지하고 Demo 의존성만 분리한다. RF 상태 변경 및 구현 착수는 사용자 검토 후 진행한다.
+RF-013의 비-CiA402 Profile 수용 구조와 실제 IO 하드웨어 확정을 우선 논의한다. RF-006~009는 외부 구상 이력으로 분리하고 RF-019/020은 후속 제품 기능으로 유지한다. 2026-11-25 사용자 동의에 따라 RF-013/015의 범위를 제한하여 진행 중으로 갱신했다. 이번 작업은 문서 정리이며 런타임·코드 변경 또는 물리 시험을 수행하지 않았다. 상세 책임·산출물은 [프로젝트 계획](project-plan.md)를 따른다.

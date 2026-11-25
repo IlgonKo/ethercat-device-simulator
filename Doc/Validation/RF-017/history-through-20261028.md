@@ -188,7 +188,7 @@ PT 계산은 `torque += (targetTorque - torque) * dt / max(TorqueTimeConstant, d
 
 ## 후속 장애 격리 설계 (2026-10-28)
 
-공통 Diagnostic 데이터 구조 및 오류별 정책은 [DT-008](../../Design/DT-008-diagnostic-fault.md), 구현 추적은 [RF-018](../../RF/RF-018-diagnostic-fault.md)으로 분리한다. 응답 제한 시간·복구 명령·재Enable 정책은 아직 확정하지 않았다.
+공통 Diagnostic 데이터 구조 및 오류별 정책은 [ADR-008](../../Design/ADR-008-diagnostic-fault.md), 구현 추적은 [RF-018](../../RF/RF-018-diagnostic-fault.md)으로 분리한다. 응답 제한 시간·복구 명령·재Enable 정책은 아직 확정하지 않았다.
 
 
 ## 2026-10-28 현재 상태 갱신 — 이전 단계 기록보다 우선

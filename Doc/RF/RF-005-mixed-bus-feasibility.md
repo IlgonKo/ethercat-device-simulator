@@ -5,7 +5,7 @@
 
 - 등록일: 2026-09-15
 - 완료일: 2026-09-22
-- 설계: [DT-001](../Design/DT-001-system-architecture.md)
+- 설계: [ADR-001](../Design/ADR-001-system-architecture.md)
 - 선행: RF-001~004 기본 통신·모델·통합 검증
 
 ## 완료 범위

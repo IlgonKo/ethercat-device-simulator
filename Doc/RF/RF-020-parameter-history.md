@@ -4,7 +4,11 @@
 - 상태 상세: 계획 / 미착수 — RF-010에서 명시적으로 분리
 
 - 등록일: 2026-10-28
-- 연계: RF-010, RF-009, RF-019, DT-004
+- 연계: RF-010, RF-009, RF-019, ADR-004
+
+## 2026-11-25 Demo 경계
+
+장기 제품 후속 항목으로 예정 상태를 유지한다. Demo Parameter Pairing은 Orchestrator와 기존 Motion Server API를 우선 사용하며 이 RF의 완료를 Demo 선행 조건으로 두지 않는다.
 
 ## 범위
 

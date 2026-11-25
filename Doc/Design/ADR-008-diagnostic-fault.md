@@ -1,9 +1,17 @@
-# DT-008 — Diagnostic 및 Fault 처리
+# ADR-008 — Diagnostic 및 Fault 처리
 
+- 결정 상태: **채택** (현행 범위 기준; 본문의 보류·과거 제안은 구분)
 - 합의 반영일: 2026-10-28
-- 상태: 현재 축 Fault/Reset·IPC 격리 구현 및 물리 연동 검증 완료 / 관리·자동 복구 후속 보류
+- 구현 상태: 현재 축 Fault/Reset·IPC 격리 구현 및 물리 연동 검증 완료 / 관리·자동 복구 후속 보류
 - 관련 요구: [RF-018](../RF/RF-018-diagnostic-fault.md)
 - 참조: Motion Server `docs/diagnostic/diagnostic_model.md`, `motion_server/diagnostic/{models,manager,runtime}.py`, `motion_server/app/recovery.py`
+
+
+## 2026-11-25 Modular Remote I/O의 장애 처리 확장
+
+기존 RF-018 축 Fault Reset·모델 장애 격리·수동 Docker 복구는 유지한다. RF-013의 IO는 CiA402 Statusword/Fault Reset을 그대로 적용하지 않는다. DO 유지/해제, DI 유효성, Loader 정지·센서 표현 및 복구 정책은 IO 하드웨어·동작 모델 계약과 함께 결정하고 시험한다. 현재 Motion Server 연결 상실이 자동 DO 해제를 보장한다고 가정하지 않는다.
+
+Orchestrator의 Init/Ready/Running/Fault는 EtherCAT AL 상태나 축 CiA402 상태와 별개다. 사용자 시퀀스 중단·모드 전환·충돌 대응은 Orchestrator 책임이며 Soft ESC는 장치/모델의 진단과 피드백을 제공한다. 장기 Model Recovery/위치 수락 API는 이번 Demo 조건으로 부활시키지 않는다.
 
 ## 목적과 경계
 
@@ -144,7 +152,7 @@ latching 진단은 resolve 후에도 acknowledge 전까지 활성 상태다. 진
 5. 수락 시 새 세션의 위치와 유효성 정보를 일관되게 공개하고, 연동 측에서 Master의 현재 위치 재조회와 DT 표시 갱신을 확인한다. 시뮬레이터 혼자 Master/DT 내부 상태의 동기화 완료를 보증하지 않는다. 관리 명령과 확인 방식은 미확정이다.
 6. 축 Reset 및 명시적 Enable 후 새 이동 요청만 실행한다. 장애 이전 Controlword/목표 위치가 PDO에 반복되어도 자동 재실행하지 않도록 명령 재수락 조건을 별도 정의한다.
 
-실제 장비를 움직여 가상축에 맞추지 않는다. 실제/가상 모드 전환 동기화는 [DT-002](DT-002-mode-switching.md)의 별도 절차다. 향후 모델이 명시적 초기 상태 설정을 지원하면 정지 상태 주입을 검토할 수 있지만, 현재 Copley는 임의 초기 위치 및 실제 FMI 상태 복원을 지원하지 않는다.
+실제 장비를 움직여 가상축에 맞추지 않는다. 실제/가상 모드 전환 동기화는 [ADR-002](ADR-002-mode-switching.md)의 별도 절차다. 향후 모델이 명시적 초기 상태 설정을 지원하면 정지 상태 주입을 검토할 수 있지만, 현재 Copley는 임의 초기 위치 및 실제 FMI 상태 복원을 지원하지 않는다.
 
 좌표 offset으로 이전 표시 위치를 유지하거나 모델에 이전 상태를 주입하는 기능은 1차 구현 범위에서 제외한다. 향후 좌표 변환을 도입하려면 절대 목표·상대 이동·위치 제한·참조 상태까지 일관되게 변환해야 하며, 위치 표시 연속성이 모델의 내부 동적 상태 복원을 의미하지 않는다.
 

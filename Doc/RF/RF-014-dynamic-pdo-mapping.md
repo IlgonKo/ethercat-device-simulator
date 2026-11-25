@@ -5,7 +5,7 @@
 - 완료일: 2026-11-05
 
 - 등록일: 2026-09-22
-- 현재 대상: 가상축. 가상 IO는 RF-013의 별도 보류 범위.
+- 완료 대상: 가상축. Modular Remote I/O는 RF-013에서 공통 기반을 재사용하고 프로파일별 매핑 검증·지원 범위를 별도 구현/검증한다. 이 RF의 기존 완료 판정은 유지한다.
 - 관련: [RF-004](RF-004-motion-server-axis-panel.md), [RF-011](RF-011-device-configuration.md), [TD-001](../TD/TD-001-sdo-abort-response.md)
 
 ## 최신 결정 — 마지막 적용 매핑 유지·복원 (2026-11-03)

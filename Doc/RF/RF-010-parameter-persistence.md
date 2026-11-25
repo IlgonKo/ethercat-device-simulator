@@ -4,7 +4,7 @@
 - 상태 상세: 완료 — 2026-10-28 현재 합의 범위 (관리 API·양방향 동기화·이력 관리 후속 분리)
 
 - 등록일: 2026-09-15
-- 설계: [DT-004](../Design/DT-004-parameter-sync-persistence.md)
+- 설계: [ADR-004](../Design/ADR-004-parameter-sync-persistence.md)
 - 연계: RF-007 모델 초기화, RF-009 파라미터 동기화
 
 ## 현재 합의 범위 — 2026-10-28
