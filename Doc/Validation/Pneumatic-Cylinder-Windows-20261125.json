@@ -1,0 +1,88 @@
+{
+  "passed": true,
+  "platform": "Windows-11-10.0.26100-SP0",
+  "python": "3.14.3",
+  "allocation_callbacks": "Windows UCRT",
+  "fmpy": "0.3.26",
+  "cases": [
+    {
+      "case": "roundtrip_8ms_substeps",
+      "passed": true,
+      "step_s": 0.008,
+      "stroke_m": 0.1,
+      "fmu_do_step_s": 0.0001,
+      "fmu_calls_per_control_step": 80,
+      "supply_gauge_pressure_pa": 600000,
+      "simulated_seconds": 4.0,
+      "wall_seconds": 1.9219670000020415,
+      "position_min_m": -1.5833626974092495e-05,
+      "position_max_m": 0.10001884955592145,
+      "control_step_calculation_ms": {
+        "mean": 0.3199282,
+        "p95": 0.5453,
+        "max": 1.9739
+      }
+    },
+    {
+      "case": "roundtrip_reference",
+      "passed": true,
+      "step_s": 0.001,
+      "stroke_m": 0.1,
+      "fmu_do_step_s": 5e-05,
+      "fmu_calls_per_control_step": 20,
+      "supply_gauge_pressure_pa": 600000,
+      "simulated_seconds": 4.0,
+      "wall_seconds": 1.906308899866417,
+      "position_min_m": -1.5833626974092438e-05,
+      "position_max_m": 0.10001884955592134,
+      "control_step_calculation_ms": {
+        "mean": 0.076716125,
+        "p95": 0.1191,
+        "max": 0.9546
+      }
+    },
+    {
+      "case": "stroke_50mm",
+      "passed": true,
+      "step_s": 0.008,
+      "stroke_m": 0.05,
+      "fmu_do_step_s": 0.0001,
+      "fmu_calls_per_control_step": 80,
+      "supply_gauge_pressure_pa": 600000,
+      "simulated_seconds": 4.0,
+      "wall_seconds": 1.7277171001769602,
+      "position_min_m": -1.583362697409251e-05,
+      "position_max_m": 0.050018849555921494,
+      "control_step_calculation_ms": {
+        "mean": 0.2819616,
+        "p95": 0.3819,
+        "max": 0.9541
+      }
+    },
+    {
+      "case": "no_air",
+      "passed": true,
+      "step_s": 0.008,
+      "stroke_m": 0.1,
+      "fmu_do_step_s": 0.0001,
+      "fmu_calls_per_control_step": 80,
+      "supply_gauge_pressure_pa": 0,
+      "simulated_seconds": 4.0,
+      "wall_seconds": 1.6523998000193387,
+      "position_min_m": 0.0,
+      "position_max_m": 0.0,
+      "control_step_calculation_ms": {
+        "mean": 0.2697646,
+        "p95": 0.4146,
+        "max": 0.7867
+      }
+    }
+  ],
+  "fmu_sha256": "17e86295eb735f2fb5f20f18a51d507dbe81f6e58f43d412f08e27f3553889c4",
+  "fmu_step_comparison": {
+    "max_position_difference_m": 6.831313521224458e-05,
+    "acceptance_m": 0.003,
+    "reference_fmu_step_s": 5e-05,
+    "tested_fmu_step_s": 0.0001
+  }
+}

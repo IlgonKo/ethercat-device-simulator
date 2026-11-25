@@ -1,6 +1,6 @@
 # Soft ESC — DT Demo Gap Analysis & Development Roadmap
 
-**기준일:** 2026-11-25 · **버전:** 0.3 (독립 Soft ESC 제품 정의 및 적용 경계 반영)
+**기준일:** 2026-11-25 · **버전:** 0.5 (공압 실린더 FMU 재사용·Linux 오프라인 검증 반영)
 
 > 범위 정정: 이 문서는 Demo 전체 맥락을 담은 입력 분석 자료다. 외부 Orchestrator·Pairing·Alignment·전체 통합 관련 단계는 Soft ESC의 구현 목록이나 완료 조건이 아니다. 이 저장소의 실제 구현 범위와 순서는 [프로젝트 계획](project-plan.md)를 따른다.
 
@@ -36,7 +36,7 @@ Fieldbus-level Digital Twin Demo 구현을 위해 기존 Soft ESC의 개발 상�
 | 010 | 완료 | Parameter Persistence 재사용 |
 | 011 | 완료 | 다축 구성 재사용 |
 | 012 | 진행 중 | Demo 배포 잔여 검증 |
-| 013 | 진행 중 | MDP 기반 Remote I/O·모델 연결; Digital IO·Loader 검증 사례 |
+| 013 | 진행 중 | CPX-AP-I MDP·DI/DO/AI/AO·모델 연결; Loader는 디지털 검증 사례 |
 | 014 | 완료 | Dynamic PDO Mapping 재사용 |
 | 015 | 진행 중 | 직선축 대조·검증 준비; 회전 확장은 보류 |
 | 016~018 | 완료 | Profile Adapter, FMU, Fault 재사용 |
@@ -58,12 +58,12 @@ Orchestrator → Motion Server → 공통 EtherCAT Bus → 실제 장치 및 Sof
 
 ## 5. Priority 1 — RF-013 Virtual IO
 
-[기존 RF-013](https://github.com/IlgonKo/ethercat-device-simulator/blob/main/Doc/RF/RF-013-virtual-io.md)은 2026-11-25 사용자 동의로 Digital IO·Loader 범위만 재개했다. 구현 전 하드웨어·채널·동작 계약을 확정한다.
+[기존 RF-013](https://github.com/IlgonKo/ethercat-device-simulator/blob/main/Doc/RF/RF-013-virtual-io.md)은 2026-11-25 사용자 결정으로 CPX-AP-I의 DI/DO/AI/AO를 1차 구현 범위로 확정했다. IO-Link는 제외한다. 세부 모듈/채널·아날로그 표현·동작 계약은 구현 전에 확정한다.
 Remote IO Device Profile과 Loader Behavior Model을 분리한다. EtherCAT Master 기준 DO → Valve → Cylinder Behavior → 양단 DI 생성으로 구현하며 DO를 DI에 단순 복사하지 않는다. 기존 C++ Slave/Python IPC 구조에서 비-CiA402 Device Profile 수용 방식을 검토한다.
 
-**필수:** CPX Identity, 필요한 OD/SDO, DI/DO PDO, 모듈 구성, 밸브 및 실린더 모델, 양단 센서, 초기 상태, 이동 시간 설정, 오류 및 통신 경계 검증.
-**이번 범위 제외:** Analog IO, IO-Link, IODD/ISDU, 범용 센서 모델, 정밀 공압 물리 모델.
-**미결정:** CPX-E-EC 또는 CPX-AP-I-EC 최종 형번, 모듈/채널 및 밸브 구성, 출력 해제 시 동작, 초기 상태 및 설정 스키마. 양단 OFF만으로 위치·방향을 확정하지 않는다. 별도 Loader 연속 위치 전송 인터페이스는 추가하지 않는다.
+**필수:** CPX-AP-I Identity, 필요한 OD/SDO, DI/DO/AI/AO PDO, 모듈 구성, 모델 입출력·아날로그 변환/범위 검증. Loader 사례는 밸브·실린더·양단 센서·초기 상태·이동 시간 및 오류 경계를 확인한다.
+**이번 범위 제외:** IO-Link, IODD/ISDU, 범용 센서 모델, 정밀 공압 물리 모델.
+**확정:** 기본 모듈은 DI8/DO8/AIO4:4, AI/AO는 signed 16-bit raw 표현, 모델은 인스턴스별 생성·채널별 연결. 모델/binding 문법은 ADR-005의 BEHAVIOUR_MODELS/BINDINGS로 채택했다. 실린더는 공개 Modelica 부품으로 만든 FMI 3.0 FMU를 재사용하며 Linux 오프라인 5개 시험을 통과했다. 두 입력 OFF는 밸브 방향 유지이고 이전 단순 모델의 OFF 정지/일정 속도 계약을 대체한다. IO 어댑터·채널 연결은 아직 미구현이다. **미결정:** 아날로그 시험 모델 계약, 물리량 변환·정상 범위, FMU 등록·파라미터 설정/저장, 상충 입력 및 IO 장애/복구 정책. 최신 결정은 ADR-005/007과 RF-013을 따른다. 양단 OFF만으로 위치·방향을 확정하지 않는다. 별도 Loader 연속 위치 전송 인터페이스는 추가하지 않는다.
 
 ## 6. Priority 2 — RF-015 Axis Model Semantics
 
@@ -91,7 +91,7 @@ PP Velocity/Acceleration/Deceleration, S/W Limit, RxPDO/TxPDO Mapping 및 Assign
 
 1. 최신 Motion Server 명령/API·OD/PDO·IO 모듈 지원 대조표 작성.
 2. RF-013: IO 장치/밸브·채널·초기/이동/장애 정책 및 Profile/동작 모델 계약 확정.
-3. RF-013: 최소 DI/DO·Loader 구현 및 혼합 통신 시험.
+3. RF-013: DI/DO/AI/AO·모델 연결 및 혼합 통신 시험. Loader는 디지털 사례로 사용.
 4. RF-015: 직선축 PP/PV/Jog/Homing/Limit/Stop 회귀 및 확인된 부족분 보완.
 5. Parameter Pairing 및 일반 PP/IO 기반 State Alignment 검증.
 6. RF-012/DT-demo: Edge #2, 가상 3축+IO 배포·복원 및 Manual/Auto/Sync·Omniverse 통합.

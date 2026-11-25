@@ -64,7 +64,7 @@ DT Demo는 요구와 시험 사례를 제공하며 제품 실행 의존성이 �
 
 1. 선정 IO 장치 설명/ESI와 외부 Master의 Identity·SDO·PDO·모듈 요구 대조. Motion Server는 현재 호환성 검증 대상이며 제품의 설정 원본은 아니다.
 2. MDP 기반 장치/모듈·채널 구성, 모델 어댑터, 초기/오류/저장 계약 확정.
-3. 공통 기반의 축 전용 가정 분리, Modular Remote I/O의 Digital IO 구현 및 Loader 모델 연결.
+3. 공통 기반의 축 전용 가정 분리, CPX-AP-I Modular Remote I/O의 DI/DO/AI/AO 구현 및 모델 연결. Loader는 디지털 사용 사례로 검증한다.
 4. 모듈 순서·채널 독립성·DO/DI·잘못된 구성·모델 지연/종료 검증, 기존 Drive/FMU·저장·매핑 회귀.
 5. RF-015 직선축 기능 대조·필요 보완 및 일반 SDO/PP/IO 지원 검증.
 6. RF-012 새 Linux PC 및 혼합 축+IO 배포·재시작·장애 복구 확인.
@@ -73,13 +73,17 @@ DT Demo는 요구와 시험 사례를 제공하며 제품 실행 의존성이 �
 
 ## 구현 전 확정할 항목
 
-- Remote I/O 구체 제품: CPX-E-EC / CPX-AP-I-EC 형번, 지원 모듈·슬롯·채널과 초기화·매핑 계약.
-- Loader 모델: 밸브 DO 수·극성, 상충 명령·출력 OFF 의미, 초기 상태와 이동 시간·양단 DI.
+- 확정: CPX-AP-I(EtherCAT 인터페이스 CPX-AP-I-EC), DI/DO/AI/AO를 1차 구현에 포함. IO-Link 제외.
+- 확정: 기본 검증 구성 DI8/DO8/AIO4:4, 모듈 슬롯 1/2/3. Motion Server와 같은 MODULES 문법, AI/AO signed 16-bit raw·어댑터 단위 변환.
+- 확정: 모델 인스턴스별 생성, 채널별 명시적 binding, 미연결 기본값과 모델 오류 구분. ADR-005/007 참조.
+- 확정: BEHAVIOUR_MODELS의 `ID:종류`, IO별 BINDINGS의 `슬롯:종류:채널=ID.입출력명`. 우선 IO에 적용하며 기존 AXIS_MODELS 유지.
+- 미결정: 아날로그 시험 모델 계약, 정상 신호 범위·단위 변환, 모델 파라미터 설정/저장 및 IO 진단·초기화/매핑 세부 계약. 모델 선언·binding 파서는 아직 미구현.
+- 확정: 자체 일정 속도 실린더 대신 `SoftESCDoubleActingCylinder` FMI 3.0 FMU를 재사용한다. Linux 5개 오프라인 시험 통과. 두 입력 OFF는 밸브 방향 유지이며 이전 OFF 정지·각 1초 계약은 대체한다. 남은 일은 IO 어댑터/채널 연결·FMU 등록/파라미터·상충 입력/장애 정책과 물리 통신 검증이다. [검증 결과](Validation/Pneumatic-Cylinder-Web-FMU-20261125.md), RF-013 참조.
 - 공통 IO 경계: PRE-OP·버스 단절·Host 장애 시 출력 적용, 입력 유효성·진단·복구, 저장할 파라미터.
 
 ## 이번 확장 범위와 후속
 
-RF-013은 Modular Remote I/O와 Digital IO·Loader 연결을 진행한다. Analog/IO-Link/IODD/ISDU·정밀 공압 모델은 후속 범위다. RF-015의 신규 검증은 직선축이며 회전 확장·CSP/보간은 포함하지 않는다. 관리 API/이력은 RF-019/020 후속, NIC 추가 시험은 보류다.
+RF-013은 CPX-AP-I의 Modular Remote I/O·DI/DO/AI/AO 및 동작 모델 연결을 진행한다. Loader는 디지털 시험 사례이며 AI/AO 연결·변환은 별도로 검증한다. IO-Link/IODD/ISDU·정밀 공압 모델은 후속 범위다. RF-015의 신규 검증은 직선축이며 회전 확장·CSP/보간은 포함하지 않는다. 관리 API/이력은 RF-019/020 후속, NIC 추가 시험은 보류다.
 
 RF-006~009는 외부 연동 구상 이력으로만 보존하며 Soft ESC 구현 목록·현행 진행률에서 구분한다. 기존 완료 RF를 재개하지 않고 변경 영향 부분만 회귀한다.
 

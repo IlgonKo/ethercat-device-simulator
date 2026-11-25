@@ -1,0 +1,12 @@
+{
+  "repository": "https://github.com/Samarth030312/pneumatic-circuits-openmodelica",
+  "commit": "9aaa71e837333ab4964ebd40426b1f89a3c099e0",
+  "archive_url": "https://codeload.github.com/Samarth030312/pneumatic-circuits-openmodelica/zip/9aaa71e837333ab4964ebd40426b1f89a3c099e0",
+  "archive_sha256": "d2bb1a90d33d40b0c71af496a6516818d87e79c551f15e3eadb444d2d7080d32",
+  "license": "MIT",
+  "package": "modelica/PneumaticCircuits/package.mo",
+  "openmodelica_version": "1.27.1",
+  "fmi_version": "2.0",
+  "fmi_type": "CoSimulation",
+  "solver": "cvode"
+}

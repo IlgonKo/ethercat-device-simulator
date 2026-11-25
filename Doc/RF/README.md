@@ -41,12 +41,12 @@
 
 총 21개 문서 중 **제품 범위 17개: 완료 12 / 진행 중 3 / 예정 2**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
 
-- RF-013: Modular Remote I/O·모델 어댑터·Digital IO 구현. Loader는 검증용 동작 모델 사례이며 현재 코드 구현은 미완료.
+- RF-013: CPX-AP-I Modular Remote I/O·모델 어댑터·DI/DO/AI/AO 구현. IO-Link는 제외. 공압 실린더 FMU 재사용 및 Linux 오프라인 검증 완료. IO 어댑터·채널 연결·물리 통신은 미완료이며 RF는 진행 중이다.
 - RF-015: 기존 직선축 지원 대조·회귀. 3축은 Demo 요구에서 가져온 시험 구성.
 - RF-012: 새 Linux PC와 축+IO 독립 배포·복원·통신 확인. Edge #2는 배포 사례.
 - RF-019/020: 후속 제품 기능. 이번 IO 지원의 필수 조건으로 확대하지 않음.
 
-DT/Sync·Pairing·정렬 절차·ROS2/Omniverse는 제품 실행 의존성이 아니다. Analog/IO-Link·회전 확장·NIC 추가 시험은 기존 후속/보류 경계를 유지한다. 기존 완료 검증을 보존하고 변경 영향만 회귀한다. [제품 정의](../Design/ADR-001-system-architecture.md), [프로젝트 계획](../project-plan.md)를 따른다.
+DT/Sync·Pairing·정렬 절차·ROS2/Omniverse는 제품 실행 의존성이 아니다. IO-Link·회전 확장·NIC 추가 시험은 기존 후속/보류 경계를 유지한다. 기존 완료 검증을 보존하고 변경 영향만 회귀한다. [제품 정의](../Design/ADR-001-system-architecture.md), [프로젝트 계획](../project-plan.md)를 따른다.
 
 이하 날짜별 상태표와 잔여 항목은 당시 이력이다. 현재 판정은 위 요약과 개별 RF의 최신 범위를 우선한다.
 

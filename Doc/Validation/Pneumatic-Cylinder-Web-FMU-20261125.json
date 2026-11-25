@@ -1,0 +1,103 @@
+{
+  "passed": true,
+  "platform": "Linux-6.8.1-1015-realtime-x86_64-with-glibc2.39",
+  "python": "3.12.3",
+  "fmpy": "0.3.26",
+  "fmu_sha256": "34b14a7967042fe3abaabab4de6086e8a29324faeb3a2ab29f569c590e2cac42",
+  "validation_issues": [],
+  "cases": [
+    {
+      "case": "roundtrip_8ms",
+      "interval": 0.008,
+      "stroke": 0.1,
+      "pressure": 600000,
+      "passed": true,
+      "samples": 501,
+      "simulated_seconds": 4.0,
+      "position_min_m": -1.5833626974092543e-05,
+      "position_max_m": 0.10001884956359937,
+      "final_position_m": -1.5833626974092543e-05,
+      "lifecycle": "instantiate / initialize / simulate / terminate / free completed",
+      "wall_seconds": 0.16922925412654877,
+      "process_exit_code": 0
+    },
+    {
+      "case": "roundtrip_1ms",
+      "interval": 0.001,
+      "stroke": 0.1,
+      "pressure": 600000,
+      "passed": true,
+      "samples": 4001,
+      "simulated_seconds": 4.0,
+      "position_min_m": -1.583362697409254e-05,
+      "position_max_m": 0.10001884956707789,
+      "final_position_m": -1.583362697409254e-05,
+      "lifecycle": "instantiate / initialize / simulate / terminate / free completed",
+      "wall_seconds": 0.2813507509417832,
+      "process_exit_code": 0
+    },
+    {
+      "case": "stroke_50mm",
+      "interval": 0.008,
+      "stroke": 0.05,
+      "pressure": 600000,
+      "passed": true,
+      "samples": 501,
+      "simulated_seconds": 4.0,
+      "position_min_m": -1.5833626974092543e-05,
+      "position_max_m": 0.05001884958261811,
+      "final_position_m": -1.5833626974092543e-05,
+      "lifecycle": "instantiate / initialize / simulate / terminate / free completed",
+      "wall_seconds": 0.16677031619474292,
+      "process_exit_code": 0
+    },
+    {
+      "case": "no_air",
+      "interval": 0.008,
+      "stroke": 0.1,
+      "pressure": 0,
+      "passed": true,
+      "samples": 501,
+      "simulated_seconds": 4.0,
+      "position_min_m": 0.0,
+      "position_max_m": 0.0,
+      "final_position_m": 0.0,
+      "lifecycle": "instantiate / initialize / simulate / terminate / free completed",
+      "wall_seconds": 0.15277961967512965,
+      "process_exit_code": 0
+    },
+    {
+      "case": "event_mode_8ms",
+      "interval": 0.008,
+      "stroke": 0.1,
+      "pressure": 600000,
+      "event_mode": true,
+      "early_return": true,
+      "passed": true,
+      "event_iterations": 34,
+      "early_returns": 25,
+      "do_step_calls": 525,
+      "samples": 501,
+      "simulated_seconds": 4.0,
+      "position_min_m": -1.5833626974092543e-05,
+      "position_max_m": 0.10001884956359937,
+      "final_position_m": -1.5833626974092543e-05,
+      "lifecycle": "instantiate / initialize / simulate / terminate / free completed",
+      "wall_seconds": 0.1525827869772911,
+      "process_exit_code": 0
+    }
+  ],
+  "binaries": [
+    "binaries/x86_64-linux/SoftESCDoubleActingCylinder.so",
+    "binaries/x86_64-linux/SoftESCDoubleActingCylinder.cwasm",
+    "binaries/x86_64-windows/SoftESCDoubleActingCylinder.dll",
+    "binaries/x86_64-windows/SoftESCDoubleActingCylinder.cwasm",
+    "binaries/wasm32-wasip2/SoftESCDoubleActingCylinder.wasm"
+  ],
+  "generator": "OpenModelica Compiler v1.28.0-dev.2122+ga67a2b8d1e.rust",
+  "model_name": "SoftESCDoubleActingCylinder",
+  "step_comparison": {
+    "max_position_difference_m": 3.134298376394895e-13,
+    "acceptance_m": 0.003
+  }
+}

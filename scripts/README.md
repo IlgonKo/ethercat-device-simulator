@@ -53,3 +53,14 @@ python3 scripts/linux/validate-fleet.py --binary build/timing/cmmt_simulator
 ## 오프라인 배포·재빌드
 
 [배포 묶음 매뉴얼](deployment/README.md)을 따른다. `scripts/deployment/offline.py`는 export / verify / load-image / restore / rebuild를 제공한다. FMI 의존성은 wheel hash까지, C++ 의존성 소스와 FMU 소스는 SHA-256으로, Docker base/builder는 digest로 고정했다. 묶음은 운영 `.env`와 state를 포함하지 않으며 컨테이너를 자동 실행하지 않는다. 호스트 컴파일러는 필요 없으며 OS·Docker 및 기존 도구용 Python/Git은 별도 준비한다.
+
+## 공압 실린더 FMU 오프라인 개발·검증
+
+- `windows/build-pneumatic-fmu.py`: 고정 공개 소스에서 Windows FMI 2.0 FMU 빌드.
+  `--browser-only`는 Windows/Linux 모두에서 컴파일러 없이 Playground 단일 소스 2개를 생성한다.
+- `windows/test-pneumatic-fmu.py`: Windows FMI 2.0 왕복·파라미터·무공압 검증.
+- `linux/test-pneumatic-fmi3.py`: Playground에서 내보낸 FMI 3.0 파일의 Linux 왕복·파라미터·
+  무공압·Event Mode 검증. NIC와 운영 Docker를 사용하지 않는다.
+
+선택한 IO 연결용 산출물은 FMI 3.0 Linux FMU이며, 운영 모델 등록/IO 연결은 아직 없다.
+자세한 사용법은 [모델 README](../model_sources/pneumatic_cylinder/README.md)를 따른다.

@@ -842,3 +842,49 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 설계 결정이 아닌 소스 출처·이관 경로·원본 SHA-256 기록을 Doc/Design에서 Doc/Validation/RF-016/source-provenance.json으로 이동했다.
 - RF-016 본문과 과거 검증 기록의 링크를 수정했다. JSON 파일 전체 SHA-256이 이동 전후 동일함을 확인했다.
 - 요구사항은 RF, 설계 결정은 ADR, 소스 이관 근거는 Validation으로 구분했다. 코드·운영 설정·검증 결과는 변경하지 않았다.
+
+## 2026-11-25 — Remote I/O 1차 범위 확정
+
+- 사용자 결정: CPX-AP-I, DI/DO/AI/AO 모두 포함. IO-Link는 1차 구현에서 제외.
+- RF-013·프로젝트 계획·RF 목록·README·Demo 입력 분석 자료의 Analog 후속 분류를 대체했다.
+- 모듈별 형번/슬롯/채널 수 및 AI/AO raw 자료형·단위·변환·허용 범위는 미결정으로 유지한다. 아날로그 모델 연결·변환·경계값 검증을 RF-013 완료 기준에 반영했다.
+- Loader는 디지털 사용 사례이며 AI/AO 검증을 대신하지 않는다. 문서만 수정했고 코드·설정·운영 상태는 변경하지 않았다.
+
+## 2026-11-25 — IO 구성·raw 표현·모델 binding 원칙 확정
+
+- 기본 모듈 구성 DI8/DO8/AIO4:4와 모듈별 0-based 채널, ESI 기반 데이터 배치, 아날로그 signed 16-bit raw 및 어댑터 단위 변환 원칙을 반영했다.
+- Motion Server parser/ESI layout 검사에서 축약형 `1:DI:8,2:DO:8,3:AIO:4:4` 통과. 전체 아날로그 모듈명 경로는 추가 출력 비트로 인한 18-bit 추론 오류를 확인했으며 서버를 수정하지 않고 기본 표기를 축약형으로 정했다. 물리 통신 시험은 아니다.
+- 사용자 동의에 따라 모델 종류/인스턴스 구분, 다중 모델 연결, 채널별 binding·검증·단일 DI/AI writer, 미연결 DI=False/AI=0·DO/AO 보관과 자동 loopback 금지를 ADR-007/RF-013에 기록했다. 연결 모델 오류는 기본값으로 숨기지 않는다.
+- 모델 인스턴스 선언/binding의 구체 .env 문법은 다음 논의이며 구현·운영 파일은 변경하지 않았다.
+
+## 2026-11-25 — 모델 선언·채널 binding 환경 변수 문법 채택
+
+- 사용자 동의: DEVICE_SIMULATOR_BEHAVIOUR_MODELS는 인스턴스 ID:모델 종류 목록, DEVICE_SIMULATOR_IO_<io_id>_BINDINGS는 슬롯:DI/DO/AI/AO:채널=인스턴스.입출력명 목록으로 정의한다.
+- DO/AO는 모델 입력, DI/AI는 모델 출력이며 미연결은 항목 생략으로 표현한다. FMU 내부 변수명과 단위 변환은 모델별 어댑터 매핑 책임이다.
+- 기존 AXIS_MODELS는 유지하고 우선 IO 연결에 적용한다. 예시 virtual_cylinder/analog_test와 변수명은 모델 계약 설명용이며 구현 완료 또는 등록된 모델로 표시하지 않았다.
+- ADR-005/007·RF-013·프로젝트 계획·입력 분석 자료의 미확정 문법 표현을 갱신했다. 실제 모델 동작·변수/파라미터 계약은 다음 논의 대상이다.
+- 문서만 수정했으며 운영 .env·코드·컨테이너는 변경하지 않았다.
+
+## 2026-11-25 — virtual_cylinder 기능 계약 채택
+
+- 사용자 동의로 범용 왕복 실린더 모델의 bool 입력 extend/retract, 출력 extended/retracted를 확정했다.
+- OFF/OFF 정지, 단일 방향 ON 시 끝단까지 일정 속도 이동, 정상 이동 중 방향 반전, 끝단 유지, 중간 위치 두 센서 OFF를 적용한다.
+- ON/ON은 정지·진단이며 두 입력 OFF 확인 후 새 유효 명령으로 재개한다. 기본 초기 위치는 후진 끝단, 전진/후진 시간은 각 1초이며 모델 파라미터로 분리한다.
+- 내부 위치 0..1은 센서 계산에 사용하고 별도 EtherCAT 위치 채널을 추가하지 않는다. 재시작 시 설정 초기 위치를 사용하며 이전 위치·진행 명령은 복원하지 않는다.
+- RF-013·ADR-005·프로젝트 계획·입력 분석 자료의 확정/미결정 항목을 정리했다. 아날로그 시험 모델, 파라미터 설정/저장, IO 진단 상세가 다음 설계 대상이다. 구현·물리 시험·커밋/푸시는 수행하지 않았다.
+
+## 2026-11-25 — Playground 실린더 FMU Linux 검증
+
+- 사용자가 내보낸 FMI 3.0 Co-Simulation 실린더 FMU를 수정 없이 Edge-ubuntu에서 실행했다. Linux/Windows x86-64 및 WebAssembly 바이너리와 외부 Boolean 입력 2개를 확인했다.
+- Linux에서 100mm 왕복(8ms/1ms), 50mm 스트로크 변경, 무공압, 명시적 Event Mode/Early Return의 5개 오프라인 시험을 통과했다. 생성·초기화·계산·종료·해제를 모두 확인했다.
+- FMPy 0.3.26의 고수준 Event Mode 경로에서 Boolean 입력 호출 순서 문제가 발생했다. 표준 상태 전이에 맞춘 시험기에서 통과했으며 FMU 자체는 수정하지 않았다. 기본 Co-Simulation 경로도 통과했다.
+- [검증 보고서](Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)와 결과 JSON 및 scripts/linux/test-pneumatic-fmi3.py를 추가했다. FMU는 model_artifacts/SoftESCDoubleActingCylinder-fmi3-web.fmu에 보관했다.
+- Soft ESC/IO 어댑터 연결이나 실시간 검증은 아니다. 운영 컨테이너·.env·장치 상태를 변경하지 않았다. 두 입력 OFF 시 방향을 유지하는 밸브 모델이므로 기존 단순 실린더의 OFF/OFF 정지 계약과 구분한다.
+
+## 2026-11-25 — 공압 실린더 FMU 재사용 결정·소스와 검증 문서 정리
+
+- 사용자 결정에 따라 검증한 SoftESCDoubleActingCylinder FMI 3.0 FMU를 IO 연결용 동작 모델로 사용한다. Linux 오프라인 검증 완료와 IO 어댑터/MDP·물리 통신 미완료를 구분했다.
+- RF-013·ADR-005/007·프로젝트 계획·RF 목록·README·입력 분석 자료의 기존 일정 속도/OFF 정지 계약을 FMU의 메모리 밸브 방향 유지 동작으로 대체했다. 이전 결정은 위 작업 일지에 이력으로 유지한다.
+- Windows에서 준비한 Modelica 소스·고정 원본 정보·Windows 빌드/시험 코드·검증 보고서를 Linux 기준 저장소에 반영했다. --browser-only로 Linux에서도 컴파일러 없이 웹용 단일 소스를 재생성할 수 있다.
+- FMU 바이너리는 기존 정책대로 model_artifacts에 보관하고 Git에는 소스·재현 절차·해시·검증 결과를 기록한다. 런타임 코드·운영 .env·컨테이너는 변경하지 않았다.
+- 남은 일: 실제 FMU 모델 등록/설정·IO 어댑터·DO/DI 연결, AI/AO 계약, 상충 입력·Host/버스 장애·복구와 혼합 물리 통신 검증. RF-013은 진행 중으로 유지한다.

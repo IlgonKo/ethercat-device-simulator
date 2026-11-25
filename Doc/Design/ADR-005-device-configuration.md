@@ -10,7 +10,7 @@
 
 Soft ESC는 DT와 무관한 자체 장치 구성을 소유한다. CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 같은 버스에 구성할 수 있도록 확장한다. 제품 범위와 달리 현재 로더는 축만 허용하므로 아래 AXIS 목록 규칙은 현재 축 계약이다.
 
-IO는 장치·모듈/슬롯/채널과 선택 동작 모델의 입출력 연결을 구분한다. Loader/3축은 구성 사례이며 하드코딩하지 않는다. IO에서 AXIS 목록을 요구하지 않도록 검증을 프로파일별로 분리하고, 기존 축 설정 호환성을 유지한다. 키 이름·지원 모듈·모델 연결 스키마는 RF-013에서 확정하며 현재 미구현 설정 예제를 배포하지 않는다.
+IO는 장치·모듈/슬롯/채널과 선택 동작 모델의 입출력 연결을 구분한다. Loader/3축은 구성 사례이며 하드코딩하지 않는다. IO에서 AXIS 목록을 요구하지 않도록 검증을 프로파일별로 분리하고, 기존 축 설정 호환성을 유지한다. 모듈 선언 및 모델 인스턴스/binding 문법은 아래 채택 절을 따른다. 구현 전까지 운영 .env/.env.example에 미구현 키를 적용하지 않으며, 지원 모듈·실제 모델 변수 계약은 RF-013에서 관리한다.
 
 BUS의 프로파일 선택과 동작 모델 선택은 분리한다. 모듈·채널 배치와 PRE-OP PDO mapping/assignment는 별개이며 .env 초기 PDO 매핑 옵션을 재도입하지 않는다. 구체적인 IO 매핑 계약은 선정 장치 요구와 RF-014 기반을 대조해 결정한다.
 
@@ -28,6 +28,55 @@ Motion Server는 독립 패키지다. 명명 규칙은 유사하게 사용하지
 | Simulator 실행·가상장치 | Simulator 자체 .env |
 | 장치 영구 파라미터 | 별도 저장소; 안정적인 ID와 PARAMETER_SET 기준 |
 | 실제/가상/논리 장치/DT 대응 | Orchestrator의 독립 Pairing 설정 |
+
+## IO 모듈 선언 — 2026-11-25 채택, 파서 구현 전
+
+모듈 값의 문법은 Motion Server와 동일한 `슬롯: 모듈` 쉼표 목록으로 한다. 환경 변수 접두어만 패키지에 맞게 사용하며 Motion Server 설정 파일이나 파서에 런타임 의존하지 않는다.
+
+```ini
+DEVICE_SIMULATOR_IO_io0_MODULES=\
+    1: DI:8, \
+    2: DO:8, \
+    3: AIO:4:4
+```
+
+CPX 내부 슬롯 0은 인터페이스, 모듈 슬롯은 1부터, 채널은 모듈별 0부터 시작한다. 기본 검증 구성은 DI8/DO8/AI4/AO4이며 모듈 정의는 각각 CPX-AP-I-8DI-M8-3P, CPX-AP-I-8DO-M8-3P, CPX-AP-I-4AI4AO-U-I-M12다. 제품 수량 제한이나 전체 모듈 지원을 의미하지 않는다. 자료형·프로세스 데이터 크기는 모듈 정의/ESI에서 가져온다.
+
+Linux Motion Server의 실제 parser 및 ESI layout 검증으로 위 축약형을 확인했다. 혼합 아날로그 모듈의 전체 이름 표기는 현재 서버에서 추가 출력 비트를 채널 폭에 포함해 18-bit 추론 오류가 발생했다. 서버는 수정하지 않았으며 기본 예제는 검증된 축약형을 사용한다. 이 확인은 Soft ESC 구현·물리 통신 시험 완료를 뜻하지 않는다.
+
+IO 모듈 구성과 동작 모델 생성/채널 binding은 별도 설정이다. 모델 인스턴스별 독립성과 연결 검증 원칙은 ADR-007을 따르며 모델 선언/binding 문법은 다음 절의 채택 내용을 적용한다.
+
+## 모델 인스턴스·채널 binding 문법 — 2026-11-25 채택, 구현 전
+
+모듈 구성, 동작 모델 생성, 채널 연결을 별도 선언한다. IO 연결 모델의 인스턴스 목록은 `DEVICE_SIMULATOR_BEHAVIOUR_MODELS`, IO별 연결 목록은 `DEVICE_SIMULATOR_IO_<io_id>_BINDINGS`를 사용한다.
+
+```ini
+DEVICE_SIMULATOR_BEHAVIOUR_MODELS=\
+    loader0: virtual_cylinder, \
+    analog0: analog_test
+
+DEVICE_SIMULATOR_IO_io0_BINDINGS=\
+    2:DO:0=loader0.extend, \
+    2:DO:1=loader0.retract, \
+    1:DI:0=loader0.retracted, \
+    1:DI:1=loader0.extended, \
+    3:AO:0=analog0.command, \
+    3:AI:0=analog0.feedback
+```
+
+위 예시는 채택한 문법이다. `virtual_cylinder`는 초기 논의의 모델 종류 예시이며 현재 등록된 구현 식별자가 아니다. 실린더 동작은 RF-013의 공압 FMU 재사용 결정으로 대체했고 extend/retract 및 extended/retracted는 어댑터 논리 신호로 연결한다. 실제 FMU 모델 등록 식별자·artifact/파라미터 설정은 구현 전에 확정한다. `analog_test`와 command/feedback은 아날로그 계약 설명용 예시로 실제 의미는 별도 확정한다. 기존 코드가 이 설정을 읽는다고 간주하지 않는다.
+
+| 항목 | 확정 문법/의미 |
+| --- | --- |
+| 모델 인스턴스 선언 | `인스턴스 ID: 모델 종류`의 쉼표 목록 |
+| 채널 binding | `슬롯:DI/DO/AI/AO:채널 번호=인스턴스 ID.입출력명`의 쉼표 목록 |
+| 방향 | DO/AO → 모델 입력, DI/AI ← 모델 출력. 별도 방향 기호를 추가하지 않음 |
+| 장치 식별 | BINDINGS 환경 변수의 `<io_id>`로 대상 IO를 지정 |
+| 미연결 채널 | 해당 채널 항목 생략. 기본값/보관 정책은 ADR-007 적용 |
+
+입출력명은 모델 어댑터가 연결하는 계약이다. FMU 내부 변수명·단위 변환은 모델별 매핑에서 처리하며 IO binding에 FMU 내부 구조를 직접 요구하지 않는다. 모델 종류와 인스턴스 ID를 구분하여 같은 모델 종류를 여러 독립 인스턴스로 생성할 수 있다.
+
+문법 적용 범위는 우선 IO 연결이다. 기존 `DEVICE_SIMULATOR_AXIS_MODELS`는 유지하며 이 목록으로 통합하거나 기존 축 설정을 이관하지 않는다. 형식 채택만으로 미정인 모델 파라미터·FMU artifact 설정 필드까지 추가하지 않는다.
 
 ## 축 설정
 

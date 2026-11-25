@@ -12,8 +12,10 @@ Soft ESC는 **FMU 또는 다른 형식의 동작 모델을 EtherCAT 장치 프�
 | CiA402 Drive·F-KR CMMT·Copley FMI3 Co-Simulation | 모델별 지원 범위 구현·검증 완료 |
 | 독립 .env·영구 파라미터·동적 PDO 저장·축 Fault/Host 장애 격리 | 기존 축 범위 검증 완료 |
 | Modular Device Profile 기반 Remote I/O | 제품 범위 확정, RF-013 구현 진행 대상. 현재 실행 코드에는 미구현 |
-| IO 어댑터·동작 모델 | 모듈/채널·모델 계약 설계 대상. Digital IO·Loader 구현 준비 |
+| IO 어댑터·동작 모델 | CPX-AP-I DI/DO/AI/AO 연결 구현 준비. 복동 실린더 FMI3 Linux 오프라인 검증 완료, IO 연결 미구현. IO-Link 제외 |
 | Linux Docker | 기존 축 배포·비교 검증 완료. 새 PC·축+IO 배포 검증 잔여 |
+
+실린더 모델의 출처·소스·Export·재검증 절차는 [모델 README](model_sources/pneumatic_cylinder/README.md), 결과는 [Linux FMU 검증 보고서](Doc/Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)를 참조합니다.
 
 지원 대상 정의가 모든 모델·모듈·Master에 대한 적합성 검증 완료를 의미하지는 않습니다. 현재 Copley의 기능 제약과 모델별 지원표는 각 RF를 따릅니다.
 
