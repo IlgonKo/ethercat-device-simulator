@@ -1038,3 +1038,12 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - AIO RxPDO의 AO 4채널 8바이트 + 공급 출력 4비트 + padding 4비트 배치를 유지한다. 후속 모듈 offset은 전체 9바이트 기준이다.
 - 공급 전원 제어·By process data 설정은 모델링하지 않으며 공급 비트를 binding/모델 Enable/IO 차단/전원 진단 조건으로 사용하지 않는다.
 - RF-013·ADR-007 및 검증 기준에 반영하고 AIO 미결 문구를 제거했다. 이전 리뷰 보완(진행 중 단계 정지 경계·지연 시간 기준·FMI 초기화 전 설정 전달)과 함께 문서만 커밋한다.
+
+## 2026-11-26 — RF-013 1~3단계 구현·검증
+
+- 사용자 승인 범위를 설정/CPX 프로파일 → 기본 Slave 통신 → IO 실행/연결의 3단계로 문서화하고 연속 구현했다. 실제 실린더/지연 FMU 어댑터는 4단계로 남겼다.
+- CPX 최소 OD·F030/F050·고정 bit PDO·읽기 전용 mapping/assignment, 혼합 BUS·독립 프리셋·전역 1:1 binding, 8ms 모델 실행·station 정지/재개·모델 오류/Host timeout 분리를 구현했다. 동작 모델 오류는 CPX 진단으로 전달하지 않는다.
+- Python 77 tests(기존 조건부 1개 skip), CTest 6개, KickCAT CPX wire/ESC 및 실제 Unix IPC 연결, F-KR/Copley 4축 동적 매핑/저장/장애 회귀, Docker build 검증 통과.
+- 실제 CMMT/CPX 뒤의 가상 CPX 2 station을 OP로 시험했다. 최종 이미지 5초 570회 WKC 6/6, Model Host SIGKILL 후 3초 340회 WKC 6/6. signed AO와 9byte AIO 배치·기본 오류 OD 유지 확인. 실축 Enable/이동 없음.
+- 시험용 컨테이너 제거 후 기존 Simulator 세션을 재시작했다. 원래 .env·state·운영 이미지 태그는 유지했으며 신규 이미지는 ethercat-device-simulator:rf013이다. Motion Server는 미실행 상태였고 시험 master는 PRE-OP로 종료했다.
+- 세부 근거/재현/남은 범위는 [검증 보고서](Validation/RF-013-stage1-3-20261126.md). RF-013 전체 완료 처리 및 커밋/푸시는 이번 요청에 포함하지 않았다.

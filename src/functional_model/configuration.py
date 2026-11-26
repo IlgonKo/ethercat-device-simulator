@@ -34,7 +34,7 @@ def name(value, location):
 
 def validate_config(data, base_directory):
     data = copy.deepcopy(data)
-    fields(data, ('schema_version', 'ethercat', 'storage', 'devices'), '$')
+    fields(data, ('schema_version', 'ethercat', 'storage', 'devices') + (('io_models',) if 'io_models' in data else ()), '$')
     if type(data['schema_version']) is not int or data['schema_version'] != 1:
         raise ValueError('schema_version: only integer 1 is supported')
     fields(data['ethercat'], ('interface',), 'ethercat')
@@ -53,18 +53,23 @@ def validate_config(data, base_directory):
     ids, sets, indices = set(), set(), set()
     for n, device in enumerate(devices):
         loc = f'devices[{n}]'
-        fields(device, ('slave_index', 'id', 'type', 'model', 'parameter_set'), loc)
+        is_io = device.get('type') == 'cpx-ap-i-ec'
+        fields(device, ('slave_index', 'id', 'type', 'modules', 'bindings') if is_io else ('slave_index', 'id', 'type', 'model', 'parameter_set'), loc)
         index = device['slave_index']
         if type(index) is not int or index < 0 or index in indices:
             raise ValueError(f'{loc}.slave_index: unique nonnegative integer required')
         indices.add(index)
-        for key, used in (('id', ids), ('parameter_set', sets)):
+        for key, used in ((('id', ids),) if is_io else (('id', ids), ('parameter_set', sets))):
             name(device[key], f'{loc}.{key}')
             if device[key] in used:
                 raise ValueError(f'{loc}.{key}: duplicate {device[key]}')
             used.add(device[key])
+        if is_io:
+            from functional_model.remote_io.configuration import validate_station
+            validate_station(device)
+            continue
         if device['type'] != 'cia402-drive':
-            raise ValueError(f'{loc}.type: only cia402-drive axes are supported; IO is deferred')
+            raise ValueError(f'{loc}.type: unsupported device profile')
         model = device['model']
         if not isinstance(model, dict): raise ValueError(f'{loc}.model: object required')
         kind = model.get('type')
@@ -78,6 +83,9 @@ def validate_config(data, base_directory):
     if indices != set(range(len(devices))):
         raise ValueError('devices.slave_index: must be contiguous from 0 to N-1')
     data['devices'] = sorted(devices, key=lambda d: d['slave_index'])
+    if 'io_models' in data or any(d['type']=='cpx-ap-i-ec' for d in devices):
+        from functional_model.remote_io.configuration import validate_bindings
+        validate_bindings(data['devices'], data.get('io_models', []))
     return data
 
 
@@ -126,7 +134,7 @@ def load_environment(env, base_directory=None):
     for suffix in keys:
         key = 'DEVICE_SIMULATOR_AXIS_' + suffix
         values = {}
-        for entry in required(key).split(','):
+        for entry in filter(str.strip, env.get(key, '').split(',')):
             match = re.fullmatch(r'\s*(0|[1-9][0-9]*)\s*:\s*([^:,]+?)\s*', entry)
             if not match or int(match[1]) in values:
                 raise ValueError(f'{key}: expected unique index:value entries')
@@ -134,17 +142,24 @@ def load_environment(env, base_directory=None):
         mappings[suffix] = values
     devices = []
     indices = set()
+    bus_indices = set()
     for entry in required('DEVICE_SIMULATOR_BUS').split(','):
-        match = re.fullmatch(r'\s*(0|[1-9][0-9]*)\s*:\s*axis\s*:\s*(cia402-drive)\s*', entry)
-        if not match:
-            raise ValueError('DEVICE_SIMULATOR_BUS: expected explicit index:axis:cia402-drive entries')
-        index = int(match[1])
-        if index in indices:
-            raise ValueError('DEVICE_SIMULATOR_BUS: duplicate slave index')
+        parts=[part.strip() for part in entry.split(':')]
+        if len(parts) not in (3,4) or not re.fullmatch(r'0|[1-9][0-9]*', parts[0]):
+            raise ValueError('DEVICE_SIMULATOR_BUS: expected index:axis:cia402-drive or index:io:cpx_ap_i_ec:id')
+        index=int(parts[0])
+        if index in bus_indices:raise ValueError('DEVICE_SIMULATOR_BUS: duplicate slave index')
+        bus_indices.add(index)
+        if len(parts)==4 and parts[1:3]==['io','cpx_ap_i_ec']:
+            from functional_model.remote_io.configuration import station_from_environment
+            devices.append(station_from_environment(index,parts[3],env))
+            continue
+        if len(parts)!=3 or parts[1:]!=['axis','cia402-drive']:
+            raise ValueError('DEVICE_SIMULATOR_BUS: unsupported device')
         indices.add(index)
         if any(index not in values for values in mappings.values()):
             raise ValueError(f'Missing axis mapping for slave {index}')
-        devices.append(dict(slave_index=index, id=mappings['IDS'][index], type=match[2],
+        devices.append(dict(slave_index=index, id=mappings['IDS'][index], type='cia402-drive',
                             model=dict(type=mappings['MODELS'][index], mode=mappings['MODES'][index]),
                             parameter_set=mappings['PARAMETER_SETS'][index]))
     if any(set(values) != indices for values in mappings.values()):
@@ -154,13 +169,16 @@ def load_environment(env, base_directory=None):
     if unused:
         raise ValueError(f'Unknown axis settings: {sorted(unused)}')
     for device in devices:
-        if device['model']['type'] == 'copley_drive_sim':
+        if device['type']=='cia402-drive' and device['model']['type'] == 'copley_drive_sim':
             folder = env.get('DEVICE_SIMULATOR_FMU_DIR', './model_artifacts').strip()
             if not folder: raise ValueError('DEVICE_SIMULATOR_FMU_DIR: nonempty path required')
             device['model']['artifact'] = str(Path(folder) / 'CopleyDriveSim-linux.fmu')
     state = required('DEVICE_SIMULATOR_STATE_DIR')
     data = dict(schema_version=1, ethercat=dict(interface=required('KICKCAT_INTERFACE')),
                 storage=dict(directory=str(Path(state))), devices=devices)
+    if any(d['type']=='cpx-ap-i-ec' for d in devices) or any(k.startswith(('DEVICE_SIMULATOR_IO_','DEVICE_SIMULATOR_BEHAVIOUR_','DEVICE_SIMULATOR_MODEL_')) and k!='DEVICE_SIMULATOR_MODEL_TIMEOUT_MS' for k in env):
+        from functional_model.remote_io.configuration import models_from_environment
+        data['io_models']=models_from_environment(env, devices)
     return validate_config(data, base_directory or Path.cwd())
 
 

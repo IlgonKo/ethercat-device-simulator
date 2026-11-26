@@ -72,17 +72,18 @@ extend_command/retract_command 및 끝단 센서 변수로 연결한다. 실린�
 src/
  ├─ ethercat_slave/                 # 기존 C++ 통신/매핑/IPC/진단
  └─ functional_model/
-      ├─ configuration.py         # 현재 축 설정; 프로파일별 검증 확장 필요
+      ├─ configuration.py         # 축/IO 혼합 설정 및 프로파일별 검증
       ├─ cia402_drive/
       │    ├─ profile/
       │    ├─ adapter/            # f_kr_cmmt.py, copley.py 등
       │    ├─ behaviour_model/    # f_kr_cmmt
       │    └─ model_definitions/  # copley_drive_sim 변수 계약
-      ├─ runtime/                 # 현재 축 실행, fleet 및 FMI 실행기
+      ├─ remote_io/               # configuration, station, runtime; 실제 IO FMU adapter는 후속
+      ├─ runtime/                 # 축 실행, fleet 및 공통 FMI 실행기
       ├─ ipc/
       ├─ storage/
       └─ diagnostics/
-device_descriptions/               # 기존 CMMT 장치 설명
+device_descriptions/               # CMMT/CPX 장치 설명과 공통 fixture XML 생성
 ```
 
 Modular Remote I/O 기능 모델은 `cia402_drive`와 같은 수준의 별도 프로파일 영역으로 추가한다. `profile / adapter / behaviour_model` 책임 구분을 유지한다. 정확한 IO 디렉터리명·클래스는 구현 설계에서 확정하며 이 문서의 설명을 이미 존재하는 경로로 해석하지 않는다. 공통 runtime/ipc/storage/diagnostics에 축/IO 특수 규칙을 무조건 넣지 않는다.
@@ -100,3 +101,7 @@ Copley의 현재 어댑터는 PP/Enable/피드백/Fault Reset 등을 지원하�
 ## 구현·검증 유지 원칙
 
 기존 RF-016/017/018 완료와 시험 자료를 유지한다. 새 IO 지원은 구성·OD·매핑·IPC·진단·저장 변경의 축 회귀를 포함한다. 동작 모델 형식·프로파일·모듈별 지원표와 시험 결과를 남긴다. 최신 설계는 과거 “향후 FMU/첫 구현” 계획을 대체하며 과거 구현·검증 근거는 해당 RF를 따른다.
+
+## 2026-11-26 RF-013 1~3단계 구현
+
+IO 프로파일 영역은 `functional_model/remote_io`로 추가했다. `station.py`는 장치 계약, `configuration.py`는 모듈/모델 연결 검증, `runtime.py`는 독립 동작 모델의 8ms 실행/스냅샷/장애 범위를 맡는다. CPX 제품별 정의는 `device_descriptions/cpx_ap_i_ec`, Slave의 로컬 OD·고정 bit PDO/SDO는 `ethercat_slave/process_data/fixed_io.h`에 둔다. IO IPC에 매핑 제어를 넣지 않는다. 어댑터의 초기 출력/step/close 경계는 주입형 시험으로 검증했으며 실제 FMU adapter 구현은 4단계에서 진행한다. [검증 보고서](../Validation/RF-013-stage1-3-20261126.md).

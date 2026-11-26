@@ -163,3 +163,7 @@ Motion Server device/cmmt/.env.example의 MOTION_SERVER_CMMT_AXIS_PDO_CONFIGURAT
 ## 프로파일과 모델 이름 분리 (2026-10-26)
 
 BUS의 axis:cia402-drive는 기능 프로파일을 선택하고 AXIS_MODELS의 f_kr_cmmt는 자체 CMMT 동작 모델을 선택한다. 기존 cmmt-as/f_kr_internal 설정 별칭은 지원하지 않는다. EtherCAT identity·기본 PDO·Motion Server 설정은 기존 CMMT 호환 값으로 유지한다. state 파일의 identity.type과 identity.model.type도 새 이름으로 갱신하고 checksum을 재계산한다. 값·모드·parameter_set은 변경하지 않으며 정지 상태에서 백업 후 일회성 이관한다.
+
+## 2026-11-26 RF-013 구현 상태
+
+축/IO 혼합 BUS, IO 모듈·프리셋·INSTANCE_CONFIG·전역 1:1 binding 파서를 구현했다. 축 목록은 축 slave_index에만 대응한다. CPX 모듈 OD 간격은 ESI AP-Slot의 0x10, PDO 번호 간격은 1이며 별도 사용자 매핑 설정은 없다. Motion Server는 독립 설정의 MODULE_PDO_INDEX_STRIDE=0x10을 사용한다. 프리셋과 모델 선언 검증은 구현했지만 실제 IO FMU 어댑터 생성은 4단계다. IO FMU 선언을 활성화하면 아직 명확한 시작 오류를 반환하며 대체 echo를 실행하지 않는다. [구현·검증](../Validation/RF-013-stage1-3-20261126.md).

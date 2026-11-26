@@ -18,6 +18,7 @@
 #include "process_data/mapping_store.h"
 #include "process_data/mapping_hook.h"
 #include "process_data/pdo_target.h"
+#include "process_data/fixed_io.h"
 #include "diagnostics/timing.h"
 #include "ipc/async_model_client.h"
 #include "ipc/sdo_gateway.h"
@@ -65,6 +66,11 @@ int main(int argc,char** argv) {
         std::vector<std::shared_ptr<cmmt::DynamicMapping>> mappings;
         std::vector<std::shared_ptr<cmmt::MappingStore>> stores;
         std::vector<std::map<cmmt::DynamicMapping::Key,std::string>> feedback(paths.size());
+        std::vector<std::shared_ptr<softesc::FixedIO>> fixed_io(paths.size());
+        std::shared_future<json> io_pending;
+        uint64_t io_request_id=0;
+        auto io_next=cmmt::TimingClock::now();
+        bool has_io=false;
         std::vector<bool> inactive_confirmed(paths.size(),false);
         std::vector<bool> pending_active(paths.size(),false);
         std::vector<uint64_t> request_ids(paths.size(),0);
@@ -123,6 +129,11 @@ int main(int argc,char** argv) {
                     throw std::runtime_error("ESI/model entry mismatch");
                 cmmt::sdoGateways[sim.mailbox.get()].entries.emplace(index,sub);
 
+            }
+            if(spec.at("profile")=="cpx-ap-i-ec") {
+                fixed_io[i]=std::make_shared<softesc::FixedIO>(sim,spec);has_io=true;
+                mappings.push_back(nullptr);stores.push_back(nullptr);
+                continue;
             }
             std::map<cmmt::DynamicMapping::Key,cmmt::DynamicMapping::Capability> capabilities;
             for(auto const& e:spec.at("entries")) {
@@ -193,6 +204,8 @@ int main(int argc,char** argv) {
                 }
             };
         }
+        if(has_io && (std::string(argv[1])=="--self-test" || std::string(argv[1])=="--motion-self-test" || std::string(argv[1]).rfind("--ipc-self-test-",0)==0))
+            throw std::runtime_error("Axis-only self-test: use test_remote_io for CPX profiles");
         if(std::string(argv[1])=="--self-test" || std::string(argv[1])=="--motion-self-test") {
             auto require=[](bool ok,char const* text){if(!ok)throw std::runtime_error(text);};
             for(size_t i=0;i<slaves.size();++i) {
@@ -448,7 +461,7 @@ int main(int argc,char** argv) {
         }
         if(std::string(argv[1])=="--validate") {
             if(timing.enabled()) {
-                for(size_t i=0;i<slaves.size();++i)request(i,{{"op","idle"}});
+                for(size_t i=0;i<slaves.size();++i)if(!fixed_io[i])request(i,{{"op","idle"}});
                 timing.flush("validation");
             }
             std::cout<<"Fixture and model validated: "<<slaves.size()<<" slaves"<<std::endl;
@@ -476,8 +489,32 @@ int main(int argc,char** argv) {
         };
         auto pump=[&]() {
             if(!model.failure().empty())fail_host(model.failure());
+            if(io_pending.valid() && io_pending.wait_for(std::chrono::seconds(0))==std::future_status::ready) {
+                try {
+                    auto response=io_pending.get();
+                    if(!host_failed) {
+                        if(response.at("host_failed").get<bool>())throw std::runtime_error("MODEL_RESPONSE_TIMEOUT");
+                        if(response.at("session")!=session || response.at("request_id")!=io_request_id)throw std::runtime_error("IO snapshot response identity mismatch");
+                        std::set<size_t> seen;
+                        std::vector<std::pair<size_t,softesc::FixedIO::Values>> prepared;
+                        for(auto const& station:response.at("stations")) {
+                            auto i=station.at("slave_index").get<size_t>();
+                            if(i>=fixed_io.size() || !fixed_io[i] || !seen.insert(i).second)throw std::runtime_error("Invalid IO station response");
+                            prepared.emplace_back(i,fixed_io[i]->prepareFeedback(station.at("values")));
+                        }
+                        if(seen.size()!=size_t(std::count_if(fixed_io.begin(),fixed_io.end(),[](auto const& p){return bool(p);})))throw std::runtime_error("Incomplete IO station response");
+                        for(auto const& [i,values]:prepared)fixed_io[i]->commitFeedback(values);
+                    }
+                }catch(std::exception const& e){fail_host(e.what());}
+                io_pending={};
+            }
             for(size_t i=0;i<slaves.size();++i) {
                 auto& sim=*slaves[i];
+                if(fixed_io[i]) {
+                    fixed_io[i]->sample(false);fixed_io[i]->publish();
+                    if(sim.slave->state()==State::OPERATIONAL || sim.slave->state()==State::SAFE_OP)sim.pdo->updateInput();
+                    continue;
+                }
                 if(pending[i].valid() && pending[i].wait_for(std::chrono::seconds(0))==std::future_status::ready) {
                     try {
                         auto response=pending[i].get();
@@ -515,12 +552,19 @@ int main(int argc,char** argv) {
                 if(sim.slave->state()==State::OPERATIONAL || sim.slave->state()==State::SAFE_OP)
                     sim.pdo->updateInput();
             }
+            auto now=cmmt::TimingClock::now();
+            if(has_io && !host_failed && !io_pending.valid() && now>=io_next) {
+                json snapshots=json::array();
+                for(size_t i=0;i<fixed_io.size();++i)if(fixed_io[i])snapshots.push_back(fixed_io[i]->snapshot(i));
+                io_pending=model.submit({{"op","io_exchange"},{"session",session},{"request_id",++io_request_id},{"stations",snapshots}});
+                io_next=now+std::chrono::milliseconds(8);
+            }
         };
         // Shared by the physical frame loop and NIC-free transition tests.
         auto runRoutine=[&](size_t i) {
             auto& sim=*slaves[i];
                 uint16_t control=0;sim.esc->read(reg::AL_CONTROL,&control,sizeof(control));
-                bool wait_for_inactive=sim.slave->state()==State::PRE_OP && (control & 0x0f)==State::SAFE_OP
+                bool wait_for_inactive=!fixed_io[i] && sim.slave->state()==State::PRE_OP && (control & 0x0f)==State::SAFE_OP
                     && !host_failed && (!inactive_confirmed[i] || pending[i].valid());
                 if(!wait_for_inactive)sim.slave->routine();
         };
@@ -614,7 +658,7 @@ int main(int argc,char** argv) {
             return 0;
         }
         auto [socket,unused]=createSockets(argv[1],"");
-        socket->setTimeout(std::chrono::milliseconds(10));
+        socket->setTimeout(std::chrono::milliseconds(has_io?1:10));
         while(running) {
             timing.due();
             pump();
@@ -625,6 +669,7 @@ int main(int argc,char** argv) {
             auto n=socket->read(frame.data(),ETH_MAX_SIZE);
             auto received=cmmt::TimingClock::now();
             timing.add("socket_read_wait",read_start,received);
+            for(size_t i=0;i<slaves.size();++i)if(fixed_io[i])runRoutine(i);
             pump();
             if(n<static_cast<int>(sizeof(EthernetHeader)+sizeof(EthercatHeader)))continue;
             if(frame.ethernet()->type!=ETH_ETHERCAT_TYPE)continue;
@@ -643,7 +688,7 @@ int main(int argc,char** argv) {
                 // Only acknowledged logical writes advance the model; mailbox frames never do.
                 if(wkc && *wkc && (header->command==Command::LRW || header->command==Command::LWR)) {
                     for(size_t i=0;i<slaves.size();++i)
-                        pdo[i]=pdo[i] || cmmt::targetsOutput(*slaves[i]->esc,*header,cmmt::DynamicMapping::bytes(mappings[i]->configuration().rx));
+                        pdo[i]=pdo[i] || cmmt::targetsOutput(*slaves[i]->esc,*header,fixed_io[i]?fixed_io[i]->bytes(true):cmmt::DynamicMapping::bytes(mappings[i]->configuration().rx));
                 }
             }
             if(socket->write(frame.data(),n)!=n)throw std::runtime_error("EtherCAT frame write failed");
@@ -657,6 +702,7 @@ int main(int argc,char** argv) {
                 timing.add("slave_routine",routine_start,cmmt::TimingClock::now());
                 auto state=sim.slave->state();
                 if(state==State::SAFE_OP && pdo[i])sim.slave->validateOutputData();
+                if(fixed_io[i]) {fixed_io[i]->sample(pdo[i]);continue;}
                 bool active=state==State::OPERATIONAL;
                 if(!host_failed && !pending[i].valid() && ((active && pdo[i]) || (!active && !inactive_confirmed[i]))) {
                     json values=json::array(), reads=json::array();

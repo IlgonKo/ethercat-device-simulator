@@ -20,3 +20,6 @@
 
 !model_sources/
 !model_sources/**
+
+!model_presets/
+!model_presets/**

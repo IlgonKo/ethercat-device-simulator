@@ -15,17 +15,19 @@ COPY CMakeLists.txt /workspace/
 COPY third_party/KickCAT /workspace/third_party/KickCAT
 COPY src /workspace/src
 COPY device_descriptions /workspace/device_descriptions
+COPY model_presets /workspace/model_presets
 COPY tests /workspace/tests
 COPY .env.example /workspace/.env.example
 COPY docker/service.py /workspace/docker/service.py
 RUN cmake -S . -B build/timing -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/opt/deps \
- && cmake --build build/timing --target cmmt_simulator test_fixed_mapping test_multi_slave test_async_fault test_sdo_gateway test_dynamic_mapping test_mapping_store test_mapping_store_failures --parallel 2 \
+ && cmake --build build/timing --target cmmt_simulator test_fixed_mapping test_multi_slave test_async_fault test_sdo_gateway test_dynamic_mapping test_mapping_store test_mapping_store_failures test_remote_io --parallel 2 \
  && ctest --test-dir build/timing --output-on-failure
 COPY scripts /workspace/scripts
 COPY model_sources /workspace/model_sources
 RUN python3 scripts/models/build-copley-fmu.py --source docker/inputs/CopleyDriveSim-source.fmu --output model_artifacts/CopleyDriveSim-linux.fmu
 ENV PYTHONPATH=/workspace/src:/workspace
 RUN python3 -m unittest discover -s tests/unit -v \
+ && python3 tests/integration/run_remote_io.py \
  && COPLEY_TEST_FMU=/workspace/model_artifacts/CopleyDriveSim-linux.fmu python3 -m unittest tests.integration.test_copley_fmu -v \
  && python3 tests/integration/run_dynamic_mapping.py --axes 4 --fmu-dir /workspace/model_artifacts --storage-startup \
  && python3 tests/integration/run_remap_ipc.py --fmu-dir /workspace/model_artifacts \
@@ -39,6 +41,7 @@ COPY --from=builder /workspace/build/timing/cmmt_simulator /opt/simulator/bin/cm
 COPY --from=builder /workspace/model_artifacts /model_artifacts
 COPY --from=builder /workspace/src/functional_model /opt/simulator/src/functional_model
 COPY --from=builder /workspace/device_descriptions /opt/simulator/device_descriptions
+COPY --from=builder /workspace/model_presets /opt/simulator/model_presets
 COPY --from=builder /workspace/docker/service.py /opt/simulator/docker/service.py
 ENV PYTHONPATH=/opt/simulator/src:/opt/simulator DEVICE_SIMULATOR_FMU_DIR=/model_artifacts
 RUN ! command -v gcc && ! command -v g++ \
