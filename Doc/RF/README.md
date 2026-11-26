@@ -25,6 +25,7 @@
 | [RF-018](RF-018-diagnostic-fault.md) | 공통 Diagnostic 및 모델 장애 격리 | **완료** |
 | [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **예정** |
 | [RF-020](RF-020-parameter-history.md) | 파라미터 revision 및 변경 이력 관리 | **예정** |
+| [RF-021](RF-021-pneumatic-cylinder-fmu-improvements.md) | 공압 실린더 FMU 개선·정격 유량 설정 노출 | **예정** |
 
 ## 외부 연동 구상 — Soft ESC 범위 외 참고 이력
 
@@ -37,14 +38,15 @@
 | [RF-008](RF-008-omniverse-sync.md) | Omniverse 축·IO 상태 동기화 | **범위 외** |
 | [RF-009](RF-009-parameter-sync.md) | 실제·가상 장치 양방향 파라미터 동기화 | **범위 외** |
 
-## 2026-11-25 독립 제품 범위 반영
+## 2026-11-26 제품 범위 요약
 
-총 21개 문서 중 **제품 범위 17개: 완료 12 / 진행 중 3 / 예정 2**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
+총 22개 요구 항목 중 **제품 범위 18개: 완료 12 / 진행 중 3 / 예정 3**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
 
 - RF-013: CPX-AP-I Modular Remote I/O·모델 어댑터·DI/DO/AI/AO 구현. IO-Link는 제외. 공압 실린더 FMU 재사용 및 Linux 오프라인 검증 완료. IO 어댑터·채널 연결·물리 통신은 미완료이며 RF는 진행 중이다.
 - RF-015: 기존 직선축 지원 대조·회귀. 3축은 Demo 요구에서 가져온 시험 구성.
 - RF-012: 새 Linux PC와 축+IO 독립 배포·복원·통신 확인. Edge #2는 배포 사례.
 - RF-019/020: 후속 제품 기능. 이번 IO 지원의 필수 조건으로 확대하지 않음.
+- RF-021: 정격 유량의 FMU 외부 설정 지원. RF-013은 기존 FMU로 계속 진행하며 개선 완료를 기다리지 않음.
 
 DT/Sync·Pairing·정렬 절차·ROS2/Omniverse는 제품 실행 의존성이 아니다. IO-Link·회전 확장·NIC 추가 시험은 기존 후속/보류 경계를 유지한다. 기존 완료 검증을 보존하고 변경 영향만 회귀한다. [제품 정의](../Design/ADR-001-system-architecture.md), [프로젝트 계획](../project-plan.md)를 따른다.
 

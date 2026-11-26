@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "id": "cylinder_100mm",
+  "model": "pneumatic_double_acting",
+  "config": {
+    "stroke": 0.1,
+    "piston_diameter": 0.02,
+    "rod_diameter": 0.008,
+    "moving_mass": 0.15,
+    "sensor_width": 0.001
+  }
+}

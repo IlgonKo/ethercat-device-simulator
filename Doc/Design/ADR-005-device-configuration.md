@@ -12,7 +12,7 @@ Soft ESC는 DT와 무관한 자체 장치 구성을 소유한다. CiA402 Drive�
 
 IO는 장치·모듈/슬롯/채널과 선택 동작 모델의 입출력 연결을 구분한다. Loader/3축은 구성 사례이며 하드코딩하지 않는다. IO에서 AXIS 목록을 요구하지 않도록 검증을 프로파일별로 분리하고, 기존 축 설정 호환성을 유지한다. 모듈 선언 및 모델 인스턴스/binding 문법은 아래 채택 절을 따른다. 구현 전까지 운영 .env/.env.example에 미구현 키를 적용하지 않으며, 지원 모듈·실제 모델 변수 계약은 RF-013에서 관리한다.
 
-BUS의 프로파일 선택과 동작 모델 선택은 분리한다. 모듈·채널 배치와 PRE-OP PDO mapping/assignment는 별개이며 .env 초기 PDO 매핑 옵션을 재도입하지 않는다. 구체적인 IO 매핑 계약은 선정 장치 요구와 RF-014 기반을 대조해 결정한다.
+BUS의 프로파일 선택과 동작 모델 선택은 분리한다. 축은 RF-014의 PRE-OP 동적 PDO/저장 계약을 유지한다. CPX는 .env의 모듈 구성과 ESI에서 고정 PDO를 생성하고 mapping/assignment 개별 읽기만 지원한다. SDO 매핑 변경·별도 CPX 매핑 저장/복원은 지원하지 않는다. 별도 .env PDO 설정을 추가하지 않으며 모듈 구성 변경은 정지·수정·재시작·Master 재검색으로 적용한다(RF-013).
 
 ## 현재 결정과 이전 결정 대체
 
@@ -52,8 +52,8 @@ IO 모듈 구성과 동작 모델 생성/채널 binding은 별도 설정이다. 
 
 ```ini
 DEVICE_SIMULATOR_BEHAVIOUR_MODELS=\
-    loader0: virtual_cylinder, \
-    analog0: analog_test
+    loader0: cylinder_100mm, \
+    analog0: analog_test_preset
 
 DEVICE_SIMULATOR_IO_io0_BINDINGS=\
     2:DO:0=loader0.extend, \
@@ -64,19 +64,25 @@ DEVICE_SIMULATOR_IO_io0_BINDINGS=\
     3:AI:0=analog0.feedback
 ```
 
-위 예시는 채택한 문법이다. `virtual_cylinder`는 초기 논의의 모델 종류 예시이며 현재 등록된 구현 식별자가 아니다. 실린더 동작은 RF-013의 공압 FMU 재사용 결정으로 대체했고 extend/retract 및 extended/retracted는 어댑터 논리 신호로 연결한다. 실제 FMU 모델 등록 식별자·artifact/파라미터 설정은 구현 전에 확정한다. `analog_test`와 command/feedback은 아날로그 계약 설명용 예시로 실제 의미는 별도 확정한다. 기존 코드가 이 설정을 읽는다고 간주하지 않는다.
+2026-11-26 결정으로 모델 선언의 오른쪽 값은 모델 종류 대신 프리셋 ID다. cylinder_100mm는 model_presets/pneumatic_cylinder/double_acting/cylinder_100mm.json의 ID이며 model=pneumatic_double_acting을 선택한다. analog_test_preset은 순수 지연 FMU용 프리셋 자리표시자이며 실제 파일/식별자로 등록하지 않았다. command/feedback은 signed 16-bit raw 정수의 지연 입출력으로 확정했다. 로더/모델 등록은 미구현이다.
+
+모델 특성은 프리셋 JSON의 config, 인스턴스별 운전 조건·초기 조건은 `.env`의 `DEVICE_SIMULATOR_MODEL_<id>_INSTANCE_CONFIG`에 둔다. 예: `supply_gauge_pressure:600000,opposing_force:0,initial_position:0`. 기존 CONFIG/CONDITIONS/INITIAL 분리 제안은 대체한다. 프리셋 특성의 `.env` 덮어쓰기는 제공하지 않으며 미지정 값은 FMU 기본값, 변경은 재시작 때 적용한다. 자세한 형식·검증은 [RF-013](../RF/RF-013-virtual-io.md)을 따른다.
 
 | 항목 | 확정 문법/의미 |
 | --- | --- |
-| 모델 인스턴스 선언 | `인스턴스 ID: 모델 종류`의 쉼표 목록 |
+| 모델 인스턴스 선언 | `인스턴스 ID: 프리셋 ID`의 쉼표 목록 |
 | 채널 binding | `슬롯:DI/DO/AI/AO:채널 번호=인스턴스 ID.입출력명`의 쉼표 목록 |
 | 방향 | DO/AO → 모델 입력, DI/AI ← 모델 출력. 별도 방향 기호를 추가하지 않음 |
 | 장치 식별 | BINDINGS 환경 변수의 `<io_id>`로 대상 IO를 지정 |
+| 연결 수 | DI/DO/AI/AO 모두 채널과 모델 신호가 1:1. 전체 binding의 채널 키와 인스턴스 신호 키 각각 중복 거부 |
+| station 분산 | 같은 모델의 서로 다른 신호를 여러 io_id의 BINDINGS에서 연결 가능. 같은 station으로 제한하지 않음 |
 | 미연결 채널 | 해당 채널 항목 생략. 기본값/보관 정책은 ADR-007 적용 |
+
+실린더는 DO의 extend/retract와 DI의 extended/retracted만 지원한다. 실린더 AI/AO 연결은 지원하지 않으며 위 analog0는 별도 순수 지연 모델의 연결 예시이며 제작/등록은 아직 수행하지 않았다.
 
 입출력명은 모델 어댑터가 연결하는 계약이다. FMU 내부 변수명·단위 변환은 모델별 매핑에서 처리하며 IO binding에 FMU 내부 구조를 직접 요구하지 않는다. 모델 종류와 인스턴스 ID를 구분하여 같은 모델 종류를 여러 독립 인스턴스로 생성할 수 있다.
 
-문법 적용 범위는 우선 IO 연결이다. 기존 `DEVICE_SIMULATOR_AXIS_MODELS`는 유지하며 이 목록으로 통합하거나 기존 축 설정을 이관하지 않는다. 형식 채택만으로 미정인 모델 파라미터·FMU artifact 설정 필드까지 추가하지 않는다.
+문법 적용 범위는 우선 IO 연결이다. 기존 `DEVICE_SIMULATOR_AXIS_MODELS`는 유지하며 이 목록으로 통합하거나 기존 축 설정을 이관하지 않는다. 프리셋/INSTANCE_CONFIG는 위 결정으로 채택했으며 FMU artifact 선택·패키징의 세부 구현은 후속이다.
 
 ## 축 설정
 
