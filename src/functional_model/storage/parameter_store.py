@@ -44,7 +44,7 @@ class ParameterStore:
 
     @staticmethod
     def schema_version(model):
-        return 2 if model.device["model"]["type"] == "f_kr_cmmt" else 1
+        return 3 if model.device["model"]["type"] == "f_kr_cmmt" else 1
 
     def identity(self, model):
         return {'type': model.device['type'],

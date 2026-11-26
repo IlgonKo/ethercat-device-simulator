@@ -1201,3 +1201,21 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - API move_vel(0) 제한과 Stop 내부 PDO 속도0 명령을 구분했다. F-KR 정책과 호환되며 구현 후 검증이 필요하다.
 - 실제 Copley FMU 오프라인 시험에서 운전 중 B8 OFF 및 Halt 이후 이동 지속을 확인하고 RF-015/검토 기록에 차이로 분리했다. Disable은 해당 시험에서 정지했다.
 - 서버/모델 제품 코드·실행 중 컨테이너는 변경하지 않았다.
+
+## 2026-11-26 — RF-015 구현 1~4단계
+
+- 사용자 요청에 따라 추가 개입 없이 계약 시험, OD/실행 상태 분리, PP/PV/Jog/한계/모드, Stop/Halt/Quick Stop/Disable/Homing/Reset을 구현했다.
+- 신규 정책 시험 34개 통과. 전체 단위 시험 123개 중 122개 통과·Windows PySOEM 전용 1개 건너뜀.
+- NIC 없는 혼합 4축 매핑/저장 복원/PP 시험 및 IPC 장애 8개 사례 통과. 보고서: [구현·시험 결과](Validation/RF-015/implementation-20261126.md).
+- Quick Stop OD를 공개했으나 영구 저장 키/스키마는 유지했다. 신규 Quick Stop 설정의 영구 저장 계약과 어댑터 단위 경계·Docker/물리 통합은 5단계에 남겼다.
+- RF-014, Motion Server, 기존 state 및 실행 중 컨테이너는 변경하지 않았다. RF-015 전체 완료로 처리하지 않았다.
+
+## 2026-11-26 — RF-015 5단계·새 이미지 적용·물리 통합
+
+- 어댑터 소유 FKrUnits를 통해 직선축 동작 상태를 SI로 계산하도록 변경했다. OD 원시값/단일 OD/IPC/PDO 계약 유지.
+- Quick Stop 0x605A/0x6085를 영구 저장에 포함: F-KR schema 3/23개, Copley schema 1 유지. 구형 시작 거부 및 기존 명시적 오프라인 이관 경로·백업·검증을 적용했다.
+- 단위 128개 중 127개 통과·1개 건너뜀, Docker CTest 6개·IO FMU 12개·Copley FMU 8개 및 CPX/매핑/IPC 회귀 통과.
+- F-KR 2축 기본 운전, 임시 F-KR 3축의 Quick Stop 포함 운전, 원래 F-KR/Copley 4축+실린더 6회 혼합 물리 시험 통과. 상태 표본 WKC 불일치 0.
+- 실제 SDO Quick Stop 감속 2345/3456 저장·컨테이너 재생성 후 복원 확인, 원래 1000 복원·저장. 기존 21개 값과 Copley 파일 보존 확인.
+- 원래 .env·모델 구성·Motion Server basic 모드 복원, 새 이미지 실행, WKC 24/24, 전체 Disable/정지·조작권 반환.
+- [5단계 결과](Validation/RF-015/stage5-20261126.md). 세부 경계 전체의 물리 반복/장시간 RT 검증을 완료했다고 주장하지 않는다. Motion Server 소스·RF-014·Copley 지원 범위는 변경하지 않았다.

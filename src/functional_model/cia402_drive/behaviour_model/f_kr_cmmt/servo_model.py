@@ -1,15 +1,36 @@
 from functional_model.cia402_drive.profile.configured_od import ConfiguredObjectDictionary
-from .state_machine import CiA402StateMachine
+from .state_machine import CiA402StateMachine, CiA402State
+from dataclasses import dataclass
+import math
+
+
+@dataclass(frozen=True)
+class PPExecution:
+    target: float
+    velocity: float
+    acceleration: float
+    deceleration: float
+    limits: tuple[float, float]
+
+
+@dataclass(frozen=True)
+class StopExecution:
+    reason: str
+    deceleration: float
 
 
 class VirtualCiA402Servo:
-    def __init__(self, cycle_time=0.001, device_profile=None, od=None):
+    def __init__(self, cycle_time=0.001, device_profile=None, od=None, units=None):
         self.cycle_time = cycle_time
         if device_profile is None:
             raise ValueError("VirtualCiA402Servo requires an explicit device_profile")
         self.device_profile = device_profile
 
         self.od = od if od is not None else ConfiguredObjectDictionary(device_profile)
+        if units is None:
+            raise ValueError("F-KR requires adapter-owned unit conversion")
+        self._read = units.read
+        self._write = units.write
         self.sm = CiA402StateMachine()
 
         self.actual_position = 0.0
@@ -39,39 +60,31 @@ class VirtualCiA402Servo:
             self.od.read_role("parameter_save_command")
         )
 
-        #self.init_object_dictionary()
+        self.applied_mode = int(self._read(0x6060))
+        self.od.write_internal(0x6061, self.applied_mode)
+        self.pp_execution = None
+        self.stop_execution = None
+        self.active_limits = None
+        self.velocity_active = False
+        self.velocity_rearm = False
+        self.pp_armed = False
+        self.homing_elapsed = 0.0
+        self.position_window_elapsed = 0.0
+        self._last_csp_target_command = self._read(0x607A)
 
     def _apply_od_commands(self):
         device_reset_command = int(self.od.read_role("device_reset_command"))
-        if (
-            device_reset_command != self._last_device_reset_command
-            and device_reset_command == 1
-        ):
+        if device_reset_command != self._last_device_reset_command and device_reset_command == 1:
             self._apply_device_reset_response()
         self._last_device_reset_command = device_reset_command
-
         parameter_save_command = int(self.od.read_role("parameter_save_command"))
-        if (
-            parameter_save_command != self._last_parameter_save_command
-            and parameter_save_command == 1
-        ):
+        if parameter_save_command != self._last_parameter_save_command and parameter_save_command == 1:
             self.od.write_role("parameter_save_status", 0)
             self.od.write_role("parameter_save_return_code", 0)
             self.od.write_role("parameter_save_return_value", 1)
         self._last_parameter_save_command = parameter_save_command
-
-        requested_mode = int(self.od.read_role("mode_of_operation"))
-        requested_target = self.od.read_role("target_position")
-        if requested_mode != self._last_mode_command:
-            self.set_mode(
-                requested_mode,
-                previous_mode=self._last_mode_command,
-            )
-        if requested_target != self._last_target_position_command:
-            self.set_target_position(
-                requested_target,
-                previous_target=self._last_target_position_command,
-            )
+        # OD command writes never mutate an accepted PP execution.
+        self._last_target_position_command = self._read(0x607A)
 
     def _apply_device_reset_response(self):
         current_position = self.od.read_role("actual_position")
@@ -88,65 +101,32 @@ class VirtualCiA402Servo:
         self._last_target_position_command = self.od.read_role("target_position")
 
     def get_statusword(self):
-        return self.od.read(0x6041)
+        return self._read(0x6041)
 
     def model_update(self):
+        if not math.isfinite(self.cycle_time) or not 0 < self.cycle_time <= .1:
+            raise ValueError("Cycle time must be finite and in (0, 0.1]")
         self._apply_od_commands()
         self.process_cycle()
 
     def set_mode(self, mode, previous_mode=None):
-        next_mode = int(mode)
-        current_mode = int(
-            self.od.read(0x6060)
-            if previous_mode is None
-            else previous_mode
-        )
-        if next_mode != current_mode:
-            self.stop_at_current_position()
-            if next_mode != 6:
-                self.homing_active = False
-                self.homing_error = False
-        self.od.write(0x6060,next_mode)
-        self.od.write(0x6061,next_mode)
-        self._last_mode_command = next_mode
+        # Request only; the cycle applies it at standstill.
+        self._write(0x6060, int(mode))
 
     def set_target_position(self, position, previous_target=None):
-        if self._position_command_requires_reference() and not self.homing_referenced:
-            if previous_target is not None:
-                self.od.write(0x607A, previous_target)
-                self._last_target_position_command = previous_target
-            return
-
-        if not self._position_target_is_within_software_limits(position):
-            self.software_limit_warning = True
-            self.position_target_rejected = True
-            self.stop_at_current_position()
-            self.target_reached = False
-            return
-
-        self.position_target_rejected = False
-        if not self._actual_position_exceeds_software_limits():
-            self.software_limit_warning = False
-
-        current_target = (
-            self.od.read(0x607A)
-            if previous_target is None
-            else previous_target
-        )
-        if position != current_target:
-            self.target_reached = False
-            self.window_counter = 0
-        self.od.write(0x607A, position)
+        self._write(0x607A, position)
         self._last_target_position_command = position
 
     def set_software_position_limits(self, negative_limit, positive_limit):
-        self.od.write(0x607D, negative_limit, 1)
-        self.od.write(0x607D, positive_limit, 2)
+        if negative_limit > positive_limit:
+            raise ValueError("Minimum position limit exceeds maximum")
+        self._write(0x607D, negative_limit, 1)
+        self._write(0x607D, positive_limit, 2)
 
     def get_software_position_limits(self):
         return {
-            "negative_limit": self.od.read(0x607D, 1),
-            "positive_limit": self.od.read(0x607D, 2),
+            "negative_limit": self._read(0x607D, 1),
+            "positive_limit": self._read(0x607D, 2),
         }
 
     def set_position_loop_gain(self, kp):
@@ -156,40 +136,43 @@ class VirtualCiA402Servo:
         return self.kp
 
     def get_position(self):
-        return self.od.read(0x6064)
+        return self._read(0x6064)
 
     def get_target_position(self):
-        return self.od.read(0x607A)
+        return self._read(0x607A)
 
     def get_velocity(self):
-        return self.od.read(0x606C)
+        return self._read(0x606C)
 
     def is_target_reached(self):
         return self.target_reached
 
     def stop_at_current_position(self):
+        # Cancel execution, not the user's OD settings.
         self.actual_velocity = 0.0
         self.pp_active = False
-        self.pp_target_position = self.actual_position
-        self.od.write(0x607A, self.actual_position)
-        self._last_target_position_command = self.actual_position
-        self.od.write(0x6064, self.actual_position)
-        self.od.write(0x606C, self.actual_velocity)
+        self.pp_setpoint_ack = False
+        self.pp_execution = None
+        self.stop_execution = None
+        self.velocity_active = False
+        self.velocity_rearm = True
+        self.pp_armed = False
+        if self.homing_active:
+            self.homing_referenced = False
+        self.homing_active = False
+        self.homing_elapsed = 0.0
         self.window_counter = 0
-        self.target_reached = True
+        self.position_window_elapsed = 0.0
+        self.target_reached = False
+        self._write_actual_feedback()
 
     # ---------------------------------
     # CiA402
     # ---------------------------------
 
     def is_in_position(self):
-        target = self.od.read(0x607A)
-
-        actual = self.od.read(0x6064)
-
-        window = self.od.read(0x6067)
-
-        return abs(target - actual) <= window
+        target = self.pp_target_position if self.applied_mode == 1 else self._read(0x607A)
+        return abs(target - self._read(0x6064)) <= abs(self._read(0x6067))
 
     def update_target_reached(self):
         if self.is_in_position():
@@ -198,7 +181,7 @@ class VirtualCiA402Servo:
             self.window_counter = 0
             self.target_reached = False
 
-        window_time_ms = self.od.read(0x6068)
+        window_time_ms = self._read(0x6068)
 
         required_count = max(1,int(window_time_ms /(self.cycle_time *1000)))
 
@@ -206,154 +189,134 @@ class VirtualCiA402Servo:
             self.target_reached = True
 
     def _position_command_requires_reference(self):
-        return int(self.od.read(0x6060)) in {1, 8}
+        return self.applied_mode in {1, 8}
 
     # ---------------------------------
     # Main Cycle
     # ---------------------------------
 
     def process_cycle(self):
-        controlword = self.od.read(0x6040)
-        self.halt_active = bool(controlword & (1 << 8))
-        was_operation_enabled = self.sm.get_statusword() == 0x0027
-
-        self.sm.process(controlword)
-        is_operation_enabled = self.sm.get_statusword() == 0x0027
-        if was_operation_enabled and not is_operation_enabled:
+        cw = int(self._read(0x6040))
+        self.halt_active = bool(cw & 0x100)
+        old_state = self.sm.state
+        self.sm.process(cw)
+        if self.sm.state == CiA402State.QUICK_STOP_ACTIVE:
+            if old_state != CiA402State.QUICK_STOP_ACTIVE:
+                self._begin_stop("quick_stop", self._read(0x6085))
+            self._step_stop()
+        elif self.sm.state != CiA402State.OPERATION_ENABLED:
             self.stop_at_current_position()
-
-        mode = self.od.read(0x6060)
-
-        if mode == 1:
-            self.process_pp()
-        elif mode == 3:
-            self.process_pv()
-        elif mode == 8:
-            self.process_csp()
-        elif mode == 6:
-            self.process_homing()
-        elif mode == -3:
-            self.process_jog()
-
+            self._apply_pending_mode()
+        else:
+            self._apply_pending_mode()
+            if self.stop_execution is None and not self.halt_active and self._velocity_input_is_neutral():
+                self.velocity_rearm = False
+            if not cw & 0x10:
+                self.pp_armed = True
+                self.pp_setpoint_ack = False
+            if self.halt_active and self.applied_mode != 8:
+                self.velocity_rearm = True
+                if self._is_moving() and self.stop_execution is None:
+                    decel = self.pp_execution.deceleration if self.pp_execution else self._read(0x6084)
+                    self._begin_stop("halt", decel)
+                if self.applied_mode == 1:
+                    self.target_reached = False
+            if self.stop_execution is not None:
+                self._step_stop()
+            elif not self.halt_active or self.applied_mode == 8:
+                handler = {1: self.process_pp, 3: self.process_pv, -3: self.process_jog,
+                           6: self.process_homing, 8: self.process_csp}.get(self.applied_mode)
+                if handler:
+                    handler()
+        self._write_actual_feedback()
+        # Clear a limit warning only after a valid recovery has entered the range.
+        if (self.pp_active or self.velocity_active) and self.active_limits is not None:
+            lo, hi = self.active_limits
+            if lo <= self.actual_position <= hi:
+                self.software_limit_warning = False
         statusword = self.sm.get_statusword()
-
-        if self.target_reached:
-            statusword |= (1 << 10)
-        if self.pp_setpoint_ack:
-            statusword |= (1 << 12)
-        if self._is_moving():
-            statusword |= (1 << 8)
-        if self._software_limit_is_active():
-            statusword |= (1 << 7)
-            statusword |= (1 << 11)
-        if self.homing_referenced:
-            statusword |= (1 << 15)
-        if mode == 6 and self.homing_error:
-            statusword |= (1 << 3)
-
-        self.od.write(0x6041, statusword)
-        self.previous_controlword = controlword
+        if self.target_reached: statusword |= 1 << 10
+        if self.pp_setpoint_ack and self.applied_mode == 1: statusword |= 1 << 12
+        if self._is_moving(): statusword |= 1 << 8
+        if self._software_limit_is_active(): statusword |= (1 << 7) | (1 << 11)
+        if self.homing_referenced: statusword |= 1 << 15
+        if self.applied_mode == 6 and self.homing_error: statusword |= 1 << 3
+        self.od.write_internal(0x6041, statusword)
+        self.od.write_internal(0x6061, self.applied_mode)
+        self.previous_controlword = cw
 
     # ---------------------------------
     # Homing
     # ---------------------------------
 
     def process_homing(self):
-        if self.sm.get_statusword() != 0x0027:
+        cw = int(self._read(0x6040))
+        if self.homing_active and not cw & 0x10:
+            self.homing_active = False
+            self.homing_referenced = False
+            self.homing_elapsed = 0.0
+            self.target_reached = False
             return
-
-        controlword = self.od.read(0x6040)
-        start_homing = (
-            bool(controlword & (1 << 4)) and
-            not bool(self.previous_controlword & (1 << 4))
-        )
-
-        if start_homing:
+        edge = bool(cw & 0x10) and not self.previous_controlword & 0x10
+        if edge and not self._is_moving():
             self.homing_active = True
-            self.homing_counter = max(1, int(0.1 / self.cycle_time))
+            self.homing_elapsed = 0.0
             self.homing_referenced = False
             self.homing_error = False
-            self.actual_velocity = 0.0
-            self._write_actual_feedback()
             self.target_reached = False
-
         if not self.homing_active:
             return
-
-        self.homing_counter -= 1
-        if self.homing_counter > 0:
+        self.homing_elapsed += self.cycle_time
+        if self.homing_elapsed + 1e-12 < .1:
             return
-
+        # Coordinate reset, not a simulated travel to zero.
         self.actual_position = 0.0
         self.actual_velocity = 0.0
-        self.od.write(0x607A, self.actual_position)
-        self._write_actual_feedback()
-        self.target_reached = True
+        self._write(0x607A, 0)
+        self.pp_target_position = 0.0
+        self.pp_execution = None
+        self.active_limits = None
+        self._last_target_position_command = 0
         self.homing_active = False
         self.homing_referenced = True
+        self.target_reached = True
 
     # ---------------------------------
     # PP
     # ---------------------------------
 
     def process_pp(self):
-        if self.sm.get_statusword() != 0x0027:
-            return
-
-        if self.halt_active:
-            self.pp_active = False
-            self.pp_setpoint_ack = False
-            self._decelerate_to_stop()
-            self._write_actual_feedback()
-            self.target_reached = abs(self.actual_velocity) <= 1e-9
-            return
-
-        if not self.homing_referenced:
-            self.pp_active = False
-            self.pp_setpoint_ack = False
+        cw = int(self._read(0x6040))
+        edge = bool(cw & 0x10) and not self.previous_controlword & 0x10
+        if edge and self.pp_armed and not self._is_moving():
+            self.pp_armed = False
             self.target_reached = False
-            self._decelerate_to_stop()
-            self._write_actual_feedback()
-            return
-
-        controlword = self.od.read(0x6040)
-        new_setpoint = (
-            bool(controlword & (1 << 4)) and
-            not bool(self.previous_controlword & (1 << 4))
-        )
-
-        if new_setpoint:
-            if self.position_target_rejected:
-                self.pp_active = False
-                self.pp_setpoint_ack = False
-                self._decelerate_to_stop()
-                self._write_actual_feedback()
+            if not self.homing_referenced:
                 return
-            else:
-                self.pp_target_position = self.od.read(0x607A)
-                self.pp_active = True
-            self.target_reached = False
-            self.window_counter = 0
-
-        self.pp_setpoint_ack = bool(controlword & (1 << 4))
-
+            target = float(self._read(0x607A))
+            limits = self._software_position_limits()
+            self.active_limits = limits
+            if not limits[0] <= target <= limits[1]:
+                self.position_target_rejected = True
+                self.software_limit_warning = True
+                return
+            velocity = abs(float(self._read(0x6081)))
+            cap = abs(float(self._read(0x607F))) if target >= self.actual_position else abs(float(self._read(0x2183, 12)))
+            if cap > 0:
+                velocity = min(velocity, cap)
+            self.pp_execution = PPExecution(target, velocity, abs(float(self._read(0x6083))),
+                                             abs(float(self._read(0x6084))), limits)
+            self.pp_target_position = target
+            self.position_target_rejected = False
+            self.pp_active = True
+            self.pp_setpoint_ack = True
+            self.position_window_elapsed = 0.0
         if not self.pp_active:
-            self._decelerate_to_stop()
-            self._write_actual_feedback()
-            self.update_target_reached()
             return
-
-        target = self.pp_target_position
-        profile_vel = abs(float(self.od.read(0x6081)))
-        positive_limit = abs(float(self.od.read(0x607F)))
-        negative_limit = abs(float(self.od.read(0x2183, 0x0C)) * 1000.0)
-        max_profile_vel = positive_limit
-        if target < self.actual_position and negative_limit > 0:
-            max_profile_vel = negative_limit
-        max_vel = min(profile_vel, max_profile_vel) if max_profile_vel > 0 else profile_vel
-        accel = abs(float(self.od.read(0x6083)))
-        decel = abs(float(self.od.read(0x6084)))
-        window = abs(float(self.od.read(0x6067)))
+        profile = self.pp_execution
+        target, max_vel = profile.target, profile.velocity
+        accel, decel = profile.acceleration, profile.deceleration
+        window = abs(float(self._read(0x6067)))
         dt = self.cycle_time
 
         error = target - self.actual_position
@@ -364,17 +327,16 @@ class VirtualCiA402Servo:
         ):
             self.actual_position = target
             self.actual_velocity = 0.0
-            self.pp_active = False
             self._write_actual_feedback()
-            self.update_target_reached()
+            self._update_pp_completion()
             return
 
         direction = 1.0 if error >= 0.0 else -1.0
         velocity_toward_target = self.actual_velocity * direction
         position_velocity_toward_target = (
-            self._velocity_to_position_rate(self.actual_velocity) * direction
+            self.actual_velocity * direction
         )
-        decel_position_rate = self._acceleration_to_position_rate(decel)
+        decel_position_rate = decel
         stopping_distance = (
             max(position_velocity_toward_target, 0.0) ** 2
             / (2.0 * decel_position_rate)
@@ -399,7 +361,7 @@ class VirtualCiA402Servo:
         )
         next_position = (
             self.actual_position
-            + self._velocity_to_position_rate(self.actual_velocity) * dt
+            + self.actual_velocity * dt
         )
 
         if (
@@ -408,22 +370,21 @@ class VirtualCiA402Servo:
         ):
             self.actual_position = target
             self.actual_velocity = 0.0
-            self.pp_active = False
         else:
             self.actual_position = next_position
 
         self._write_actual_feedback()
-        self.update_target_reached()
+        self._update_pp_completion()
 
     def _decelerate_to_stop(self):
-        decel = abs(float(self.od.read(0x6084)))
+        decel = abs(float(self._read(0x6084)))
         self.actual_velocity = self._move_towards(
             self.actual_velocity,
             0.0,
             self._acceleration_to_velocity_delta(decel, self.cycle_time),
         )
         self.actual_position += (
-            self._velocity_to_position_rate(self.actual_velocity)
+            self.actual_velocity
             * self.cycle_time
         )
 
@@ -438,124 +399,39 @@ class VirtualCiA402Servo:
         return current + max_delta * (1.0 if delta > 0.0 else -1.0)
 
     def _write_actual_feedback(self):
-        self.od.write(0x6064, self.actual_position)
-        self.od.write(0x606C, self.actual_velocity)
+        self._write(0x6064, self.actual_position)
+        self._write(0x606C, self.actual_velocity)
 
-    def _scale_from_exponent(self, exponent):
-        exponent = int(exponent)
-        return 10.0 ** (-exponent) if exponent > 0 else 10.0 ** exponent
 
-    def _unit_scale(self, subindex, default=1.0):
-        try:
-            return self._scale_from_exponent(self.od.read(0x2194, subindex))
-        except Exception:
-            return float(default)
-
-    def _position_scale(self):
-        return max(self._unit_scale(0x01), 1e-12)
-
-    def _velocity_scale(self):
-        return max(self._unit_scale(0x02), 1e-12)
-
-    def _acceleration_scale(self):
-        return max(self._unit_scale(0x03), 1e-12)
-
-    def _velocity_to_position_rate(self, velocity):
-        return float(velocity) * self._velocity_scale() / self._position_scale()
-
-    def _position_rate_to_velocity(self, position_rate):
-        return float(position_rate) * self._position_scale() / self._velocity_scale()
-
-    def _acceleration_to_position_rate(self, acceleration):
-        return float(acceleration) * self._acceleration_scale() / self._position_scale()
-
-    def _acceleration_to_velocity_delta(self, acceleration, dt):
-        return (
-            float(acceleration)
-            * self._acceleration_scale()
-            / self._velocity_scale()
-            * float(dt)
-        )
+    @staticmethod
+    def _acceleration_to_velocity_delta(acceleration, dt):
+        return float(acceleration) * float(dt)
 
     # ---------------------------------
     # PV
     # ---------------------------------
 
     def process_pv(self):
-        if self.sm.get_statusword() != 0x0027:
-            return
-
-        target_velocity = 0.0 if self.halt_active else float(self.od.read(0x60FF))
-        positive_limit = abs(float(self.od.read(0x607F)))
-        negative_limit = abs(float(self.od.read(0x2183, 0x0C)) * 1000.0)
-        if target_velocity >= 0.0 and positive_limit > 0.0:
-            target_velocity = min(target_velocity, positive_limit)
-        elif target_velocity < 0.0 and negative_limit > 0.0:
-            target_velocity = max(target_velocity, -negative_limit)
-
-        accel = float(self.od.read(0x6083))
-        decel = float(self.od.read(0x6084))
-        if abs(target_velocity) > abs(self.actual_velocity):
-            limit = accel
-        else:
-            limit = decel
-
-        self.actual_velocity = self._move_towards(
-            self.actual_velocity,
-            target_velocity,
-            self._acceleration_to_velocity_delta(limit, self.cycle_time),
-        )
-        self.actual_position += (
-            self._velocity_to_position_rate(self.actual_velocity)
-            * self.cycle_time
-        )
-        self._write_actual_feedback()
-        self.target_reached = abs(self.actual_velocity - target_velocity) <= max(
-            self._acceleration_to_velocity_delta(limit, self.cycle_time),
-            1e-9,
-        )
+        target = float(self._read(0x60FF))
+        cap = abs(float(self._read(0x607F))) if target >= 0 else abs(float(self._read(0x2183, 12)))
+        if cap > 0:
+            target = max(-cap, min(cap, target))
+        self._process_velocity(target)
 
     # ---------------------------------
     # Jog
     # ---------------------------------
 
     def process_jog(self):
-        if self.sm.get_statusword() != 0x0027:
-            return
-
-        controlword = self.od.read(0x6040)
-        positive = bool(controlword & (1 << 4))
-        negative = bool(controlword & (1 << 5))
-        if positive == negative or self.halt_active:
-            target_velocity = 0.0
-        else:
-            direction = 1.0 if positive else -1.0
-            target_velocity = direction * self._jog_velocity_limit(controlword)
-
-        accel = float(self.od.read(0x6083))
-        decel = float(self.od.read(0x6084))
-        target_velocity = self._limit_jog_velocity_at_software_limit(target_velocity)
-        if abs(target_velocity) > abs(self.actual_velocity):
-            limit = accel
-        else:
-            limit = decel
-
-        self.actual_velocity = self._move_towards(
-            self.actual_velocity,
-            target_velocity,
-            self._acceleration_to_velocity_delta(limit, self.cycle_time),
-        )
-        self.actual_position += (
-            self._velocity_to_position_rate(self.actual_velocity)
-            * self.cycle_time
-        )
-        self._write_actual_feedback()
-        self.target_reached = abs(self.actual_velocity) <= 1e-9
+        cw = int(self._read(0x6040))
+        positive, negative = bool(cw & 0x10), bool(cw & 0x20)
+        target = 0.0 if positive == negative else (1 if positive else -1) * self._jog_velocity_limit(cw)
+        self._process_velocity(target)
 
     def _jog_velocity_limit(self, controlword):
-        profile_velocity = abs(float(self.od.read(0x6081)))
-        positive_limit = abs(float(self.od.read(0x607F)))
-        negative_limit = abs(float(self.od.read(0x2183, 0x0C)) * 1000.0)
+        profile_velocity = abs(float(self._read(0x6081)))
+        positive_limit = abs(float(self._read(0x607F)))
+        negative_limit = abs(float(self._read(0x2183, 0x0C)))
         configured_limits = [
             value for value in (profile_velocity, positive_limit, negative_limit)
             if value > 0.0
@@ -584,11 +460,10 @@ class VirtualCiA402Servo:
         return target_velocity
 
     def _software_position_limits(self):
-        negative_limit = float(self.od.read(0x607D, 1))
-        positive_limit = float(self.od.read(0x607D, 2))
-        if negative_limit > positive_limit:
-            return positive_limit, negative_limit
-        return negative_limit, positive_limit
+        limits = float(self._read(0x607D, 1)), float(self._read(0x607D, 2))
+        if limits[0] > limits[1]:
+            raise ValueError("Minimum position limit exceeds maximum")
+        return limits
 
     def _position_target_is_within_software_limits(self, position):
         negative_limit, positive_limit = self._software_position_limits()
@@ -603,17 +478,11 @@ class VirtualCiA402Servo:
         )
 
     def _software_limit_is_active(self):
-        return (
-            self.software_limit_warning or
-            self._actual_position_exceeds_software_limits()
-        )
+        return self.software_limit_warning
 
     def _is_moving(self):
-        return (
-            abs(float(self.actual_velocity)) > 1e-9 or
-            self.pp_active or
-            self.homing_active
-        )
+        return (abs(float(self.actual_velocity)) > 1e-9 or self.pp_active
+                or self.homing_active or self.velocity_active or self.stop_execution is not None)
 
     # ---------------------------------
     # CSP
@@ -623,6 +492,16 @@ class VirtualCiA402Servo:
 
         if self.sm.get_statusword() != 0x0027:
             return
+
+        target = self._read(0x607A)
+        if target != self._last_csp_target_command:
+            if not self.homing_referenced:
+                self._write(0x607A, self._last_csp_target_command)
+            elif not self._position_target_is_within_software_limits(target):
+                self.software_limit_warning = True
+                self.stop_at_current_position()
+                self._write(0x607A, self.actual_position)
+            self._last_csp_target_command = self._read(0x607A)
 
         if self.halt_active:
             self._decelerate_to_stop()
@@ -636,20 +515,20 @@ class VirtualCiA402Servo:
             self._write_actual_feedback()
             return
 
-        target = self.od.read(0x607A)
-        profile_vel = abs(float(self.od.read(0x6081)))
-        positive_limit = abs(float(self.od.read(0x607F)))
-        negative_limit = abs(float(self.od.read(0x2183, 0x0C)) * 1000.0)
+        target = self._read(0x607A)
+        profile_vel = abs(float(self._read(0x6081)))
+        positive_limit = abs(float(self._read(0x607F)))
+        negative_limit = abs(float(self._read(0x2183, 0x0C)))
         max_profile_vel = positive_limit
         if target < self.actual_position and negative_limit > 0:
             max_profile_vel = negative_limit
         max_vel = min(profile_vel, max_profile_vel) if max_profile_vel > 0 else profile_vel
-        accel = self.od.read(0x6083)
-        decel = self.od.read(0x6084)
+        accel = self._read(0x6083)
+        decel = self._read(0x6084)
 
         error = target - self.actual_position
 
-        desired_velocity = self._position_rate_to_velocity(self.kp * error)
+        desired_velocity = self.kp * error
         desired_velocity = max(
             min(desired_velocity, max_vel),
             -max_vel,
@@ -672,12 +551,107 @@ class VirtualCiA402Servo:
         self.actual_velocity += delta_v
 
         self.actual_position += (
-            self._velocity_to_position_rate(self.actual_velocity)
+            self.actual_velocity
             * self.cycle_time
         )
 
-        self.od.write(0x6064, self.actual_position)
+        self._write(0x6064, self.actual_position)
 
-        self.od.write(0x606C, self.actual_velocity)
+        self._write(0x606C, self.actual_velocity)
 
         self.update_target_reached()
+
+    def _apply_pending_mode(self):
+        requested = int(self._read(0x6060))
+        if requested == self.applied_mode or self._is_moving():
+            return
+        self.applied_mode = requested
+        self._last_mode_command = requested
+        self.pp_execution = None
+        self.pp_setpoint_ack = False
+        self.target_reached = False
+        self.active_limits = None
+        self.homing_error = False
+
+    def _begin_stop(self, reason, deceleration):
+        if self.stop_execution is not None and reason != "quick_stop":
+            return
+        deceleration = abs(float(deceleration))
+        if not math.isfinite(deceleration) or deceleration <= 0:
+            raise ValueError("A stop requires positive finite deceleration")
+        self.stop_execution = StopExecution(reason, deceleration)
+        self.pp_active = False
+        self.pp_setpoint_ack = False
+        self.pp_armed = False
+        self.velocity_active = False
+        self.velocity_rearm = True
+        if self.homing_active:
+            self.homing_referenced = False
+        self.homing_active = False
+        self.homing_elapsed = 0.0
+        self.target_reached = False
+
+    def _step_stop(self):
+        stop = self.stop_execution
+        if stop is None:
+            return
+        self.actual_velocity = self._move_towards(self.actual_velocity, 0,
+            self._acceleration_to_velocity_delta(stop.deceleration, self.cycle_time))
+        self.actual_position += self.actual_velocity * self.cycle_time
+        if abs(self.actual_velocity) <= 1e-9:
+            self.actual_velocity = 0.0
+            self.stop_execution = None
+            self.pp_execution = None
+            if stop.reason == "quick_stop":
+                self.sm.finish_quick_stop()
+            elif not self.halt_active and self._velocity_input_is_neutral():
+                self.velocity_rearm = False
+
+    def _update_pp_completion(self):
+        if abs(self.actual_position - self.pp_target_position) <= abs(self._read(0x6067)) and abs(self.actual_velocity) <= 1e-9:
+            self.position_window_elapsed += self.cycle_time
+        else:
+            self.position_window_elapsed = 0.0
+            return
+        if self.position_window_elapsed + 1e-12 >= max(0, self._read(0x6068)) / 1000:
+            self.target_reached = True
+            self.pp_active = False
+
+    def _process_velocity(self, target):
+        if self.velocity_rearm:
+            if abs(target) <= 1e-12:
+                self.velocity_rearm = False
+            return
+        if target == 0:
+            if self.velocity_active or abs(self.actual_velocity) > 1e-9:
+                self._begin_stop("stop", self._read(0x6084))
+                self._step_stop()
+            return
+        if not self.velocity_active:
+            self.active_limits = self._software_position_limits()
+            self.velocity_active = True
+        lo, hi = self.active_limits
+        outside_direction = ((target > 0 and self.actual_position >= hi)
+                             or (target < 0 and self.actual_position <= lo))
+        if outside_direction:
+            self.software_limit_warning = True
+            self._begin_stop("limit", self._read(0x6084))
+            self._step_stop()
+            return
+        # Reverse using the deceleration ramp, explicitly reaching zero first.
+        reversing = target * self.actual_velocity < 0
+        desired = 0.0 if reversing else target
+        accel, decel = float(self._read(0x6083)), float(self._read(0x6084))
+        ramp = decel if reversing or abs(desired) < abs(self.actual_velocity) else accel
+        self.actual_velocity = self._move_towards(self.actual_velocity, desired,
+            self._acceleration_to_velocity_delta(ramp, self.cycle_time))
+        self.actual_position += self.actual_velocity * self.cycle_time
+        self.target_reached = abs(self.actual_velocity - target) <= 1e-9
+
+    def _velocity_input_is_neutral(self):
+        cw = int(self._read(0x6040))
+        if self.applied_mode == 3:
+            return self._read(0x60FF) == 0
+        if self.applied_mode == -3:
+            return bool(cw & 0x10) == bool(cw & 0x20)
+        return self._read(0x60FF) == 0 and not cw & 0x30

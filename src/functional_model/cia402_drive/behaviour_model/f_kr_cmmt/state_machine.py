@@ -12,6 +12,8 @@ class CiA402State(Enum):
 
     FAULT = 4
 
+    QUICK_STOP_ACTIVE = 5
+
 
 class CiA402StateMachine:
 
@@ -29,6 +31,17 @@ class CiA402StateMachine:
 
         if (controlword & 0x0087) == 0x0000:
             self.state = CiA402State.SWITCH_ON_DISABLED
+            return
+
+        if self.state == CiA402State.QUICK_STOP_ACTIVE:
+            if (controlword & 0x008F) == 0x0007:
+                self.state = CiA402State.SWITCHED_ON
+            elif (controlword & 0x0087) == 0x0006:
+                self.state = CiA402State.READY_TO_SWITCH_ON
+            return
+
+        if self.state == CiA402State.OPERATION_ENABLED and (controlword & 0x0086) == 0x0002:
+            self.state = CiA402State.QUICK_STOP_ACTIVE
             return
 
         if self.state == CiA402State.SWITCH_ON_DISABLED:
@@ -80,6 +93,10 @@ class CiA402StateMachine:
                 self.state = \
                     CiA402State.SWITCH_ON_DISABLED
 
+    def finish_quick_stop(self):
+        if self.state == CiA402State.QUICK_STOP_ACTIVE:
+            self.state = CiA402State.SWITCH_ON_DISABLED
+
     def get_statusword(self):
 
         if self.state == CiA402State.SWITCH_ON_DISABLED:
@@ -93,5 +110,8 @@ class CiA402StateMachine:
 
         elif self.state == CiA402State.OPERATION_ENABLED:
             return 0x0027
+
+        if self.state == CiA402State.QUICK_STOP_ACTIVE:
+            return 0x0007
 
         return 0x0008

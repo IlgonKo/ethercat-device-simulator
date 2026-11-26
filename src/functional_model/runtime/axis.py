@@ -26,6 +26,7 @@ class Model:
         self.tx_size = sum(x.byte_length for x in self.tx)
         addresses = {(x.index, x.subindex) for x in self.rx + self.tx if x.index}
         addresses.update((x.index, x.subindex) for x in self.profile.required_non_pdo_od_roles())
+        addresses.update(getattr(self.adapter, 'additional_od_keys', ()))
         self.entries = {}
         for index, subindex in sorted(addresses):
             d = self.adapter.od.definition(index, subindex)

@@ -24,6 +24,8 @@ class ParameterMigrationTests(unittest.TestCase):
         data.pop('checksum')
         data['schema_version'] = 1
         data['values'].pop('6081:00')
+        data['values'].pop('605a:00')
+        data['values'].pop('6085:00')
         data['checksum'] = self.store.checksum(data)
         self.path.write_text(json.dumps(data))
         self.original = self.path.read_bytes()
