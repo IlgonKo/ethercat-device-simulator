@@ -15,3 +15,6 @@ __pycache__/
 
 /docker/inputs/*
 !/docker/inputs/.gitkeep
+
+/results/
+/.cache/

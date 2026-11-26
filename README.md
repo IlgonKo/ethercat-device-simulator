@@ -15,7 +15,7 @@ Soft ESC는 **FMU 또는 다른 형식의 동작 모델을 EtherCAT 장치 프�
 | IO 어댑터·동작 모델 | CPX-AP-I DI/DO/AI/AO 연결 구현 준비. 복동 실린더 FMI3 Linux 오프라인 검증 완료, IO 연결 미구현. IO-Link 제외 |
 | Linux Docker | 기존 축 배포·비교 검증 완료. 새 PC·축+IO 배포 검증 잔여 |
 
-실린더 모델의 출처·소스·Export·재검증 절차는 [모델 README](model_sources/pneumatic_cylinder/README.md), 결과는 [Linux FMU 검증 보고서](Doc/Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)를 참조합니다.
+실린더 모델의 출처·소스·Export·재검증 절차는 [모델 README](model_sources/pneumatic_cylinder/double_acting/README.md), 결과는 [Linux FMU 검증 보고서](Doc/Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)를 참조합니다.
 
 지원 대상 정의가 모든 모델·모듈·Master에 대한 적합성 검증 완료를 의미하지는 않습니다. 현재 Copley의 기능 제약과 모델별 지원표는 각 RF를 따릅니다.
 
@@ -133,3 +133,5 @@ bash scripts/docker/start.sh
 ### Copley FMU 오프라인 검증
 
 FMI3 CS 기반 PP 어댑터와 Linux FMU 빌드 도구의 실행 방법은 [RF-017](Doc/RF/RF-017-copley-fmu.md)을 따른다. `.env`에서 `copley_drive_sim` 선택, FMU 폴더 마운트 및 지원 파라미터 저장을 제공한다. 혼합 물리 PP·저장·Fault/Reset 및 RF-018 IPC 장애 격리를 확인했다. 세부 물리 이동·파라미터 효과와 정량 성능 근거는 RF-017에 남는다.
+
+폴더 역할과 생성물 보관 정책: [ADR-010](Doc/Design/ADR-010-project-layout.md).

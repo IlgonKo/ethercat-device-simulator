@@ -1,0 +1,7 @@
+{
+  "repository": "https://github.com/Beckhoff-USA-Community/AAG_TwinCAT_CiA402_CANopen_CPP_FMU_MATLAB",
+  "revision": "68978af04ea475cf89e39ae872cdccb5ddc95e4c",
+  "source_url": "https://raw.githubusercontent.com/Beckhoff-USA-Community/AAG_TwinCAT_CiA402_CANopen_CPP_FMU_MATLAB/68978af04ea475cf89e39ae872cdccb5ddc95e4c/MATLAB_and_Simulink/FMU_DriveSim/CopleyDriveSim.fmu",
+  "source_sha256": "e6456f4787b61b209f0e718c62ee3d570560ce975b7aacf733da6d4f21994b4d",
+  "format": "FMI 3.0 source FMU containing generated C sources"
+}

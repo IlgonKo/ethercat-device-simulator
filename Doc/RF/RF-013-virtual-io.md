@@ -52,7 +52,7 @@ IO-Link는 1차 구현 범위에서 제외한다. 기본 검증 구성은 슬롯
 - 선택 산출물: Playground Export, FMI 3.0 Co-Simulation, solver `auto`, Linux x86-64.
 - 보관: `model_artifacts/SoftESCDoubleActingCylinder-fmi3-web.fmu`. 파일 해시·환경·결과는
   [Linux 검증 보고서](../Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)에 기록했다.
-- 출처·고정 커밋·Modelica 소스·Export 방법: [모델 README](../../model_sources/pneumatic_cylinder/README.md).
+- 출처·고정 커밋·Modelica 소스·Export 방법: [모델 README](../../model_sources/pneumatic_cylinder/double_acting/README.md).
 - Linux에서 100mm 왕복(8ms/1ms), 50mm 변경, 무공압, 명시적 이벤트 처리의 5개 시험을 통과했다.
   현재 사용 가능한 것은 동작 모델의 오프라인 실행이며 Soft ESC에 IO 모델로 등록된 상태는 아니다.
 

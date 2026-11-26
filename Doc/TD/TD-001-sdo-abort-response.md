@@ -97,7 +97,7 @@ Mailbox 헤더를 제외한 데이터이다. 보정한다면 검증된 Abort의 
 - 미지원 SDO는 Python 서비스에서 구조화된 error 응답을 반환한다. C++ gateway는 0x80/CoE service 2/length 10의 Abort로 변환하고 다음 요청을 계속 처리한다.
 - KickCAT이 처리하는 기타 OD의 Abort도 명령 바이트 전체를 0x80으로 정규화한다.
 - 실제 Copley FMU + Python IPC + C++ mailbox 시험에서 restart=0 성공, restart=1/미지원 mode/RO 쓰기/없는 객체·subindex/잘못된 길이 Abort, 실패 후 OD 값 보존, 정상 SDO 읽기 및 PDO Operation Enabled 도달을 검증했다.
-- 실행: `PYTHONPATH=src:. build/fmi-venv/bin/python scripts/linux/validate-sdo.py --binary build/timing/test_sdo_gateway` (Copley가 포함된 .env 필요, 임시 저장소 사용, NIC 미사용).
+- 실행: `PYTHONPATH=src:. build/fmi-venv/bin/python scripts/validation/validate-sdo.py --binary build/timing/test_sdo_gateway` (Copley가 포함된 .env 필요, 임시 저장소 사용, NIC 미사용).
 - 물리 PySOEM의 SdoError 수신과 캡처는 아직 재검증하지 않았다. native FMU crash/hang·IPC timeout 시 Slave 유지 정책은 별도 작업이다.
 
 ### 2026-10-27 — 메일박스 응답 길이 후속 수정

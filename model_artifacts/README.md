@@ -7,7 +7,7 @@ read-only at `/model_artifacts`. FMU binaries are not committed.
 Build on Linux x86_64:
 
 ```bash
-build/fmi-venv/bin/python scripts/linux/build-copley-fmu.py \
+build/fmi-venv/bin/python scripts/models/build-copley-fmu.py \
   --output model_artifacts/CopleyDriveSim-linux.fmu
 ```
 
@@ -21,7 +21,7 @@ five offline cases on 2026-11-25. It is not registered as an operational Soft ES
 
 - SHA256: `34b14a7967042fe3abaabab4de6086e8a29324faeb3a2ab29f569c590e2cac42`.
 - Preserve the complete FMU archive, including its resources and companion binary files.
-- [Source / export instructions](../model_sources/pneumatic_cylinder/README.md).
+- [Source / export instructions](../model_sources/pneumatic_cylinder/double_acting/README.md).
 - [Linux validation](../Doc/Validation/Pneumatic-Cylinder-Web-FMU-20261125.md).
 - FMU binaries remain outside Git; source, upstream pin, scripts and validation hashes are tracked.
   A newly exported artifact must be validated again.

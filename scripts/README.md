@@ -22,10 +22,10 @@ start는 NIC를 실제로 연다. Motion Server를 정지하고 기존 native Si
 | --- | --- |
 | linux/build-kickcat.sh | 직접 native 개발·디버깅용 C++ 의존성/toolchain 준비 |
 | linux/build-cmmt.sh | 직접 native 개발·디버깅용 cmmt_simulator 빌드 |
-| linux/validate-fleet.py | 물리 NIC 없는 C++/Python 계약 검사; 모델/바이너리 변경 검증 |
-| linux/benchmark-role-index.py | 기존 모델 OD 조회 성능 회귀 검사 |
-| linux/summarize-timing.py | Docker 로그의 C++ 계측 분석 |
-| linux/summarize-python-timing.py | Docker 로그의 Python 계측 분석 |
+| validation/validate-fleet.py | 물리 NIC 없는 C++/Python 계약 검사; 모델/바이너리 변경 검증 |
+| validation/benchmark-role-index.py | 기존 모델 OD 조회 성능 회귀 검사 |
+| validation/summarize-timing.py | Docker 로그의 C++ 계측 분석 |
+| validation/summarize-python-timing.py | Docker 로그의 Python 계측 분석 |
 | windows/sdo_checks.py | 테스트가 사용하는 SDO 복원 검사 라이브러리. Docker 실행 스크립트는 아님 |
 
 Docker는 이제 Builder에서 C++ 의존성·KickCAT·Simulator·Linux Copley FMU를 소스로 빌드한다. 호스트 native 실행 파일은 사용하지 않는다. `start.sh --build`도 전체 소스 빌드이며 고정 이미지·입력을 먼저 준비한다. 자세한 준비 방법은 [배포 매뉴얼](deployment/README.md)을 따른다. Python 기능 모델은 저장소 내부 src/functional_model에서 포함한다.
@@ -45,7 +45,7 @@ Docker는 이제 Builder에서 C++ 의존성·KickCAT·Simulator·Linux Copley F
 python3 -m pip install -e .
 python3 -m unittest discover -s tests
 bash scripts/linux/build-cmmt.sh
-python3 scripts/linux/validate-fleet.py --binary build/timing/cmmt_simulator
+python3 scripts/validation/validate-fleet.py --binary build/timing/cmmt_simulator
 ```
 
 개발 검증에 --model-root는 사용하지 않는다. windows/export-model-source.py는 자체 모델 이관 후 삭제했다. tests/unit/test_sdo_restore.py는 Windows용 pysoem 의존성이 없는 환경에서는 건너뛴다.
@@ -56,11 +56,11 @@ python3 scripts/linux/validate-fleet.py --binary build/timing/cmmt_simulator
 
 ## 공압 실린더 FMU 오프라인 개발·검증
 
-- `windows/build-pneumatic-fmu.py`: 고정 공개 소스에서 Windows FMI 2.0 FMU 빌드.
+- `models/build-pneumatic-fmu.py`: 고정 공개 소스에서 Windows FMI 2.0 FMU 빌드.
   `--browser-only`는 Windows/Linux 모두에서 컴파일러 없이 Playground 단일 소스 2개를 생성한다.
-- `windows/test-pneumatic-fmu.py`: Windows FMI 2.0 왕복·파라미터·무공압 검증.
-- `linux/test-pneumatic-fmi3.py`: Playground에서 내보낸 FMI 3.0 파일의 Linux 왕복·파라미터·
+- `validation/test-pneumatic-fmi2.py`: Windows FMI 2.0 왕복·파라미터·무공압 검증.
+- `validation/test-pneumatic-fmi3.py`: Playground에서 내보낸 FMI 3.0 파일의 Linux 왕복·파라미터·
   무공압·Event Mode 검증. NIC와 운영 Docker를 사용하지 않는다.
 
 선택한 IO 연결용 산출물은 FMI 3.0 Linux FMU이며, 운영 모델 등록/IO 연결은 아직 없다.
-자세한 사용법은 [모델 README](../model_sources/pneumatic_cylinder/README.md)를 따른다.
+자세한 사용법은 [모델 README](../model_sources/pneumatic_cylinder/double_acting/README.md)를 따른다.

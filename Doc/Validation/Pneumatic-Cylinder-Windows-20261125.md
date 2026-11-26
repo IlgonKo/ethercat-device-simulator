@@ -91,7 +91,7 @@ Set-Location C:\Users\Festo\Documents\ethercat-device-simulator
 python scripts/windows/test-pneumatic-fmu.py
 ```
 
-재빌드·Playground 사용 방법은 [모델 README](../../model_sources/pneumatic_cylinder/README.md)에 기록했다.
+재빌드·Playground 사용 방법은 [모델 README](../../model_sources/pneumatic_cylinder/double_acting/README.md)에 기록했다.
 기존 Windows 체크아웃의 미커밋 문서 변경과 Linux 실행 환경은 수정하지 않았다.
 
 ## 근거

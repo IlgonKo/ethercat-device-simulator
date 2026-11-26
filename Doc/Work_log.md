@@ -888,3 +888,13 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - Windows에서 준비한 Modelica 소스·고정 원본 정보·Windows 빌드/시험 코드·검증 보고서를 Linux 기준 저장소에 반영했다. --browser-only로 Linux에서도 컴파일러 없이 웹용 단일 소스를 재생성할 수 있다.
 - FMU 바이너리는 기존 정책대로 model_artifacts에 보관하고 Git에는 소스·재현 절차·해시·검증 결과를 기록한다. 런타임 코드·운영 .env·컨테이너는 변경하지 않았다.
 - 남은 일: 실제 FMU 모델 등록/설정·IO 어댑터·DO/DI 연결, AI/AO 계약, 상충 입력·Host/버스 장애·복구와 혼합 물리 통신 검증. RF-013은 진행 중으로 유지한다.
+
+## 2026-11-26 — 폴더 역할 확정과 재구조화
+
+- ADR-010에 실행 코드·모델 원본·FMU·시험 결과·캐시·영구 상태의 역할과 Git/정리 기준을 기록했다.
+- motor_controller/copley, pneumatic_cylinder/double_acting으로 원본을 분류하고 모델 빌드와 검증 스크립트를 역할별로 이동했다.
+- Copley 빌드 원본 정보는 upstream.json으로 분리하고 Docker COPY/빌드 경로 및 활성 문서 참조를 갱신했다.
+- 과거 시험 보고서의 경로는 실행 당시 이력으로 보존한다. 최신 명령은 scripts/README와 ADR-010을 따른다.
+- Windows 과거 체크아웃은 외부 보관하고 Linux 기준으로 재구성한다. 운영 컨테이너·.env·state는 변경하지 않는다.
+
+- 재구조화 검증 완료: [결과](Validation/Project-Layout-20261126.md). Docker/CTest 6개·Python 57개(1 skip)·Copley 8개·실린더 Linux 5개/Windows 4개 통과. 운영 서비스는 유지했다.

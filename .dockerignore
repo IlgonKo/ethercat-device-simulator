@@ -17,3 +17,6 @@
 **/.git
 **/__pycache__
 **/*.pyc
+
+!model_sources/
+!model_sources/**
