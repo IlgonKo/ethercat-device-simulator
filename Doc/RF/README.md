@@ -19,13 +19,14 @@
 | [RF-012](RF-012-docker-deployment.md) | Simulator Docker 패키징 및 실행 검증 | **진행 중** |
 | [RF-013](RF-013-virtual-io.md) | Modular Device Profile 기반 Remote I/O·모델 연결 | **완료** |
 | [RF-014](RF-014-dynamic-pdo-mapping.md) | 동적 PDO 매핑 지원 | **완료** |
-| [RF-015](RF-015-axis-model-semantics.md) | 직선축 동작·위치 제한 검증 | **진행 중** |
+| [RF-015](RF-015-axis-model-semantics.md) | 축 동작 모델의 운전 정책 및 호환성 검증 | **진행 중** |
 | [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **완료** |
 | [RF-017](RF-017-copley-fmu.md) | Copley FMU 초기 연동 | **완료** |
 | [RF-018](RF-018-diagnostic-fault.md) | 공통 Diagnostic 및 모델 장애 격리 | **완료** |
 | [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **예정** |
 | [RF-020](RF-020-parameter-history.md) | 파라미터 revision 및 변경 이력 관리 | **예정** |
 | [RF-021](RF-021-pneumatic-cylinder-fmu-improvements.md) | 공압 실린더 FMU 개선·정격 유량 설정 노출 | **예정** |
+| [RF-022](RF-022-f-kr-cmmt-fmu.md) | F-KR CMMT 동작 모델 FMU 전환 | **예정** |
 
 ## 외부 연동 구상 — Soft ESC 범위 외 참고 이력
 
@@ -40,10 +41,11 @@
 
 ## 2026-11-26 제품 범위 요약
 
-총 22개 요구 항목 중 **제품 범위 18개: 완료 13 / 진행 중 2 / 예정 3**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
+총 23개 요구 항목 중 **제품 범위 19개: 완료 13 / 진행 중 2 / 예정 4**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
 
 - RF-013: CPX-AP-I DI/DO/AI/AO·실제 FMU 연결·혼합 운전·Host 장애/복구·재구성/재검색 합의 범위 완료. 아날로그 수동/물리 FMU 왕복은 사용자 결정으로 생략. IO-Link·진단 PDO/이력/Emergency·외부 DT 연동은 제외.
-- RF-015: 기존 직선축 지원 대조·회귀. 3축은 Demo 요구에서 가져온 시험 구성.
+- RF-015: 운전 정책·코드 대조·합격 기준 정리 완료. F-KR 수정·회귀는 구현 단계이며 RF-022 FMU 전환과 별도로 관리. 3축은 시험 구성.
+- RF-022: 드라이브 운전 로직을 포함한 F-KR CMMT FMU 전환. RF-015와 계약·검증을 연결하되 두 RF의 완료를 서로 선행 조건으로 삼지 않음.
 - RF-012: 새 Linux PC와 축+IO 독립 배포·복원·통신 확인. Edge #2는 배포 사례.
 - RF-019/020: 후속 제품 기능. 이번 IO 지원의 필수 조건으로 확대하지 않음.
 - RF-021: 정격 유량의 FMU 외부 설정 지원. RF-013은 기존 FMU로 계속 진행하며 개선 완료를 기다리지 않음.

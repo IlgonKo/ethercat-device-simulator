@@ -96,7 +96,7 @@ CiA402 Drive와 Modular Remote I/O는 장치 프로파일 영역으로 구분합
 
 장치 구성은 루트 `.env`에서 설정하며 [.env.example](.env.example)을 참고합니다. 개발용 검증 도구도 기본적으로 루트 `.env`를 읽습니다. 별도 파일은 `--env-file`로 지정할 수 있습니다. `config/` 예제 폴더는 제거했습니다.
 
-[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#정지-후-재구성-절차)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 직선축 요구 대조·회귀를 관리하며 회전 확장은 보류합니다.
+[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#정지-후-재구성-절차)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 축 동작 모델의 운전 정책·Motion Server 호환성·회귀를 관리하며, 이번 검증 대상은 직선축이고 회전 확장은 보류합니다.
 
 ## 2026-09-22 성능 계측 결과와 다음 작업
 
