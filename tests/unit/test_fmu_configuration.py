@@ -15,6 +15,8 @@ class FmuConfigurationTests(unittest.TestCase):
             config = load_environment(env, folder)
             self.assertEqual(config['devices'][0]['model']['artifact'],
                              str(Path(folder) / 'artifacts with spaces/CopleyDriveSim-linux.fmu'))
-            self.assertEqual(config['devices'][1]['model'], dict(type='f_kr_cmmt', mode='linear'))
+            self.assertEqual(config['devices'][1]['model'], dict(type='f_kr_cmmt', mode='linear', artifact=str(Path(folder) / 'artifacts with spaces/FKrCmmtLinear-linux.fmu')))
+            self.assertEqual(config['devices'][3]['model']['artifact'],
+                             str(Path(folder) / 'artifacts with spaces/FKrCmmtRotary-linux.fmu'))
         env['DEVICE_SIMULATOR_FMU_DIR'] = ''
         with self.assertRaises(ValueError): load_environment(env)

@@ -1,7 +1,7 @@
 """RF-015 contracts exercised without a NIC, wall-clock sleeps or stored state."""
 import unittest
 
-from functional_model.runtime.axis import Model
+from tests.reference.factory import reference_model as Model
 from functional_model.ipc.server import dispatch_request
 
 
@@ -304,7 +304,7 @@ class AxisSemanticsTests(unittest.TestCase):
         self.assertIn("605a:00",d.runtime.parameter_values())
 
     def test_reset_preserves_completed_reference_and_cancels_old_motion(self):
-        from functional_model.cia402_drive.behaviour_model.f_kr_cmmt.state_machine import CiA402State
+        from tests.reference.state_machine import CiA402State
         d=self.drive();d.start();d.tick(count=5)
         d.model.sm.state=CiA402State.FAULT
         d.tick();position=d.model.actual_position
@@ -314,7 +314,7 @@ class AxisSemanticsTests(unittest.TestCase):
         self.assertFalse(d.model.pp_active)
 
     def test_fault_cancels_homing_without_late_completion(self):
-        from functional_model.cia402_drive.behaviour_model.f_kr_cmmt.state_machine import CiA402State
+        from tests.reference.state_machine import CiA402State
         d=self.drive(6,referenced=False);d.tick(0x1f)
         d.model.sm.state=CiA402State.FAULT;d.tick(count=20)
         self.assertFalse(d.model.homing_referenced)

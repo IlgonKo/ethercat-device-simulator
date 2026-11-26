@@ -17,6 +17,7 @@ def status(response):
 class FaultRuntimeTests(unittest.TestCase):
     def setUp(self):
         self.model = Model()
+        self.addCleanup(self.model.close)
         self.tick = 10
 
     def cycle(self, cw, **kwargs):
@@ -25,7 +26,9 @@ class FaultRuntimeTests(unittest.TestCase):
             return self.model.dispatch(pdo(cw, **kwargs))
 
     def test_adapter_fault_requires_correction_reset_and_new_enable(self):
-        self.model.adapter.model.homing_referenced = True
+        for cw in (6,7,15): self.cycle(cw, mode=6)
+        for _ in range(13): self.cycle(0x1f, mode=6)
+        self.cycle(15)
         for cw in (6, 7, 15): self.cycle(cw)
         r = self.cycle(0x3f, mode=99)
         self.assertEqual(status(r) & 0x6f, 8)
@@ -60,6 +63,7 @@ class FaultRuntimeTests(unittest.TestCase):
     def test_other_axis_remains_independent(self):
         other = Model(dict(slave_index=1, id='axis-1', type='cia402-drive',
                            model=dict(type='f_kr_cmmt', mode='linear')))
+        self.addCleanup(other.close)
         self.cycle(15, mode=99)
         with patch('functional_model.runtime.axis.time.monotonic', return_value=10):
             r = other.dispatch(pdo(6))

@@ -16,4 +16,4 @@ def create_adapter(device):
         from .copley import CopleyAdapter
         return validate_adapter(CopleyAdapter.open(profile, device['model']['artifact'], device['id'], od=od))
     if key not in FACTORIES: raise ValueError(f'Unsupported profile/model combination: {key}')
-    return validate_adapter(FACTORIES[key](profile, od=od))
+    return validate_adapter(FACTORIES[key](profile, od=od, artifact=device['model'].get('artifact'), instance_name=device['id']))

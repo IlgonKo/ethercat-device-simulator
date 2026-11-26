@@ -73,10 +73,10 @@ def validate_config(data, base_directory):
         model = device['model']
         if not isinstance(model, dict): raise ValueError(f'{loc}.model: object required')
         kind = model.get('type')
-        fields(model, ('type', 'mode', 'artifact') if kind == 'copley_drive_sim' else ('type', 'mode'), f'{loc}.model')
+        fields(model, ('type', 'mode', 'artifact') if kind == 'copley_drive_sim' or 'artifact' in model else ('type', 'mode'), f'{loc}.model')
         if kind not in ('f_kr_cmmt', 'copley_drive_sim') or model['mode'] not in ('linear', 'rotary'):
             raise ValueError(f'{loc}.model: expected f_kr_cmmt/copley_drive_sim with linear or rotary mode')
-        if kind == 'copley_drive_sim':
+        if 'artifact' in model:
             if not isinstance(model['artifact'], str) or not model['artifact'].strip():
                 raise ValueError(f'{loc}.model.artifact: path required')
             model['artifact'] = str((Path(base_directory) / model['artifact']).resolve())
@@ -172,10 +172,11 @@ def load_environment(env, base_directory=None):
     if unused:
         raise ValueError(f'Unknown axis settings: {sorted(unused)}')
     for device in devices:
-        if device['type']=='cia402-drive' and device['model']['type'] == 'copley_drive_sim':
+        if device['type']=='cia402-drive' and device['model']['type'] in ('copley_drive_sim', 'f_kr_cmmt'):
             folder = env.get('DEVICE_SIMULATOR_FMU_DIR', './model_artifacts').strip()
             if not folder: raise ValueError('DEVICE_SIMULATOR_FMU_DIR: nonempty path required')
-            device['model']['artifact'] = str(Path(folder) / 'CopleyDriveSim-linux.fmu')
+            filename = 'CopleyDriveSim-linux.fmu' if device['model']['type'] == 'copley_drive_sim' else 'FKrCmmt' + device['model']['mode'].title() + '-linux.fmu'
+            device['model']['artifact'] = str(Path(folder) / filename)
     state = required('DEVICE_SIMULATOR_STATE_DIR')
     data = dict(schema_version=1, ethercat=dict(interface=required('KICKCAT_INTERFACE')),
                 storage=dict(directory=str(Path(state))), devices=devices)

@@ -21,6 +21,7 @@ class AdapterContractTests(unittest.TestCase):
 
     def test_unsupported_mode_never_mutates_od(self):
         model = Model()
+        self.addCleanup(model.close)
         adapter = model.adapter
         before = adapter.read_sdo(0x6060, 0, 1)
         with self.assertRaises(DeviceRejectedException): adapter.write_sdo(0x6060, 0, b'\x04')
@@ -32,9 +33,11 @@ class AdapterContractTests(unittest.TestCase):
 
     def test_shared_definition_has_independent_state(self):
         first, second = Model(), Model()
+        self.addCleanup(first.close); self.addCleanup(second.close)
         self.assertEqual(first.profile.name, 'cia402-drive')
         self.assertIsNot(first.adapter.od, second.adapter.od)
         self.assertEqual(first.adapter.capabilities.state_machine_owner, 'model')
-        self.assertIs(first.adapter.model.od, first.adapter.od)
+        self.assertFalse(hasattr(first.adapter, "model"))
+        self.assertIs(first.adapter.bridge.od_model, first.adapter.od)
         first.adapter.write_sdo(0x6081, 0, (99).to_bytes(4,'little'))
         self.assertNotEqual(first.adapter.read_sdo(0x6081,0,4), second.adapter.read_sdo(0x6081,0,4))

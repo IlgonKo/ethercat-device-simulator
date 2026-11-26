@@ -22,6 +22,7 @@
 | …/diagnostics/ | 기능 모델 진단·Fault 처리 | 포함 |
 | device_descriptions/ | 제품별 Identity·ESI·확장 OD·모듈 설명. cmmt_as 유지, cpx_ap_i_ec는 구현 시 추가 | 포함 |
 | model_sources/ | 장치 종류 → 모델 종류별 원본·출처·재현 정보 | 포함 |
+| model_sources/motor_controller/f_kr_cmmt/ | F-KR CMMT 공통 C++ 코어·FMI 3.0 연결 소스·계약, 직선/회전 FMU 생성 입력 | 포함 |
 | model_sources/motor_controller/copley/ | C 소스 포함 원본 FMU의 URL·커밋·체크섬·설명 | 포함 |
 | model_sources/pneumatic_cylinder/double_acting/ | 실린더 Modelica 소스·자동 왕복 데모·원본 정보 | 포함 |
 | model_presets/ | 모델 종류·특성을 담는 재사용 JSON. 운전 조건·초기 조건은 .env IO_MODEL_INSTANCES로 분리 | 포함 |
@@ -79,3 +80,5 @@
 경로 참조 검사, Python 단위 회귀, C++ 회귀, 실린더 FMI3 오프라인 5개 시험,
 Copley 소스 빌드와 FMU 회귀, Docker 이미지 빌드를 수행한다. NIC 물리 시험이나
 운영 컨테이너 교체는 이 구조 변경 작업에 포함하지 않는다.
+
+RF-022의 Python 비교 기준은 tests/reference에 보존한다. 제품 F-KR 어댑터는 FMI만 호출하고 C++ 코어를 model_sources에서 빌드한다. 기존 behaviour_model의 Python 파일은 제품 계산 fallback으로 사용하지 않는다.

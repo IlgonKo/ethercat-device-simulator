@@ -1,0 +1,21 @@
+{
+  "reference_commit": "88d7f40a30fb0733d14f674c9be10847b2f18bf9",
+  "raw_tolerance": 1,
+  "status_and_mode": "exact_each_tick",
+  "results": {
+    "linear": {
+      "compared_ticks": 3300,
+      "max_raw_error": 0,
+      "max_encoded_error": 0,
+      "max_position_si_error": 0,
+      "max_velocity_si_error": 0
+    },
+    "rotary": {
+      "compared_ticks": 3146,
+      "max_raw_error": 3.2741809263825417e-10,
+      "max_encoded_error": 0,
+      "max_position_si_error": 9.325873406851315e-15,
+      "max_velocity_si_error": 2.7755575615628914e-17
+    }
+  }
+}

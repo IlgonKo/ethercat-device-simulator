@@ -23,12 +23,11 @@ class UnitBoundaryTests(unittest.TestCase):
             (0x6085,0,2000,2),(0x2183,12,-.2,-.2)):
             a.od.write(index,raw,sub)
             self.assertAlmostEqual(a.units.read(index,sub),physical)
-        a.model.actual_position=.012345
-        a.model.actual_velocity=-.123
-        a.model._write_actual_feedback()
+        a.units.write(0x6064, .012345)
+        a.units.write(0x606C, -.123)
         self.assertEqual(int.from_bytes(a.read_sdo(0x6064,0,4),'little',signed=True),12345)
         self.assertEqual(int.from_bytes(a.read_sdo(0x606C,0,4),'little',signed=True),-123)
-        self.assertIs(a.od,a.model.od)
+        self.assertIs(a.od,a.bridge.od_model)
 
     def test_round_trip_preserves_raw_quantization_and_control_bits(self):
         a=self.model().adapter
@@ -53,8 +52,8 @@ class UnitBoundaryTests(unittest.TestCase):
                 a.od.write(0x60FF,100);a.step(.008)
                 expected_v=a.units.scales[0x6083,0]*1000*.008
                 expected_x=expected_v*.008
-                self.assertAlmostEqual(a.model.actual_velocity,expected_v)
-                self.assertAlmostEqual(a.model.actual_position,expected_x)
+                self.assertAlmostEqual(a.runner.get('actual_velocity'),expected_v*a.angular_scale)
+                self.assertAlmostEqual(a.runner.get('actual_position'),expected_x*a.angular_scale)
                 self.assertAlmostEqual(a.od.read(0x6064),expected_x/a.units.scales[0x6064,0])
 
 

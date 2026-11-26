@@ -28,7 +28,7 @@ def main():
         for key, values in [('NAMES',[f'axis-{i}' for i in range(args.axes)]), ('MODELS',models),
                             ('MODES',['linear']*args.axes)]:
             settings['DEVICE_SIMULATOR_AXIS_'+key]=','.join(f'{i}:{v}' for i,v in enumerate(values))
-        if args.fmu_dir: settings['DEVICE_SIMULATOR_FMU_DIR']=str(Path(args.fmu_dir).resolve())
+        settings['DEVICE_SIMULATOR_FMU_DIR']=str(Path(args.fmu_dir).resolve() if args.fmu_dir else ROOT/'model_artifacts')
         envfile=root/'test.env'
         envfile.write_text('\n'.join(f'{k}={v}' for k,v in settings.items()))
         for attempt in range(2):

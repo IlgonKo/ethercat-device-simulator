@@ -1,0 +1,311 @@
+{
+  "image": "sha256:503af1972240d73eddcd0879bedbbed347c9e8be80dcbe6c8be3e505fb9ceede",
+  "cycle_s": 0.004,
+  "linear_samples": 192,
+  "four_axis_samples": 410,
+  "mixed_samples": 235,
+  "mixed_motion_seconds": 12.10381089989096,
+  "host_fault_samples": 457,
+  "host_fault_observation_seconds": 7.412629842758179,
+  "wkc_mismatches": 0,
+  "restore": {
+    "env_unchanged": true,
+    "parameters_byte_identical": {
+      "virtual-axis-1.json": true,
+      "virtual-axis-0.json": true,
+      "virtual-axis-2.json": true,
+      "virtual-axis-3.json": true
+    },
+    "mapping": {
+      "7669727475616c2d617869732d32.json": {
+        "layout_identity_unchanged": true,
+        "revision_before": 24,
+        "revision_after": 26
+      },
+      "7669727475616c2d617869732d33.json": {
+        "layout_identity_unchanged": true,
+        "revision_before": 24,
+        "revision_after": 26
+      },
+      "7669727475616c2d617869732d31.json": {
+        "layout_identity_unchanged": true,
+        "revision_before": 24,
+        "revision_after": 26
+      },
+      "7669727475616c2d617869732d30.json": {
+        "layout_identity_unchanged": true,
+        "revision_before": 24,
+        "revision_after": 26
+      }
+    }
+  },
+  "timing": {
+    "baseline-idle": {
+      "windows": 51,
+      "metrics": {
+        "frame_busy": {
+          "count": 6504,
+          "max_ms": 0.27999,
+          "avg_ms": 0.08778260009225093
+        },
+        "ipc_async_axis_0": {
+          "count": 6503,
+          "max_ms": 1.405385,
+          "avg_ms": 1.1148939887744116
+        },
+        "rx_gap": {
+          "count": 6504,
+          "max_ms": 6.026504,
+          "avg_ms": 3.99993807902829
+        },
+        "rx_to_reply": {
+          "count": 6504,
+          "max_ms": 0.182429,
+          "avg_ms": 0.019304707872078723
+        },
+        "axis_3_model": {
+          "count": 6254,
+          "max_ms": 0.237961,
+          "avg_ms": 0.07913276207227375
+        },
+        "exchange_request": {
+          "count": 25013,
+          "max_ms": 0.608978,
+          "avg_ms": 0.16894195582297206
+        },
+        "axis_0_model": {
+          "count": 6253,
+          "max_ms": 0.054746,
+          "avg_ms": 0.01490307964177195
+        },
+        "axis_1_model": {
+          "count": 6253,
+          "max_ms": 0.038023,
+          "avg_ms": 0.01262275355829202
+        },
+        "axis_2_model": {
+          "count": 6253,
+          "max_ms": 0.30073,
+          "avg_ms": 0.08585643147289301
+        },
+        "pdo_frame_busy": {
+          "count": 6504,
+          "max_ms": 0.27999,
+          "avg_ms": 0.08778260009225093
+        },
+        "pdo_post_reply": {
+          "count": 6504,
+          "max_ms": 0.167412,
+          "avg_ms": 0.06847789222017221
+        }
+      },
+      "ipc_failures_max": 0
+    },
+    "new-idle": {
+      "windows": 36,
+      "metrics": {
+        "frame_busy": {
+          "count": 4503,
+          "max_ms": 0.236061,
+          "avg_ms": 0.08906891983122363
+        },
+        "ipc_async_axis_0": {
+          "count": 4503,
+          "max_ms": 1.284502,
+          "avg_ms": 1.1133494019542525
+        },
+        "rx_gap": {
+          "count": 4503,
+          "max_ms": 6.400527,
+          "avg_ms": 3.999894915833889
+        },
+        "rx_to_reply": {
+          "count": 4503,
+          "max_ms": 0.121162,
+          "avg_ms": 0.020164111037086388
+        },
+        "axis_1_model": {
+          "count": 4503,
+          "max_ms": 0.279532,
+          "avg_ms": 0.10392680590717301
+        },
+        "exchange_request": {
+          "count": 18010,
+          "max_ms": 3.478241,
+          "avg_ms": 0.21434875169350356
+        },
+        "axis_2_model": {
+          "count": 4503,
+          "max_ms": 0.215333,
+          "avg_ms": 0.07836066400177662
+        },
+        "axis_3_model": {
+          "count": 4502,
+          "max_ms": 1.23533,
+          "avg_ms": 0.07706919302532209
+        },
+        "axis_0_model": {
+          "count": 4502,
+          "max_ms": 0.315283,
+          "avg_ms": 0.11268298556197248
+        },
+        "pdo_frame_busy": {
+          "count": 4503,
+          "max_ms": 0.236061,
+          "avg_ms": 0.08906891983122363
+        },
+        "pdo_post_reply": {
+          "count": 4503,
+          "max_ms": 0.185025,
+          "avg_ms": 0.06890480879413724
+        }
+      },
+      "ipc_failures_max": 0
+    },
+    "mixed-operating": {
+      "windows": 71,
+      "metrics": {
+        "frame_busy": {
+          "count": 9158,
+          "max_ms": 0.246342,
+          "avg_ms": 0.08765386503603406
+        },
+        "ipc_async_axis_0": {
+          "count": 8940,
+          "max_ms": 2.15722,
+          "avg_ms": 1.11180965279642
+        },
+        "rx_gap": {
+          "count": 9158,
+          "max_ms": 6.459298,
+          "avg_ms": 3.933421603406859
+        },
+        "rx_to_reply": {
+          "count": 9158,
+          "max_ms": 0.130914,
+          "avg_ms": 0.020078875846254635
+        },
+        "axis_3_model": {
+          "count": 8680,
+          "max_ms": 1.23533,
+          "avg_ms": 0.07760547926267285
+        },
+        "exchange_request": {
+          "count": 34790,
+          "max_ms": 3.478241,
+          "avg_ms": 0.21622210589249788
+        },
+        "axis_0_model": {
+          "count": 8707,
+          "max_ms": 0.332452,
+          "avg_ms": 0.11376732502584128
+        },
+        "axis_1_model": {
+          "count": 8705,
+          "max_ms": 0.336667,
+          "avg_ms": 0.10530400539919585
+        },
+        "axis_2_model": {
+          "count": 8698,
+          "max_ms": 0.216351,
+          "avg_ms": 0.07902586790066686
+        },
+        "pdo_frame_busy": {
+          "count": 8942,
+          "max_ms": 0.246342,
+          "avg_ms": 0.08940279221650636
+        },
+        "pdo_post_reply": {
+          "count": 8942,
+          "max_ms": 0.185025,
+          "avg_ms": 0.06912185282934467
+        }
+      },
+      "ipc_failures_max": 0
+    },
+    "four-fkr-operating": {
+      "windows": 56,
+      "metrics": {
+        "frame_busy": {
+          "count": 9935,
+          "max_ms": 15.271554,
+          "avg_ms": 0.05338712299949672
+        },
+        "ipc_async_axis_0": {
+          "count": 5192,
+          "max_ms": 4.151541,
+          "avg_ms": 1.1083336683359013
+        },
+        "rx_gap": {
+          "count": 9934,
+          "max_ms": 15.346065,
+          "avg_ms": 2.2636283409502713
+        },
+        "rx_to_reply": {
+          "count": 9935,
+          "max_ms": 0.130632,
+          "avg_ms": 0.014956474786109708
+        },
+        "exchange_request": {
+          "count": 20735,
+          "max_ms": 0.588336,
+          "avg_ms": 0.22927237299252468
+        },
+        "axis_0_model": {
+          "count": 5204,
+          "max_ms": 0.394737,
+          "avg_ms": 0.11574693005380478
+        },
+        "axis_1_model": {
+          "count": 5200,
+          "max_ms": 0.363958,
+          "avg_ms": 0.10721986384615384
+        },
+        "axis_2_model": {
+          "count": 5185,
+          "max_ms": 0.449737,
+          "avg_ms": 0.10559373346190935
+        },
+        "axis_3_model": {
+          "count": 5142,
+          "max_ms": 0.440608,
+          "avg_ms": 0.10587771489692728
+        },
+        "pdo_frame_busy": {
+          "count": 5193,
+          "max_ms": 0.264876,
+          "avg_ms": 0.0892036433660697
+        },
+        "pdo_post_reply": {
+          "count": 5193,
+          "max_ms": 0.163226,
+          "avg_ms": 0.06872109243212014
+        }
+      },
+      "ipc_failures_max": 0
+    }
+  },
+  "final": {
+    "wkc": 24,
+    "velocities": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ],
+    "statuswords": [
+      33331,
+      32803,
+      32803,
+      33331,
+      33331
+    ],
+    "authority": {
+      "owner": null,
+      "owned_by_this_client": false,
+      "available": true
+    },
+    "real_position": 147.83999999999997
+  }
+}

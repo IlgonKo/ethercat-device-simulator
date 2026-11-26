@@ -13,7 +13,7 @@ Soft ESC는 **FMU 또는 다른 형식의 동작 모델을 EtherCAT 장치 프�
 | 독립 .env·영구 파라미터·동적 PDO 저장·축 Fault/Host 장애 격리 | 기존 축 범위 검증 완료 |
 | Modular Device Profile 기반 Remote I/O | CPX-AP-I 고정 PDO·최소 SDO·DI/DO/AI/AO 및 재구성/재검색 합의 범위 완료 |
 | IO 어댑터·동작 모델 | 복동 실린더·아날로그 지연 FMI3 연결 및 혼합 운전·Host 장애 복구 완료. 아날로그 수동/물리 전체 왕복은 생략, IO-Link 제외 |
-| Linux Docker | 기존 축 배포·비교 검증 완료. 새 PC·축+IO 배포 검증 잔여 |
+| Linux Docker | 현재 벤치 축+IO·FMU·복구 검증 완료. 새 PC/OS 및 Demo 최종 구성 배포 확인 잔여 |
 
 실린더 모델의 출처·소스·Export·재검증 절차는 [모델 README](model_sources/pneumatic_cylinder/double_acting/README.md), 결과는 [Linux FMU 검증 보고서](Doc/Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)를 참조합니다.
 
@@ -96,7 +96,7 @@ CiA402 Drive와 Modular Remote I/O는 장치 프로파일 영역으로 구분합
 
 장치 구성은 루트 `.env`에서 설정하며 [.env.example](.env.example)을 참고합니다. 개발용 검증 도구도 기본적으로 루트 `.env`를 읽습니다. 별도 파일은 `--env-file`로 지정할 수 있습니다. `config/` 예제 폴더는 제거했습니다.
 
-[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#정지-후-재구성-절차)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. 현재 자체 모델은 `src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt`에 포함되어 있습니다. [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 축 동작 모델의 운전 정책·Motion Server 호환성·회귀를 관리하며, 이번 검증 대상은 직선축이고 회전 확장은 보류합니다.
+[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#정지-후-재구성-절차)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. RF-022부터 `f_kr_cmmt`는 `model_sources/motor_controller/f_kr_cmmt`의 C++ 코어로 빌드한 직선/회전 FMU를 호출합니다. Python 기준은 `tests/reference`에 보존합니다. [전환 검증](Doc/Validation/RF-022/stage1-4-20261126.md). [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 직선축 운전 정책·Motion Server 호환성·회귀의 합의 범위를 완료했습니다. RF-022에서 기존 회전 동작도 FMU로 이식·검증했으며, modulo/최단 경로 등 추가 기능은 제외합니다.
 
 ## 2026-09-22 성능 계측 결과와 다음 작업
 
@@ -114,7 +114,7 @@ src/functional_model/
   cia402_drive/
     profile/                       # 공통 OD·PDO 정의
     adapter/                       # F-KR Internal 연결·계약·등록
-    behaviour_model/f_kr_cmmt/  # 상태 전이·운동 계산
+    behaviour_model/f_kr_cmmt/  # 기존 Python 코드·OD role 도구(제품 운동 계산은 FMU)
   runtime/                         # 축 인스턴스와 서비스
   ipc/ storage/ diagnostics/
 device_descriptions/cmmt_as/        # 기존 identity·ESI·확장·저장 명령
@@ -137,3 +137,13 @@ FMI3 CS 기반 PP 어댑터와 Linux FMU 빌드 도구의 실행 방법은 [RF-0
 폴더 역할과 생성물 보관 정책: [ADR-010](Doc/Design/ADR-010-project-layout.md).
 
 축 ID는 파라미터와 PDO 매핑의 공통 영구 식별자입니다. 파라미터는 `state/<축 ID>.json`에 저장하며 `AXIS_PARAMETER_SETS`는 사용하지 않습니다. 기존 구성의 이름 이관 및 호환 정책은 [검증 기록](Doc/Validation/Axis-ID-Storage-20261126.md)을 참조하세요.
+
+### F-KR FMU 빌드와 선택 (RF-022)
+
+기존 `DEVICE_SIMULATOR_AXIS_MODELS=f_kr_cmmt`와 `DEVICE_SIMULATOR_AXIS_MODES=linear/rotary`를 유지합니다.
+Docker Builder가 `FKrCmmtLinear-linux.fmu`(m 계열)와 `FKrCmmtRotary-linux.fmu`(rad 계열)를 생성합니다.
+FMU는 FMI 3.0 Co-Simulation / Linux x86-64이며 Python 인터프리터를 포함하지 않습니다.
+소스·독립 실행 계약은 [모델 설명](model_sources/motor_controller/f_kr_cmmt/README.md)을 참조합니다.
+외부 FMU 폴더를 명시적으로 마운트하면 해당 구성에서 사용하는 F-KR/Copley/IO FMU를 모두 넣어야 합니다.
+필요한 FMU 누락이나 축 mode와 다른 파일은 시작 오류이며 Python으로 자동 대체하지 않습니다.
+RF-022 5단계의 [물리 통합·저장·복구 검증](Doc/Validation/RF-022/stage5-20261126.md)을 완료했고, 원래 혼합 구성에서 새 이미지를 실행 중입니다.

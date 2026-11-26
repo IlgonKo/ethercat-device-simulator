@@ -25,10 +25,13 @@ RUN cmake -S . -B build/timing -DCMAKE_BUILD_TYPE=Release -DCMAKE_PREFIX_PATH=/o
 COPY scripts /workspace/scripts
 COPY model_sources /workspace/model_sources
 RUN python3 scripts/models/build-copley-fmu.py --source docker/inputs/CopleyDriveSim-source.fmu --output model_artifacts/CopleyDriveSim-linux.fmu \
+ && python3 scripts/models/build-f-kr-cmmt-fmus.py \
  && python3 scripts/models/build-analog-delay-fmu.py \
  && python3 scripts/models/package-io-fmus.py
 ENV PYTHONPATH=/workspace/src:/workspace
 RUN python3 -m unittest discover -s tests/unit -v \
+ && python3 -m unittest tests.integration.test_f_kr_fmu -v \
+ && python3 tests/integration/run_dynamic_mapping.py --axes 4 --motion \
  && python3 tests/integration/run_remote_io.py \
  && IO_TEST_FMU_DIR=/workspace/model_artifacts python3 -m unittest tests.integration.test_io_fmu -v \
  && COPLEY_TEST_FMU=/workspace/model_artifacts/CopleyDriveSim-linux.fmu python3 -m unittest tests.integration.test_copley_fmu -v \
