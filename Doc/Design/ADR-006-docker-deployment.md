@@ -36,7 +36,7 @@ Linux Docker Engine의 단일 컨테이너 안에서 KickCAT Slave와 Model Host
 
 - Docker Builder 단계에 컴파일러와 C++ 의존성을 포함한다. 호스트 native 사전 빌드는 필요 없다.
 - 실행 이미지는 `ethercat-device-simulator:dev`. 자체 동작 모델과 기본 Linux Copley FMU를 포함한다.
-- 설정은 Simulator 자체 `.env`의 BUS와 AXIS_IDS/MODELS/MODES/PARAMETER_SETS 목록을 사용한다. IO 필드는 RF-013에서 확정한다.
+- 설정은 Simulator 자체 `.env`의 BUS와 AXIS_NAMES/MODELS/MODES 목록을 사용한다. IO 필드는 RF-013에서 확정한다.
 - `DEVICE_SIMULATOR_STATE_DIR=./state`를 컨테이너 `/state`로 연결한다. 영구 파라미터와 PDO 매핑은 별도 저장 파일이며 이미지 교체 후에도 유지한다.
 - Unix 소켓·임시 파일은 영구 저장에서 제외한다. 컨테이너 재시작 시 운전 위치·이전 이동 명령을 복원하지 않는다.
 - 데이터 비호환은 오류로 처리한다. 자동 이관/초기화하지 않으며 재시작 절차에서 저장소를 삭제하지 않는다.

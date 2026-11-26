@@ -17,7 +17,7 @@
 | [RF-010](RF-010-parameter-persistence.md) | 가상장치 파라미터 영구 저장 및 복원 | **완료** |
 | [RF-011](RF-011-device-configuration.md) | 독립 장치 구성 및 다중 가상축 | **완료** |
 | [RF-012](RF-012-docker-deployment.md) | Simulator Docker 패키징 및 실행 검증 | **진행 중** |
-| [RF-013](RF-013-virtual-io.md) | Modular Device Profile 기반 Remote I/O·모델 연결 | **진행 중** |
+| [RF-013](RF-013-virtual-io.md) | Modular Device Profile 기반 Remote I/O·모델 연결 | **완료** |
 | [RF-014](RF-014-dynamic-pdo-mapping.md) | 동적 PDO 매핑 지원 | **완료** |
 | [RF-015](RF-015-axis-model-semantics.md) | 직선축 동작·위치 제한 검증 | **진행 중** |
 | [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **완료** |
@@ -40,9 +40,9 @@
 
 ## 2026-11-26 제품 범위 요약
 
-총 22개 요구 항목 중 **제품 범위 18개: 완료 12 / 진행 중 3 / 예정 3**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
+총 22개 요구 항목 중 **제품 범위 18개: 완료 13 / 진행 중 2 / 예정 3**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
 
-- RF-013: CPX-AP-I Modular Remote I/O·모델 어댑터·DI/DO/AI/AO 구현. IO-Link는 제외. 공압 실린더 FMU 재사용 및 Linux 오프라인 검증 완료. IO 어댑터·채널 연결·물리 통신은 미완료이며 RF는 진행 중이다.
+- RF-013: CPX-AP-I DI/DO/AI/AO·실제 FMU 연결·혼합 운전·Host 장애/복구·재구성/재검색 합의 범위 완료. 아날로그 수동/물리 FMU 왕복은 사용자 결정으로 생략. IO-Link·진단 PDO/이력/Emergency·외부 DT 연동은 제외.
 - RF-015: 기존 직선축 지원 대조·회귀. 3축은 Demo 요구에서 가져온 시험 구성.
 - RF-012: 새 Linux PC와 축+IO 독립 배포·복원·통신 확인. Edge #2는 배포 사례.
 - RF-019/020: 후속 제품 기능. 이번 IO 지원의 필수 조건으로 확대하지 않음.

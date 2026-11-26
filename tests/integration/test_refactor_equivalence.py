@@ -16,7 +16,7 @@ class RefactorEquivalenceTests(unittest.TestCase):
             with self.subTest(case=key):
                 axis_mode, mode = key.split(':')
                 model = Model(dict(slave_index=0, id='axis-0', type='cia402-drive',
-                    model=dict(type='f_kr_cmmt', mode=axis_mode), parameter_set='axis-0'))
+                    model=dict(type='f_kr_cmmt', mode=axis_mode)))
                 outputs = []
                 for i in range(baseline['cycles_per_case']):
                     cw = [6, 7, 15][i] if i < 3 else 31

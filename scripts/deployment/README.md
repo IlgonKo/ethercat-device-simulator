@@ -67,7 +67,7 @@ python3 <bundle>/source/scripts/deployment/offline.py load-image <bundle>
 python3 <bundle>/source/scripts/deployment/offline.py restore <bundle> --work /home/festo/ethercat-device-simulator
 ```
 
-복원 위치에서 `.env.example`을 `.env`로 복사하고 NIC/장치/모델/파라미터 저장 위치를 설정한다. 예제는 F-KR 4축이며 Copley는 AXIS_MODELS 및 신규 PARAMETER_SETS로 선택한다. 기존 파라미터가 필요하면 정지 상태에서 별도로 백업·이관한다. 기존 Simulator 정지와 전환 준비 후 `docker tag <manifest의 image_id> ethercat-device-simulator:dev`, `bash scripts/docker/validate.sh`, `bash scripts/docker/start.sh` 순서로 수동 적용한다. 배포 이미지를 바로 쓰는 경우 `--build`를 붙이지 않는다. Motion Server에서 버스 재연결·초기화한다.
+복원 위치에서 `.env.example`을 `.env`로 복사하고 NIC/장치/모델/파라미터 저장 위치를 설정한다. 예제는 F-KR 4축이며 Copley는 AXIS_MODELS로 선택한다. 모델 종류를 바꿔 새 장치로 시작할 때는 신규 AXIS_NAMES를 사용하며 파라미터와 PDO 매핑 모두 새 ID에 연결된다. 기존 파라미터가 필요하면 정지 상태에서 별도로 백업·이관한다. 기존 Simulator 정지와 전환 준비 후 `docker tag <manifest의 image_id> ethercat-device-simulator:dev`, `bash scripts/docker/validate.sh`, `bash scripts/docker/start.sh` 순서로 수동 적용한다. 배포 이미지를 바로 쓰는 경우 `--build`를 붙이지 않는다. Motion Server에서 버스 재연결·초기화한다.
 
 ## 묶음만으로 전체 재빌드
 

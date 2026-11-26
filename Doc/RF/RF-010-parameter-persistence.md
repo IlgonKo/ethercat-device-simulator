@@ -9,7 +9,7 @@
 
 ## 현재 합의 범위 — 2026-10-28
 
-시뮬레이터 소유 parameter_set별 영구 저장소, SDO 적용·명시적 저장, 저장 완료 응답, 정상 재시작 복원, 오류 검출·단일 writer, 수동 백업/복원·명시적 초기화 및 지원 스키마 이관을 대상으로 한다. 배포 기본값·영구 설정·실행 상태를 분리한다.
+시뮬레이터 소유 축 ID별 영구 저장소, SDO 적용·명시적 저장, 저장 완료 응답, 정상 재시작 복원, 오류 검출·단일 writer, 수동 백업/복원·명시적 초기화 및 지원 스키마 이관을 대상으로 한다. 배포 기본값·영구 설정·실행 상태를 분리한다.
 
 관리 API는 [RF-019](RF-019-parameter-management-api.md), 양방향 파라미터 동기화는 기존 [RF-009](RF-009-parameter-sync.md), 설정 revision·변경 이력은 [RF-020](RF-020-parameter-history.md)으로 이관한다. 이 항목들은 현재 RF-010 완료 조건에서 제외한다. 아래 과거 기록보다 이 범위가 우선한다.
 
@@ -17,7 +17,7 @@
 
 - [x] 실제 SDO 변경·명시적 저장 후 컨테이너 재생성·Master 초기화 후 복원: F-KR 111, Copley 123 확인 후 원래 100으로 복원·저장.
 - [x] 저장 도중 프로세스 종료·쓰기 실패·동시 writer에서 불완전 snapshot 사용 방지: Linux SIGKILL 3경계, 원자적 교체 실패 및 잠금 시험.
-- [x] 장치 순서 변경 시 parameter_set 연결 유지: 기존 구성 회귀 시험.
+- [x] 장치 순서 변경 시 축 ID 기반 저장 연결 유지: 기존 구성 회귀 시험.
 - [x] 최초 생성·손상/누락 필드·스키마 불일치 거부, 백업 복원·명시적 초기화·F-KR 1→2 이관 검증.
 - [x] 위치·속도 피드백·Controlword·Enable·진행 명령을 영구 저장하지 않음: 모델 재생성 회귀. Profile Velocity 설정은 저장 대상이며 실제 속도 피드백과 구분.
 - [x] Master 초기화 후 저장 항목 유지: F-KR 21개×2 + Copley 8개×2 = 58개 물리 SDO readback이 파일과 일치. 재기입 경계는 아래 처리표 참조.
@@ -42,7 +42,7 @@ storage.directory/parameter_set에 저장한다. 스키마 1, 장치·모델·mo
 
 ## 2026-10-28 저장 계약 및 검증
 
-- 현재 경로는 DEVICE_SIMULATOR_STATE_DIR(기본 ./state), AXIS_PARAMETER_SETS 매핑의 파일이다. 이전 storage.directory/JSON 설정은 이력이며 영구 파라미터 JSON 자체는 유지한다.
+- 현재 경로는 DEVICE_SIMULATOR_STATE_DIR(기본 ./state), AXIS_NAMES로 선택하는 <축 ID>.json 파일이다. 2026-11-26 별도 PARAMETER_SETS 설정을 제거했다. 이전 storage.directory/JSON 설정은 이력이며 영구 파라미터 JSON 자체는 유지한다.
 - 기존 구성/저장 및 실제 Linux Copley 혼합 저장 시험 25개 통과. 별도 임시 저장소에 공통 가감속을 저장한 뒤 미저장 변경을 주고 컨테이너를 제거·새로 생성하여 마지막 저장값 복원, 위치 0·Enable 해제를 확인했다. 실제 EtherCAT SDO를 사용한 시험은 아니다.
 - 최초 Profile Velocity 교차 모델 시험에서 F-KR은 저장 목록에 0x6081이 없고 Copley만 저장함을 확인했다. 사용자 결정에 따라 두 모델 모두 저장하도록 변경했다. F-KR 저장 스키마는 2(21개 OD), Copley는 기존 스키마 1(8개 OD)을 유지한다.
 - 서비스는 구 F-KR 스키마 1을 자동 보정하지 않고 거부한다. 명시적 오프라인 이관 도구가 기존 체크섬·정체성·전체 목록·값을 검사하고 원본 .schema1.bak을 보존한 뒤 새 파일을 원자적으로 저장한다. 저장소 잠금 필수이며 실행 중 소유 저장소는 이관할 수 없다. 새 값은 --profile-velocity로 반드시 지정한다.
@@ -52,8 +52,8 @@ storage.directory/parameter_set에 저장한다. 스키마 1, 장치·모델·mo
 명시적 이관 예시(모델 서비스 종료 후, 새 코드 환경):
 
 ```bash
-python -m functional_model.storage.migrate --store /state --parameter-set cmmt-0 --mode linear --profile-velocity 100
-python -m functional_model.storage.migrate --store /state --parameter-set cmmt-1 --mode linear --profile-velocity 100
+python -m functional_model.storage.migrate --store /state --axis-id virtual-axis-0 --mode linear --profile-velocity 100
+python -m functional_model.storage.migrate --store /state --axis-id virtual-axis-1 --mode linear --profile-velocity 100
 ```
 
 ### Motion Server 초기화 경계
@@ -129,7 +129,7 @@ mkdir -p backups
 cp -a state backups/state-20261028-before-maintenance
 ```
 
-백업 폴더는 매번 고유한 이름으로 만들고 기존 백업에 덮어쓰지 않는다. .env의 장치 ID·모델·mode·parameter_set 매핑 및 사용한 이미지/소스 revision도 함께 보관한다. 기본 ./state 외 경로를 쓰는 경우 실제 마운트 경로를 사용한다.
+백업 폴더는 매번 고유한 이름으로 만들고 기존 백업에 덮어쓰지 않는다. .env의 장치 ID·모델·mode 매핑 및 사용한 이미지/소스 revision도 함께 보관한다. 기본 ./state 외 경로를 쓰는 경우 실제 마운트 경로를 사용한다.
 
 ### 복원
 
@@ -145,7 +145,7 @@ Master를 연결하지 않은 상태에서 Simulator를 기동해 체크섬·타
 
 ### 명시적 기본값 초기화
 
-서비스 정지·백업 후 초기화할 단일 parameter_set 파일을 state 밖으로 옮긴다. 다른 장치 파일은 유지한다.
+서비스 정지·백업 후 초기화할 단일 축 ID 파라미터 파일을 state 밖으로 옮긴다. 다른 장치 파일은 유지한다.
 
 ```bash
 mv state/cmmt-0.json backups/cmmt-0-before-reset.json
@@ -156,3 +156,7 @@ mv state/cmmt-0.json backups/cmmt-0-before-reset.json
 누락 파일 한 개만 보고 최초 생성인지 사용자의 실수로 삭제됐는지 자동 구분할 수는 없다. 현재 계약은 '파일 부재 시 신규 기본값 생성'이다. 기존 파일 내부 손상/필드 누락은 자동 초기화하지 않고 거부한다. 삭제/이동 의도와 백업 확인은 운영 절차로 보장하며 저장공간 등록 이력은 RF-020에서 검토한다.
 
 강제 종료 후 남은 숨김 임시 파일은 로드 대상이 아니다. 정식 snapshot과 백업을 확인한 후 서비스 정지 중 해당 임시 파일만 정리할 수 있다. state 전체나 .lock 파일을 실행 중 삭제하지 않는다. 전원 차단/스토리지 자체 장애의 결과를 이번 SIGKILL 시험으로 보장하지 않는다.
+
+## 2026-11-26 저장 식별자 통일
+
+파라미터 파일명은 state/<축 ID>.json이다. PDO 매핑은 기존 별도 파일을 동일 ID로 연결한다. 저장 스키마·값·SDO 저장 의미는 유지한다. 기존 파일은 승인된 일회성 이름 이관으로 처리했으며 제품 시작 시 자동 이관하지 않는다. 이전 절의 parameter_set은 초기 구현 이력이다. [이관·회귀 결과](../Validation/Axis-ID-Storage-20261126.md).

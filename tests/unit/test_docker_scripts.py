@@ -66,8 +66,22 @@ if os.environ.get('FAKE_FAIL') in args: sys.exit(9)
         self.assertEqual(result.returncode, 0, result.stderr)
         self.assertEqual(path.read_text(), original)
         normalized = (self.root / 'build/compose.env').read_text()
-        self.assertIn('DEVICE_SIMULATOR_AXIS_IDS="0: virtual-axis-0,', normalized)
-        self.assertEqual(len([x for x in normalized.splitlines() if 'DEVICE_SIMULATOR_AXIS_IDS=' in x]), 1)
+        self.assertIn('DEVICE_SIMULATOR_AXIS_NAMES="0: virtual-axis-0,', normalized)
+        self.assertEqual(len([x for x in normalized.splitlines() if 'DEVICE_SIMULATOR_AXIS_NAMES=' in x]), 1)
+
+    def test_io_models_normalize_without_pythonpath_from_other_directory(self):
+        repository = Path(__file__).resolve().parents[2]
+        shutil.copytree(repository / 'src/functional_model/remote_io', self.root / 'src/functional_model/remote_io')
+        shutil.copytree(repository / 'device_descriptions', self.root / 'device_descriptions')
+        shutil.copytree(repository / 'model_presets', self.root / 'model_presets')
+        shutil.copy2(repository / 'tests/fixtures/cpx-fmu.env', self.root / '.env')
+        original = (self.root / '.env').read_bytes()
+        result, calls = self.run_script('status.sh', PYTHONPATH='')
+        self.assertEqual(result.returncode, 0, result.stderr)
+        normalized = (self.root / 'build/compose.env').read_text()
+        self.assertIn('DEVICE_SIMULATOR_IO_MODELS=', normalized)
+        self.assertIn('DEVICE_SIMULATOR_IO_MODEL_INSTANCES=', normalized)
+        self.assertEqual((self.root / '.env').read_bytes(), original)
 
     def test_stop_removes_only_service_without_volumes(self):
         result, calls = self.run_script('stop.sh')

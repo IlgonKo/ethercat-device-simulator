@@ -7,7 +7,7 @@ import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[2]
-sys.path.insert(0, str(root / 'src'))
+sys.path[:0] = [str(root / 'src'), str(root)]
 from functional_model.configuration import read_env, load_environment
 
 

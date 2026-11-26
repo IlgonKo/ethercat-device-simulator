@@ -6,7 +6,7 @@ import os
 from pathlib import Path
 import tempfile
 
-from functional_model.configuration import read_json, fields
+from functional_model.configuration import read_json, fields, name
 
 
 class ParameterStore:
@@ -38,7 +38,9 @@ class ParameterStore:
             self.lock.close(); self.lock = None
 
     def path(self, model):
-        return self.root / (model.device['parameter_set'] + '.json')
+        identifier = model.device['id']
+        name(identifier, 'axis id')
+        return self.root / (identifier + '.json')
 
     @staticmethod
     def schema_version(model):

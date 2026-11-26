@@ -22,7 +22,7 @@ Soft ESC는 가상장치의 지원 파라미터를 읽기/쓰기·검증·저장
 
 ## 설정·식별·복원
 
-자체 .env의 `DEVICE_SIMULATOR_STATE_DIR=./state`를 사용한다. Docker 내부는 `/state`다. 축 파라미터 파일은 `DEVICE_SIMULATOR_AXIS_PARAMETER_SETS`의 논리 이름으로 state 바로 아래에 저장한다. 설정 JSON·state/parameters 예시는 현행 운영 계약이 아니다.
+자체 .env의 `DEVICE_SIMULATOR_STATE_DIR=./state`를 사용한다. Docker 내부는 `/state`다. 축 파라미터 파일은 `DEVICE_SIMULATOR_AXIS_NAMES`의 ID를 키로 `state/<축 ID>.json`에 저장한다. `DEVICE_SIMULATOR_AXIS_PARAMETER_SETS`는 제거했으며 남아 있으면 시작 오류다. PDO 매핑도 같은 ID를 사용하지만 Slave가 별도 pdo-mappings 파일을 관리한다. 설정 JSON·state/parameters 예시는 현행 운영 계약이 아니다.
 
 안정적인 장치 ID와 저장 공간의 호환 메타데이터로 식별한다. 버스 번호 변경만으로 다른 장치의 저장 데이터를 연결하지 않는다. 저장 공간 부재 시 지원 기본값으로 신규 생성하는 정책과, 기존 데이터 손상/누락/비호환 시 시작 오류 처리를 구분한다. 기존 데이터를 자동 초기화·이관하지 않는다. 과거 사용자 승인 하에 수행한 일회성 이관은 제품 자동 이관 기능이 아니다.
 

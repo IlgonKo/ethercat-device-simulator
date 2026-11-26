@@ -45,8 +45,10 @@ class ConfigurationTests(unittest.TestCase):
         base = read_env(ROOT/'tests/fixtures/four-axes.env')
         for key, value in [('DEVICE_SIMULATOR_AXIS_MODES', ''),
                            ('DEVICE_SIMULATOR_AXIS_MODES', '0:unknown,1:linear,2:rotary,3:rotary'),
-                           ('DEVICE_SIMULATOR_AXIS_IDS', '0:duplicate,1:duplicate,2:axis2,3:axis3'),
+                           ('DEVICE_SIMULATOR_AXIS_NAMES', '0:duplicate,1:duplicate,2:axis2,3:axis3'),
                            ('DEVICE_SIMULATOR_AXIS_PARAMETER_SETS', '0:same,1:same,2:p2,3:p3'),
+                           ('DEVICE_SIMULATOR_AXIS_PARAMETER_SETS', ''),
+                           ('DEVICE_SIMULATOR_AXIS_IDS', '0:old-name'),
                            ('DEVICE_SIMULATOR_AXIS_MODELS', '0:f_kr_cmmt'),
                            ('DEVICE_SIMULATOR_AXIS_MODES', '0:linear,0:rotary'),
                            ('DEVICE_SIMULATOR_AXIS_MODES', '0:linear,1:linear,2:rotary,3:rotary,4:linear'),
@@ -135,6 +137,29 @@ class FleetTests(ConfigurationTests):
         self.assertEqual(fresh.models[0].adapter.model.actual_velocity, 0)
         self.assertEqual(fresh.models[0].adapter.model.od.read(0x6041), 0x40)
         self.assertFalse(fresh.models[0].adapter.model.homing_referenced)
+
+    def test_axis_id_is_the_only_parameter_filename_key(self):
+        for model in self.fleet.models:
+            self.assertNotIn('parameter_set', model.device)
+            self.assertEqual(self.store.path(model), self.store.root / (model.device['id'] + '.json'))
+        self.assertFalse((self.store.root / 'parameters').exists())
+
+    def test_new_id_creates_independent_store_and_preserves_old_snapshot(self):
+        original = self.fleet.models[0]
+        self.write(0, 0x6081, 0, '<I', 123)
+        self.store.save(original)
+        old_path = self.store.path(original); before = old_path.read_bytes()
+        cfg = copy.deepcopy(self.config); cfg['devices'][0]['id'] = 'replacement-axis'
+        fresh = ModelFleet(cfg, self.store); self.addCleanup(fresh.close)
+        self.assertEqual(self.store.path(fresh.models[0]).name, 'replacement-axis.json')
+        self.assertNotEqual(fresh.models[0].parameter_values()['6081:00'], original.parameter_values()['6081:00'])
+        self.assertEqual(old_path.read_bytes(), before)
+
+    def test_storage_rejects_invalid_axis_id_even_for_direct_callers(self):
+        from types import SimpleNamespace
+        for identifier in ('../outside', '', 'a/b'):
+            with self.assertRaises(ValueError):
+                self.store.path(SimpleNamespace(device={'id':identifier}))
 
     def test_index_reorder_keeps_parameter_space(self):
         self.write(0, 0x607D, 2, '<i', 777)

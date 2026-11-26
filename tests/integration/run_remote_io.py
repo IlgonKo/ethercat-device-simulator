@@ -14,12 +14,24 @@ from functional_model.storage.parameter_store import ParameterStore
 ROOT=Path(__file__).resolve().parents[2]
 class FixtureAdapter:
     """Test-only identity transfer; not the product analog-delay FMU."""
-    def __init__(self,spec):pass
+    def __init__(self,spec):self.identifier=spec['id']
     def initial_outputs(self):return {'feedback':0}
     def step(self,inputs,t,dt):
         assert dt==.008
+        if self.identifier=='a' and inputs['command']==-23456:
+            raise RuntimeError('Injected IO model calculation failure')
         return {'feedback':inputs['command']}
     def close(self):pass
+
+class FixtureFleet(ModelFleet):
+    """Expose internal test observations without adding a product management API."""
+    def dispatch(self,request):
+        if request.get('op')=='test_io_status':
+            with self.io_runtime.lock:
+                return dict(host_failed=self.io_runtime.host_failed,
+                            models={k:dict(fault=m['fault'],steps=m['steps']) for k,m in self.io_runtime.instances.items()},
+                            diagnostics=list(self.io_runtime.diagnostics))
+        return super().dispatch(request)
 
 def config_at(root, models=False):
     env=read_env(ROOT/'tests/fixtures/cpx-two-stations.env');env['DEVICE_SIMULATOR_STATE_DIR']=str(root/'state')
@@ -37,7 +49,7 @@ def main():
     if args.host:
         root=Path(args.host);config=config_at(root,True)
         with ParameterStore(config['storage']['directory']) as store:
-            fleet=ModelFleet(config,store,io_factory=FixtureAdapter)
+            fleet=FixtureFleet(config,store,io_factory=FixtureAdapter)
             try:fleet.generate_fixture(root);serve(fleet,root/'model.sock')
             finally:fleet.close()
         return

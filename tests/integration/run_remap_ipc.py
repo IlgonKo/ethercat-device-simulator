@@ -24,9 +24,9 @@ def main():
             settings = dict(KICKCAT_INTERFACE='unused', DEVICE_SIMULATOR_STATE_DIR=str(root/'state'),
                             DEVICE_SIMULATOR_BUS=','.join(f'{i}:axis:cia402-drive' for i in range(4)))
             for key, values in (
-                ('IDS', [f'axis-{i}' for i in range(4)]),
+                ('NAMES', [f'axis-{i}' for i in range(4)]),
                 ('MODELS', ['copley_drive_sim' if args.fmu_dir and i < 2 else 'f_kr_cmmt' for i in range(4)]),
-                ('MODES', ['linear']*4), ('PARAMETER_SETS', [f'axis-{i}' for i in range(4)])):
+                ('MODES', ['linear']*4)):
                 settings['DEVICE_SIMULATOR_AXIS_'+key] = ','.join(f'{i}:{v}' for i,v in enumerate(values))
             if args.fmu_dir: settings['DEVICE_SIMULATOR_FMU_DIR'] = str(Path(args.fmu_dir).resolve())
             envfile = root/'test.env'

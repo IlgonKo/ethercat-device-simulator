@@ -2,7 +2,7 @@
 
 상태: **실린더·아날로그 지연 프리셋 로더 및 실제 FMU 연결 구현**.
 
-재사용할 모델 종류와 모델 특성을 JSON으로 관리한다. 장치 종류/모델 종류별로 분류하고 프리셋 ID로 참조한다. 운전 조건·초기 조건은 `.env`의 `DEVICE_SIMULATOR_MODEL_<id>_INSTANCE_CONFIG`에 둔다.
+재사용할 모델 종류와 모델 특성을 JSON으로 관리한다. 장치 종류/모델 종류별로 분류하고 프리셋 ID로 참조한다. 운전 조건·초기 조건은 `.env`의 `DEVICE_SIMULATOR_IO_MODEL_INSTANCES`에 둔다.
 
 - JSON 필드: schema_version, id, model, config.
 - 프리셋은 Git 관리 대상이며 실행 중 수정하거나 state에 복제하지 않는다.

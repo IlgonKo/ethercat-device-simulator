@@ -59,7 +59,7 @@ class FaultRuntimeTests(unittest.TestCase):
 
     def test_other_axis_remains_independent(self):
         other = Model(dict(slave_index=1, id='axis-1', type='cia402-drive',
-                           model=dict(type='f_kr_cmmt', mode='linear'), parameter_set='test-1'))
+                           model=dict(type='f_kr_cmmt', mode='linear')))
         self.cycle(15, mode=99)
         with patch('functional_model.runtime.axis.time.monotonic', return_value=10):
             r = other.dispatch(pdo(6))

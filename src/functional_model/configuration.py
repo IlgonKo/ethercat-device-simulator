@@ -50,16 +50,16 @@ def validate_config(data, base_directory):
     devices = data['devices']
     if not isinstance(devices, list) or not devices:
         raise ValueError('devices: nonempty array required')
-    ids, sets, indices = set(), set(), set()
+    ids, indices = set(), set()
     for n, device in enumerate(devices):
         loc = f'devices[{n}]'
         is_io = device.get('type') == 'cpx-ap-i-ec'
-        fields(device, ('slave_index', 'id', 'type', 'modules', 'bindings') if is_io else ('slave_index', 'id', 'type', 'model', 'parameter_set'), loc)
+        fields(device, ('slave_index', 'id', 'type', 'modules', 'bindings') if is_io else ('slave_index', 'id', 'type', 'model'), loc)
         index = device['slave_index']
         if type(index) is not int or index < 0 or index in indices:
             raise ValueError(f'{loc}.slave_index: unique nonnegative integer required')
         indices.add(index)
-        for key, used in ((('id', ids),) if is_io else (('id', ids), ('parameter_set', sets))):
+        for key, used in (('id', ids),):
             name(device[key], f'{loc}.{key}')
             if device[key] in used:
                 raise ValueError(f'{loc}.{key}: duplicate {device[key]}')
@@ -124,13 +124,17 @@ def read_env(path):
 def load_environment(env, base_directory=None):
     if 'DEVICE_SIMULATOR_CONFIG_FILE' in env:
         raise ValueError('DEVICE_SIMULATOR_CONFIG_FILE removed; configure DEVICE_SIMULATOR_BUS in .env')
+    if 'DEVICE_SIMULATOR_AXIS_IDS' in env:
+        raise ValueError('DEVICE_SIMULATOR_AXIS_IDS renamed to DEVICE_SIMULATOR_AXIS_NAMES; keep existing name values to retain stored parameters and PDO mappings.')
+    if 'DEVICE_SIMULATOR_AXIS_PARAMETER_SETS' in env:
+        raise ValueError('DEVICE_SIMULATOR_AXIS_PARAMETER_SETS removed; parameters use state/<axis ID>.json. Move existing snapshots offline before starting.')
     def required(key):
         value = env.get(key, '')
         if not value.strip():
             raise ValueError(f'{key}: required')
         return value.strip()
     mappings = {}
-    keys = ('IDS', 'MODELS', 'MODES', 'PARAMETER_SETS')
+    keys = ('NAMES', 'MODELS', 'MODES')
     for suffix in keys:
         key = 'DEVICE_SIMULATOR_AXIS_' + suffix
         values = {}
@@ -159,9 +163,8 @@ def load_environment(env, base_directory=None):
         indices.add(index)
         if any(index not in values for values in mappings.values()):
             raise ValueError(f'Missing axis mapping for slave {index}')
-        devices.append(dict(slave_index=index, id=mappings['IDS'][index], type='cia402-drive',
-                            model=dict(type=mappings['MODELS'][index], mode=mappings['MODES'][index]),
-                            parameter_set=mappings['PARAMETER_SETS'][index]))
+        devices.append(dict(slave_index=index, id=mappings['NAMES'][index], type='cia402-drive',
+                            model=dict(type=mappings['MODELS'][index], mode=mappings['MODES'][index])))
     if any(set(values) != indices for values in mappings.values()):
         raise ValueError('Axis mapping indices must exactly match DEVICE_SIMULATOR_BUS')
     allowed = {'DEVICE_SIMULATOR_AXIS_' + key for key in keys}

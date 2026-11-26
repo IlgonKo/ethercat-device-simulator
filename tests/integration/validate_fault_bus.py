@@ -35,10 +35,9 @@ def main():
                    'DEVICE_SIMULATOR_STATE_DIR': str(root / 'state'),
                    'DEVICE_SIMULATOR_FMU_DIR': '/model_artifacts',
                    'DEVICE_SIMULATOR_BUS': ','.join(f'{i}:axis:cia402-drive' for i in range(4)),
-                   'DEVICE_SIMULATOR_AXIS_IDS': ','.join(f'{i}:test-{i}' for i in range(4)),
+                   'DEVICE_SIMULATOR_AXIS_NAMES': ','.join(f'{i}:test-{i}' for i in range(4)),
                    'DEVICE_SIMULATOR_AXIS_MODELS': '0:f_kr_cmmt,1:f_kr_cmmt,2:copley_drive_sim,3:copley_drive_sim',
                    'DEVICE_SIMULATOR_AXIS_MODES': ','.join(f'{i}:linear' for i in range(4)),
-                   'DEVICE_SIMULATOR_AXIS_PARAMETER_SETS': ','.join(f'{i}:temporary-{i}' for i in range(4)),
                    'DEVICE_SIMULATOR_MODEL_TIMEOUT_MS': '100'}
             processes = []
             master = pysoem.Master()

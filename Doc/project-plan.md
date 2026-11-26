@@ -8,13 +8,13 @@ DT Demo는 요구와 시험 사례를 제공하며 제품 실행 의존성이 �
 
 ## 기존 구현과 다음 작업
 
-기존 RF-001~005/002-1·010/011/014/016/017/018 완료 근거를 유지한다. 설정·저장·동적 PDO·F-KR/Copley·축 장애 격리 기반을 재사용한다. RF-013은 Modular Remote I/O·모델 연결, RF-015는 직선축 요구 대조·회귀, RF-012는 독립 배포 잔여 검증을 진행한다. RF-019/020은 후속 제품 기능이다.
+기존 RF-001~005/002-1·010/011/014/016/017/018 완료 근거를 유지한다. 설정·저장·동적 PDO·F-KR/Copley·축 장애 격리 기반을 재사용한다. RF-013의 Modular Remote I/O·모델 연결도 합의 범위 완료했다. RF-015는 직선축 요구 대조·회귀, RF-012는 독립 배포 잔여 검증을 진행한다. RF-019/020은 후속 제품 기능이다.
 
-제품 범위 RF는 18개(완료 12 / 진행 중 3 / 예정 3), 외부 연동 구상 RF-006~009 4개는 범위 외 참고 이력이다. 현재 판정은 [RF 목록](RF/README.md)을 따른다.
+제품 범위 RF는 18개(완료 13 / 진행 중 2 / 예정 3), 외부 연동 구상 RF-006~009 4개는 범위 외 참고 이력이다. 현재 판정은 [RF 목록](RF/README.md)을 따른다.
 
 작업 순서: 장치/모듈·OD/PDO 요구 대조 → MDP·IO 어댑터/모델 계약 → IO 및 공통 기반 확장 → 축+IO·기존 모델 회귀 → 독립 배포 확인. 구체적 산출물과 순서는 아래 현행 계획을 따른다. 제품 경계 결정은 [ADR-009](Design/ADR-009-product-scope-and-boundaries.md)를 참조한다. [Demo 분석](DT-demo-gap-analysis.md)은 요구 입력 자료이며 외부 작업 계획을 Soft ESC 완료 조건으로 가져오지 않는다.
 
-설정은 독립 .env를 유지한다. BUS는 축/IO 혼합 구성, AXIS 목록은 축만 지정한다. IO 모듈/채널/모델 키는 RF-013에 따라 구현했다. 전체 버스 구성은 .env를 유지한다. 모델 특성은 model_presets의 JSON, 인스턴스 운전 조건·초기 조건은 .env INSTANCE_CONFIG로 분리한다(RF-013). 기존 영구 파라미터/매핑 JSON은 유지한다.
+설정은 독립 .env를 유지한다. BUS는 축/IO 혼합 구성, AXIS 목록은 축만 지정한다. IO 모듈/채널/모델 키는 RF-013에 따라 구현했다. 전체 버스 구성은 .env를 유지한다. 모델 특성은 model_presets의 JSON, 인스턴스 운전 조건·초기 조건은 .env IO_MODEL_INSTANCES로 분리한다(RF-013). 기존 영구 파라미터/매핑 JSON은 유지한다.
 
 ## 계획과 결정 문서의 역할
 
@@ -32,7 +32,7 @@ DT Demo는 요구와 시험 사례를 제공하며 제품 실행 의존성이 �
 | 동적 PDO·매핑 저장 | RF-014 가상축 범위 완료 | 축 계약 유지. CPX는 구성 기반 고정 PDO·매핑 읽기 전용·별도 저장 없음 |
 | Fault/Reset·모델 장애 격리 | RF-018 축 범위 완료 | 공통 격리 기반 재사용, IO 진단·입출력 유효성·복구 의미 추가 |
 | 독립 Docker·빌드·2/4축 비교 | RF-012 부분 완료, RF-016 비교 완료 | 새 Linux PC와 축+IO 배포/복원·통신 회귀 |
-| Modular Remote I/O | RF-013 1~4단계 구현·검증 완료 | CPX 통신·IO 실행·실제 실린더/지연 FMU·Docker 완료. 전체 혼합 물리 검증은 5단계 |
+| Modular Remote I/O | RF-013 합의 범위 완료 | CPX 통신·실제 FMU·Docker·혼합 운전·Host 복구·재구성/원복 완료. 아날로그 수동/물리 FMU 왕복은 생략 한계 유지 |
 | IO 어댑터·동작 모델 | 구현 미완료 | 교체 가능한 모델 연결; Loader 밸브/실린더를 사용 사례로 구현·검증 |
 
 기존 완료 RF의 판정과 시험 자료는 유지한다. IO 지원을 추가한다고 기존 축 검증 전체가 미완료로 돌아가거나, 반대로 기존 축 시험이 IO 검증을 대신하지 않는다. 현재 설정 로더는 cia402-drive만 허용하고 Host·매핑 검증에 축 전용 처리가 있으므로 문서상 제품 범위와 실행 가능 범위를 구분한다.
@@ -76,14 +76,14 @@ DT Demo는 요구와 시험 사례를 제공하며 제품 실행 의존성이 �
 - 확정: CPX-AP-I(EtherCAT 인터페이스 CPX-AP-I-EC), DI/DO/AI/AO를 1차 구현에 포함. IO-Link 제외.
 - 확정: 기본 검증 구성 DI8/DO8/AIO4:4, 모듈 슬롯 1/2/3. Motion Server와 같은 MODULES 문법, AI/AO signed 16-bit raw·어댑터 단위 변환.
 - 확정: 모델 인스턴스별 생성, 채널별 명시적 binding, 미연결 기본값과 모델 오류 구분. ADR-005/007 참조.
-- 확정: BEHAVIOUR_MODELS의 `인스턴스 ID:프리셋 ID`, IO별 BINDINGS의 `슬롯:종류:채널=ID.입출력명`. 우선 IO에 적용하며 기존 AXIS_MODELS 유지.
-- 확정: 아날로그 raw Int16 순수 지연 모델, JSON 프리셋/.env INSTANCE_CONFIG, CPX 고정 PDO·매핑 읽기 전용·기본 오류 상태 OD 읽기 및 모델 내부 진단 분리. 상세 계약·구현 순서는 RF-013을 따른다. 모델 선언·binding 파서·CPX 통신·IO 실행은 1~3단계에서 구현·검증했다. 실제 IO FMU 어댑터·초기화 설정·Docker 패키징도 4단계에서 검증했다. Motion Server 기반 전체 혼합 물리 시험은 5단계다.
-- 확정: 자체 일정 속도 실린더 대신 `SoftESCDoubleActingCylinder` FMI 3.0 FMU를 재사용한다. Linux 5개 오프라인 시험 통과. 두 입력 OFF는 밸브 방향 유지이며 이전 OFF 정지·각 1초 계약은 대체한다. 남은 일은 IO 어댑터/채널 연결·FMU 등록/동작 모델 설정·실행/연결 장애 정책과 물리 통신 검증이다. 두 입력은 모두 ON인 경우까지 그대로 전달하며 상충 진단은 상위 애플리케이션 책임이다. 정격 유량 외부 설정은 [RF-021](RF/RF-021-pneumatic-cylinder-fmu-improvements.md)로 분리하고 기존 FMU로 IO 연동을 계속한다. [검증 결과](Validation/Pneumatic-Cylinder-Web-FMU-20261125.md), RF-013 참조.
+- 확정: IO_MODELS의 `인스턴스 ID:프리셋 ID`, IO별 BINDINGS의 `슬롯:종류:채널=ID.입출력명`. 우선 IO에 적용하며 기존 AXIS_MODELS 유지.
+- 확정: 아날로그 raw Int16 순수 지연 모델, JSON 프리셋/.env IO_MODEL_INSTANCES, CPX 고정 PDO·매핑 읽기 전용·기본 오류 상태 OD 읽기 및 모델 내부 진단 분리. 상세 계약·구현 순서는 RF-013을 따른다. 모델 선언·binding 파서·CPX 통신·IO 실행은 1~3단계에서 구현·검증했다. 실제 IO FMU 어댑터·초기화 설정·Docker 패키징도 4단계에서 검증했다. Motion Server 기반 5단계 혼합 운전·Host 장애/복구·CPX 재구성/재검색도 완료했다.
+- 확정: 자체 일정 속도 실린더 대신 `SoftESCDoubleActingCylinder` FMI 3.0 FMU를 재사용한다. Linux 5개 오프라인 시험 통과. 두 입력 OFF는 밸브 방향 유지이며 이전 OFF 정지·각 1초 계약은 대체한다. IO 어댑터/채널 연결·FMU 등록/동작 모델 설정·실행/연결 장애 정책과 합의한 물리 통신 검증도 완료했다. 두 입력은 모두 ON인 경우까지 그대로 전달하며 상충 진단은 상위 애플리케이션 책임이다. 정격 유량 외부 설정은 [RF-021](RF/RF-021-pneumatic-cylinder-fmu-improvements.md)로 분리하고 기존 FMU로 IO 연동을 계속한다. [검증 결과](Validation/Pneumatic-Cylinder-Web-FMU-20261125.md), RF-013 참조.
 - 공통 IO 경계: PRE-OP·버스 단절·Host 장애 시 출력 적용, 입력 유효성·진단·복구, 저장할 파라미터. 모델 계산 오류·Host 장애는 내부 진단/로그로 유지하고 CPX 장치 진단으로 전달하지 않는다. CPX 자체 진단과 모델 상태 외부 전달을 분리하며 Omniverse 등 상위 애플리케이션 연동은 후속이다. 기존 값 유지·Slave 유지·수동 복구 정책은 RF-013을 따른다.
 
 ## 이번 확장 범위와 후속
 
-RF-013은 CPX-AP-I의 Modular Remote I/O·DI/DO/AI/AO 및 동작 모델 연결을 진행한다. Loader는 디지털 시험 사례이며 AI/AO 연결·변환은 별도로 검증한다. IO-Link/IODD/ISDU·정밀 공압 모델은 후속 범위다. RF-015의 신규 검증은 직선축이며 회전 확장·CSP/보간은 포함하지 않는다. 관리 API/이력은 RF-019/020 후속, NIC 추가 시험은 보류다.
+RF-013은 CPX-AP-I의 Modular Remote I/O·DI/DO/AI/AO 및 동작 모델 연결의 합의 범위를 완료했다. Loader는 디지털 시험 사례이며 AI/AO 연결·변환은 별도로 검증한다. IO-Link/IODD/ISDU·정밀 공압 모델은 후속 범위다. RF-015의 신규 검증은 직선축이며 회전 확장·CSP/보간은 포함하지 않는다. 관리 API/이력은 RF-019/020 후속, NIC 추가 시험은 보류다.
 
 RF-006~009는 외부 연동 구상 이력으로만 보존하며 Soft ESC 구현 목록·현행 진행률에서 구분한다. 기존 완료 RF를 재개하지 않고 변경 영향 부분만 회귀한다.
 
@@ -354,3 +354,7 @@ Linux 이미지 빌드, 4축 모델 초기화, 분리된 네트워크에서 Slav
 ## RF-014 완료 (2026-11-05)
 
 [RF-014](RF/RF-014-dynamic-pdo-mapping.md)의 PRE-OP 개별 SDO 재매핑, Slave 전용 매핑 저장·복원, OD 기반 IPC, 오류 격리 및 PP 재개 조건을 구현·검증했다. F-KR/Copley 혼합 검증과 수정 이미지 적용 후 사용자 Motion Server/Axis Panel 수동 정상 동작 확인으로 완료 처리했다. 2026-09-22의 계획/미착수 기록을 대체하는 현재 상태다. 매핑 정보는 기능 모델 IPC로 전달하지 않는다.
+
+## 2026-11-26 — 축 ID 기반 영구 저장 통일
+
+AXIS_PARAMETER_SETS를 제거하고 축 ID로 파라미터와 PDO 매핑 저장소를 연결한다. 파라미터는 state 바로 아래에 유지하며 저장 책임과 파일은 분리한다. 기존 운영 파일을 백업 후 이관하고 설정·저장·복원 및 Docker 회귀를 수행한다. RF-013 5단계 물리 통합 시험과 구분한다. [검증 기록](Validation/Axis-ID-Storage-20261126.md).

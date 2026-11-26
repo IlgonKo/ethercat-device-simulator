@@ -1,7 +1,7 @@
 # RF-013 — EtherCAT Modular Device Profile 기반 Remote I/O
 
-- 현재 상태: **진행 중**
-- 상태 상세: 2026-11-26 **1~4단계 구현·검증 완료**. CPX 최소 OD/고정 PDO·IO 실행/binding에 실제 실린더·순수 지연 FMU 어댑터와 Docker 패키징을 연결했다. 5단계 Motion Server 기반 전체 혼합 물리 검증은 미완료. [1~3단계](../Validation/RF-013-stage1-3-20261126.md), [4단계](../Validation/RF-013-stage4-20261126.md).
+- 현재 상태: **완료**
+- 상태 상세: 2026-11-26 합의 범위의 구현·검증 완료. CPX 고정 PDO/SDO·실제 실린더/아날로그 지연 FMU·혼합 운전·Host 장애/복구·모듈 재구성/재검색·원복을 확인했다. 아날로그 수동/물리 AO→FMU→AI 왕복은 사용자 결정으로 생략했으며 미검증 한계로 유지한다. [5단계 종합](../Validation/RF-013-stage5-20261126.md), [최종 재구성 시험](../Validation/RF-013-reconfiguration-20261126.md).
 - 등록일: 2026-09-22
 - 설계: [ADR-001](../Design/ADR-001-system-architecture.md), [프로젝트 계획](../project-plan.md), [ADR-005](../Design/ADR-005-device-configuration.md)
 
@@ -49,7 +49,7 @@ CPX-AP-I-4AI4AO-U-I-M12의 RxPDO는 ESI의 9바이트 배치를 그대로 유지
 
 모듈은 [ADR-005](../Design/ADR-005-device-configuration.md)의 `DEVICE_SIMULATOR_IO_io0_MODULES=1:DI:8,2:DO:8,3:AIO:4:4` 문법을 사용한다. Motion Server parser/ESI와 Soft ESC parser/모듈 검증을 구현·확인했다. CPX 모듈 OD 간격은 ESI AP-Slot 기준 0x10이다. Motion Server의 MODULE_PDO_INDEX_STRIDE도 0x10으로 설정한다.
 
-모델 인스턴스별 생성·채널별 명시적 연결·미연결 처리·오류 구분은 [ADR-007](../Design/ADR-007-cia402-profile-adapters.md)의 합의 원칙을 따른다. IO 하나에 여러 모델을 연결할 수 있다. 설정 키는 `DEVICE_SIMULATOR_BEHAVIOUR_MODELS`와 `DEVICE_SIMULATOR_IO_<io_id>_BINDINGS`로 확정했다. 모델 선언은 `인스턴스 ID:프리셋 ID`, 연결은 `슬롯:종류:채널=ID.입출력명`이다. 실린더 동작은 아래의 검증된 공압 FMU 재사용 결정을 따른다. 이전 virtual_cylinder 예시가 실제 구현 모델 등록을 뜻하지 않는다. 아날로그 시험 모델은 아래 순수 지연 FMU 계약을 따르며 예시 loader0/analog0 등의 인스턴스 이름을 제품에 하드코딩하지 않는다. 기존 축의 AXIS_MODELS는 유지한다.
+모델 인스턴스별 생성·채널별 명시적 연결·미연결 처리·오류 구분은 [ADR-007](../Design/ADR-007-cia402-profile-adapters.md)의 합의 원칙을 따른다. IO 하나에 여러 모델을 연결할 수 있다. 설정 키는 `DEVICE_SIMULATOR_IO_MODELS`와 `DEVICE_SIMULATOR_IO_<io_id>_BINDINGS`로 확정했다. 모델 선언은 `인스턴스 ID:프리셋 ID`, 연결은 `슬롯:종류:채널=ID.입출력명`이다. 실린더 동작은 아래의 검증된 공압 FMU 재사용 결정을 따른다. 이전 virtual_cylinder 예시가 실제 구현 모델 등록을 뜻하지 않는다. 아날로그 시험 모델은 아래 순수 지연 FMU 계약을 따르며 예시 loader0/analog0 등의 인스턴스 이름을 제품에 하드코딩하지 않는다. 기존 축의 AXIS_MODELS는 유지한다.
 
 ## 채널·모델 신호 1:1 연결 — 2026-11-26 확정
 
@@ -134,7 +134,7 @@ AO 입력을 지정한 시간만큼 지연한 뒤 같은 값으로 AI에 출력�
 - command 연결 후 해당 입력 station의 OP·새 유효 출력 조건을 만족해야 계산한다. feedback 미연결이어도 계산할 수 있다. 다른 station의 AI로 결과를 전달할 수 있으며 출력 전용 station 이탈은 계산을 중단하지 않는다.
 - 프리셋 `config.delay_seconds`는 초 단위 유한 숫자이며 기본값 0.016(16ms), 허용 범위는 0~10초(양 끝 포함)다. 생략 시 FMU 기본값도 0.016으로 일치시킨다.
 - 음수·10초 초과·숫자가 아닌 값(불리언 포함)·NaN·무한대는 시작 오류로 처리한다. 잘못된 값의 자동 보정은 없다. 상한은 1차 버퍼 자원 범위를 제한하기 위한 계약이다.
-- 초기 출력은 0으로 고정한다. 이 모델에는 별도 INSTANCE_CONFIG가 필요 없다. 프리셋 변경은 재시작 후 적용하며 버퍼는 초기화한다.
+- 초기 출력은 0으로 고정한다. 이 모델에는 별도 IO_MODEL_INSTANCES가 필요 없다. 프리셋 변경은 재시작 후 적용하며 버퍼는 초기화한다.
 - 8ms 비배수 지연의 첫 허용 계산 시점 적용, 값 변환 없음, 일시정지 시 버퍼 유지 정책은 앞의 계약을 그대로 따른다.
 
 프리셋 설계 예시: `model_presets/signal_processing/delay/analog_delay_16ms.json` (4단계에서 모델·FMU·프리셋 구현 완료).
@@ -151,7 +151,7 @@ AO 입력을 지정한 시간만큼 지연한 뒤 같은 값으로 AI에 출력�
 ```
 
 ```ini
-DEVICE_SIMULATOR_BEHAVIOUR_MODELS=analog0:analog_delay_16ms
+DEVICE_SIMULATOR_IO_MODELS=analog0:analog_delay_16ms
 DEVICE_SIMULATOR_IO_io0_BINDINGS=3:AO:0=analog0.command
 DEVICE_SIMULATOR_IO_io1_BINDINGS=3:AI:0=analog0.feedback
 ```
@@ -227,7 +227,7 @@ DEVICE_SIMULATOR_IO_io1_BINDINGS=3:AI:0=analog0.feedback
 - CPX는 기본 오류 상태 OD의 개별 SDO 읽기만 지원한다. 진단 PDO·진단 이력·Emergency 전송은 제외하며 진단 assignment 추가를 허용하지 않는다. 아래 진단 계약을 따른다.
 
 
-자체 .env에 모듈/슬롯/채널 및 모델 연결 구성을 추가한다. 환경 변수 문법은 ADR-005의 채택 내용을 따르며, 동작 모델 입출력명은 아래 실린더/analog_delay 계약을 따른다. 모델 설정은 프리셋/INSTANCE_CONFIG로 관리하고 실행 상태를 저장하지 않으며 기존 축 저장 계약은 유지한다. Motion Server .env를 읽거나 Demo 전용 구성을 코드에 고정하지 않는다.
+자체 .env에 모듈/슬롯/채널 및 모델 연결 구성을 추가한다. 환경 변수 문법은 ADR-005의 채택 내용을 따르며, 동작 모델 입출력명은 아래 실린더/analog_delay 계약을 따른다. 모델 설정은 프리셋/IO_MODEL_INSTANCES로 관리하고 실행 상태를 저장하지 않으며 기존 축 저장 계약은 유지한다. Motion Server .env를 읽거나 Demo 전용 구성을 코드에 고정하지 않는다.
 
 ## 복동 실린더 FMU 재사용 — 2026-11-25 채택
 
@@ -276,7 +276,7 @@ FMU는 위치(m), 속도(m/s), 절대압(Pa), 공압력(N)도 제공하지만, �
 - 공급압·외력은 외부 운전 조건, 초기 위치는 초기 조건이다. 현재 FMU에서는 이 값들을 parameter로 노출한다. XML의 tunable 표시만으로 실행 중 변경 검증이 완료됐다고 보지 않는다.
 - 위치·속도·챔버 압력은 상태이며 센서·공압력은 계산 출력이다. 실제 질량 유량은 내부 계산 결과이며 외부 입출력으로 노출되지 않는다.
 - 정격 유량 외부 설정 지원은 [RF-021](RF-021-pneumatic-cylinder-fmu-improvements.md)로 분리했다. 현재 IO 연결은 기존 검증 FMU 그대로 진행하며 재Export를 기다리지 않는다.
-- 동작 모델 특성은 모델 프리셋 JSON, 인스턴스별 운전 조건·초기 조건은 `.env`의 INSTANCE_CONFIG로 분리한다. 이전 전체 `.env`/세 그룹 제안을 대체하며 `state`에 중복 저장하지 않는다.
+- 동작 모델 특성은 모델 프리셋 JSON, 인스턴스별 운전 조건·초기 조건은 `.env`의 IO_MODEL_INSTANCES로 분리한다. 이전 전체 `.env`/세 그룹 제안을 대체하며 `state`에 중복 저장하지 않는다.
 
 ## 동작 모델 실행 구성 관리 — 2026-11-26 확정
 
@@ -310,22 +310,22 @@ FMU는 위치(m), 속도(m/s), 절대압(Pa), 공압력(N)도 제공하지만, �
 ```
 
 ```ini
-DEVICE_SIMULATOR_BEHAVIOUR_MODELS=cylinder0:cylinder_100mm,cylinder1:cylinder_100mm
+DEVICE_SIMULATOR_IO_MODELS=cylinder0:cylinder_100mm,cylinder1:cylinder_100mm
 
 # 운전 조건·초기 조건 통합: Pa(gauge), N, m
-DEVICE_SIMULATOR_MODEL_cylinder0_INSTANCE_CONFIG=supply_gauge_pressure:600000,opposing_force:0,initial_position:0
+DEVICE_SIMULATOR_IO_MODEL_INSTANCES=cylinder0: supply_gauge_pressure:600000,opposing_force:0,initial_position:0
 
 # 슬롯 1=DI8, 슬롯 2=DO8인 io0에 연결하는 예
 DEVICE_SIMULATOR_IO_io0_BINDINGS=2:DO:0=cylinder0.extend,2:DO:1=cylinder0.retract,1:DI:0=cylinder0.retracted,1:DI:1=cylinder0.extended
 ```
 
 - 프리셋 JSON에는 `schema_version`, `id`, `model`, `config`를 둔다. 운전 조건·초기 조건은 넣지 않는다. 프리셋은 Git 관리 대상이며 실행 중 수정/자동 저장하지 않는다.
-- `.env`의 INSTANCE_CONFIG는 `이름:값`의 쉼표 목록이다. 기존 줄 연속 표기를 지원하는 방식으로 구현한다. CONFIG/CONDITIONS/INITIAL 개별 키는 채택하지 않는다.
-- 실린더 INSTANCE_CONFIG의 항목은 supply_gauge_pressure, opposing_force, initial_position이다. 프리셋의 스트로크·직경 등을 `.env`에서 덮어쓰지 않는다. 다른 모델 특성이 필요하면 다른 프리셋을 만든다.
+- `.env`의 IO_MODEL_INSTANCES는 `인스턴스:항목:값,항목:값,다음인스턴스:항목:값` 목록이다. 세 부분 항목은 새 인스턴스 그룹을 시작하고 두 부분 항목은 현재 그룹에 속한다. 항목과 인스턴스 그룹 모두 쉼표로 구분하며 기존 줄 연속 표기를 지원한다. CONFIG/CONDITIONS/INITIAL 개별 키는 채택하지 않는다.
+- 실린더 IO_MODEL_INSTANCES의 항목은 supply_gauge_pressure, opposing_force, initial_position이다. 프리셋의 스트로크·직경 등을 `.env`에서 덮어쓰지 않는다. 다른 모델 특성이 필요하면 다른 프리셋을 만든다.
 - 단위는 m, kg, Pa, N이다. 공급압은 게이지압, 챔버 출력은 절대압이다. 값에 단위 문자열을 붙이지 않는다.
 - 인스턴스 설정 전체나 개별 항목을 생략하면 해당 FMU 기본값을 사용한다. 프리셋 config에서 생략한 설정도 FMU 기본값을 사용한다. 초기화 완료 전에 FMI에서 허용하는 단계에 두 종류의 설정을 적용한다.
 - 누락/중복 프리셋 ID, 미지원 schema/model, 미선언 인스턴스 설정, 중복/미지원 항목 및 잘못된 값은 시작 오류로 처리한다. 모델 정의의 허용 항목·범위·관계 조건을 검사한다.
-- 프리셋 및 INSTANCE_CONFIG 변경은 재시작 시 적용한다. 종료 직전 실행 상태를 자동 복원하지 않는다.
+- 프리셋 및 IO_MODEL_INSTANCES 변경은 재시작 시 적용한다. 종료 직전 실행 상태를 자동 복원하지 않는다.
 - 인스턴스 ID는 영문자/숫자로 시작하는 1~64자의 영문/숫자/밑줄/하이픈 이름이며 모델 인스턴스 사이에서 유일해야 한다. 프리셋은 model_presets 아래 JSON의 id로 탐색하고 중복을 거부한다. 모델별 artifact 파일명은 어댑터 등록표로 선택하며 실린더는 검증한 웹 Export 원본을 사용한다.
 - 정격 유량 설정은 RF-021 후속이다. 현재 프리셋에 미지원 항목을 추가하지 않는다.
 - 4단계에서 로더·모델 등록·Docker 반영을 완료했다. `.env.example`과 tests/fixtures/cpx-fmu.env에 실행 구성을 제공한다.
@@ -382,7 +382,7 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 - 모델별 계산 실패는 해당 모델에 고정하고 후속 주기에 자동 재시도하거나 OP 재진입만으로 해제하지 않는다. 정상 모델의 갱신은 계속한다.
 - 버스 상태에 따른 정상 일시정지는 새 유효 출력으로 자동 재개한다. 모델 계산 오류·Host 장애는 이 경로와 구분하며 수동 재시작이 필요하다.
 - 공용 프로세스에서 한 FMU의 무한 대기·네이티브 충돌이 발생하면 해당 프로세스 내 다른 모델도 영향을 받을 수 있다. 이 경우 개별 모델 격리 성공으로 간주하지 않고 Host 공통 장애를 적용한다. RF-018의 기존 축 Host 장애 경계를 유지한다.
-- 모델 오류는 내부 Diagnostic에 원인·모델 ID·영향받는 station/모듈/채널을 기록한다. 이 정보는 영향 범위이며 채널 하드웨어 오류 분류를 뜻하지 않는다. CPX Category·오류 수·latest-module/code·Error register·진단 이력·Emergency에는 모델 오류를 반영하지 않는다.
+- 모델 오류는 내부 Diagnostic에 원인·모델 ID·복구 필요 여부를 기록한다. Host 오류는 Host 전체 범위로 식별한다. station/모듈/채널 목록은 중복 기록하지 않으며 필요시 binding 설정에서 연결 관계를 확인한다. 모델 ID/Host 범위는 채널 하드웨어 오류 분류를 뜻하지 않는다. CPX Category·오류 수·latest-module/code·Error register·진단 이력·Emergency에는 모델 오류를 반영하지 않는다.
 - 잘못된 출력은 해당 모델의 유효한 새 출력으로 게시하지 않는다. 기존 값 유지/유효성 정책을 적용한다.
 - 초기화 실패는 시작 오류이며 이번 운전 중 장애 격리 정책으로 무시하지 않는다.
 - 모델 단독 재생성·관리 API·자동 복구는 이번 범위에 추가하지 않는다. 수동 재시작은 지정한 초기 조건을 적용하며 마지막 운전 상태를 복원하지 않는다.
@@ -393,6 +393,7 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 - 해당 모델 계산 중단·마지막 정상 DI/AI 유지·정상 모델 계속 실행·Host 장애 영향 범위·EtherCAT Slave 유지·수동 Docker 재시작 복구 정책은 유지한다. 진단 전달 제외가 장애 검출이나 격리 제외를 뜻하지 않는다.
 - Host 종료/응답 지연은 살아 있는 Slave 측 감시 경로에서 내부 진단을 남길 수 있어야 한다. 종료된 Host가 자체 보고한다고 가정하지 않는다.
 - CPX 진단은 CPX 자체의 장치·모듈 구성·지원 파라미터·통신 진단에 한정한다. 모델 오류만으로 0x1001, 0x6102, 모듈 진단 영역, 0x10F3 또는 Emergency를 변경하지 않는다. 별개로 실제 CPX/통신 오류가 검출되면 해당 장치 계약에 따라 처리한다.
+- 2026-11-26 재확인: DO 명령 이후 DI 센서 도달 여부·동작 완료 제한시간 등 공정/장치 동작의 타임아웃 판단은 상위 애플리케이션 책임이다. Soft ESC는 이를 감시하거나 CPX 모듈 오류로 생성하지 않는다. FMU 계산 실패/응답 제한시간은 별개의 내부 실행 보호·진단이며 CPX로 전달하지 않는다. 내부 진단에는 모델 ID 또는 Host 범위·복구 필요 여부만 요구하고 연결 station/모듈/채널 목록은 요구하지 않는다.
 - CPX 기본 오류 상태 OD 읽기만 1차 지원한다. 오류 요약 0x1001 및 현재 진단 요약 0x6102를 기준으로 개별 SDO 읽기·형식·지원 장치 상태 대응을 구현 지원표에 명시한다. 동작 모델의 정상 여부를 나타내는 필드로 사용하지 않는다.
 - 진단 PDO(0x1AF1 및 0x1AF0), 진단 이력(0x10F3), Emergency 전송은 1차 범위에서 제외한다. 자동/선택형 진단 PDO 추가, 이력 저장·조회·acknowledge, Emergency 활성화 기능을 구현하지 않는다. 미지원 SDO 요청은 정상 Abort로 응답한다.
 - 기본 오류 상태 OD는 읽기 전용이며 실제 지원·검출하는 CPX 자체 상태만 표현한다. 모델 오류를 합산하거나 미구현 하드웨어 진단을 가장하지 않는다. SDO Abort 및 EtherCAT AL 상태/상태 코드는 기존 프로토콜 경로로 처리하며 모든 요청 실패를 새 CPX 진단 사건으로 만들지 않는다.
@@ -402,7 +403,7 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 - [CPX ESI·서버 경로 조사](../Validation/CPX-Diagnostic-Path-20261126.md)의 기술적 근거는 유지하되 모델 오류를 CPX로 전달하던 제안은 철회했다. Motion Server의 CPX 자체 진단 수집/표시는 별도 작업이며 모델 진단 전달의 대체 경로가 아니다.
 - 0x27F1 저장 API 의미 정합성은 사용자 등록 Motion Server **TD-044**(`docs/tasks/td/TD-044-cpx-parameter-storage-semantics.md`)로 추적한다. 이 저장소에서 Motion Server를 수정하지 않는다.
 
-## 1차 검증 구성·합격 기준 — 2026-11-26 확정, 시험 전
+## 1차 검증 구성·합격 기준 — 2026-11-26
 
 | 구성 요소 | 수량 | 검증 목적 |
 | --- | ---: | --- |
@@ -435,7 +436,7 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 - 버스 상태 이탈 시험에서 기대 WKC/AL 상태 변화는 정상 OP 연속 교환의 판정과 분리한다. 특정 station만 상태를 바꾸는 시험과 물리 링크 상실의 영향을 구분한다.
 - 모델 오류는 내부 진단·값 유지·장애 격리와 CPX 진단에 미반영됨을 검증한다. CPX 자체 진단은 확정한 OD 지원 범위에서 별도로 검증한다. Motion Server/Omniverse의 외부 진단 수집·표시는 이번 모델 장애 검증의 선행 조건이 아니다.
 - 2 station/4 모델은 1차 검증 구성이다. 기존 Drive+IO·F-KR/Copley·저장·동적 PDO 회귀 등 아래 RF 전체 완료 기준을 대체하지 않는다.
-- 위 항목은 합의한 시험 계획이며 수행 완료를 뜻하지 않는다. 임의의 장시간 시험 시간이나 모든 주기의 8ms 마감 준수를 새 합격 조건으로 추가하지 않는다.
+- 항목별 수행 결과는 아래 완료 기준/5단계 기록을 따른다. 아날로그 raw·지연·독립성은 기존 자동 시험을 수용하고 수동/물리 FMU 왕복은 사용자 결정으로 생략했다. 임의의 장시간 시험 시간이나 모든 주기의 8ms 마감 준수를 새 합격 조건으로 추가하지 않는다.
 
 ## 구현 준비 항목과 진행 추적 — 2026-11-26
 
@@ -447,7 +448,7 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 
 - 선택 CPX ESI Identity/revision, 모듈 식별/순서, 초기화 OD·SDO, 기본 오류 상태 OD의 자료형/정상값/실제 검출 상태, PDO offset/정렬 및 오류 응답 요구를 표로 고정한다. CPX는 고정 매핑 읽기/쓰기 거부/시작 시 생성으로 구현하고 RF-014의 축 동적 매핑·저장을 회귀한다.
 - Slave의 출력 갱신/유효성·AL 상태·watchdog 검출을 기존 KickCAT 코드와 대조한다. 여러 station의 입력 스냅샷과 일시정지/재개 판정 경계를 구현 설계로 구체화한다.
-- 공통 FMI 실행기는 현재 생성자에서 초기화까지 끝내므로 프리셋/INSTANCE_CONFIG와 초기 명령을 초기화 완료 전에 전달하는 경로를 추가한다. FMI 변수별 허용 설정 단계와 초기 출력 읽기를 검증하고 기존 Copley 초기화 동작을 회귀한다.
+- 공통 FMI 실행기는 현재 생성자에서 초기화까지 끝내므로 프리셋/IO_MODEL_INSTANCES와 초기 명령을 초기화 완료 전에 전달하는 경로를 추가한다. FMI 변수별 허용 설정 단계와 초기 출력 읽기를 검증하고 기존 Copley 초기화 동작을 회귀한다.
 - 공통 비동기 IO 계산과 기존 축 실행·IPC timeout 경계를 대조한다. 8ms 계산과 프레임 처리 분리 및 Host 종료 후 내부 진단 유지 경로를 확인한다.
 - 프리셋 ID 탐색·중복 검사·인스턴스 ID 문법, 모델 등록명/검증된 artifact 선택·Docker/배포 포함을 기존 구조에 맞춰 명세한다. 운영 .env/기존 축 저장을 임의 이관하지 않는다.
 - 아날로그 지연 FMU 제작 방법은 공통 실행기와 Int16 계약을 만족하는 재현 가능한 방식으로 조사한다. FMI 3.0 Co-Simulation/Linux x86-64를 우선 검토하되 4단계에서 C99 기반 FMI 3.0 Co-Simulation/Linux x86-64 FMU로 구현했다. 정수 이력 버퍼를 FMU 내부에 두며 Python 대체 계산을 사용하지 않는다.
@@ -455,7 +456,7 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 
 주요 연결·실행·지연·장애·복구 정책과 1차 검증 구성은 확정했다. 위 목록은 추가 정책 결정이 아니라 구현 준비·근거 확인 작업이다. 항목별 현재 구현·검증 상태는 아래 단계표와 완료 기준을 따른다. 전체 물리 통합 시험 완료를 뜻하지 않는다.
 
-## 구현 계획 — 2026-11-26 1~4단계 완료
+## 구현·검증 결과 — 2026-11-26 완료
 
 | 단계 | 구현 및 검증 | 현재 상태 |
 | --- | --- | --- |
@@ -463,20 +464,20 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 | 2. 기본 Slave 통신 | 검색·F030/F050·개별 SDO·정상 Abort·OP·비트 단위 PDO 및 축 회귀. 동작 모델 없이 시험 | 완료: 오프라인 + 물리 |
 | 3. IO 실행·연결 | 독립 모델 인스턴스, station 스냅샷, 8ms 비동기 계산, 정지/재개·오류 격리. 주입한 시험 모델로 실행 계약 검증 | 완료: 실제 FMU는 4단계 |
 | 4. FMU·패키징 | 초기화 전 설정 전달, 실제 실린더 어댑터, 아날로그 지연 FMU 제작·검증 및 Docker 포함 | 완료: 실제 FMU·배포 이미지 시험 |
-| 5. 통합 검증 | 실제 FMU 2 station·실린더 2개·지연 2개, 분산 연결과 Drive 혼합 물리 시험 | 후속 |
+| 5. 통합 검증 | 실제 FMU·분산 연결과 Drive 혼합 통합 시험 | 완료: 실린더·혼합 운전·Host 복구·재구성 / 아날로그 수동 생략 |
 
 1~3단계 구현 후 4단계의 실제 FMU 어댑터·빌드·패키징과 오프라인/컨테이너 검증을 완료했다. [4단계 결과](../Validation/RF-013-stage4-20261126.md)를 참조한다. [구현 경로·지원표·시험 결과](../Validation/RF-013-stage1-3-20261126.md)를 참조한다. 시험용 동작 모델은 테스트 코드에만 두며 실제 FMU 구현을 대신한 제품 loopback으로 등록하지 않는다. 사용자 확인에 따라 기존 Simulator/Motion Server를 필요시 정지·재시작할 수 있으며 설정·저장 파라미터를 보존한다. 오프라인 시험과 물리 통신 시험 결과를 구분하여 기록하고 실제 FMU 통합 완료로 확대하지 않는다.
 
 ## 완료 기준
 
-체크된 항목은 1~3단계 CPX 통신/주입형 시험과 4단계 실제 FMU 오프라인·컨테이너 시험 근거다. 전체 경로의 물리 연결·장애·재시작 및 Drive 혼합 시험은 5단계로 구분한다.
+체크된 항목은 1~3단계 CPX 통신/주입형 시험, 4단계 실제 FMU 자동 시험 및 5단계 사용자 실린더 수동 완료 보고를 근거로 한다. 아날로그 수동/물리 AO→FMU→AI 왕복은 사용자 결정으로 생략했으며 완료 필수 시험으로 다시 요구하지 않는다. 해당 물리 경로는 미검증이라는 한계를 유지한다. 자동 경계 시험은 [추가 결과](../Validation/RF-013-boundaries-20261126.md)를 근거로 반영했다. 전체 혼합 장애/재시작·구성 변경·계측도 아래 최종 결과에 따라 완료했다.
 
 - [x] 선정 장치의 MDP·모듈 식별/구성·초기화 OD·PDO 요구와 지원 범위 표.
 - [x] 모듈 구성으로 고정 PDO 생성, mapping/assignment 개별 읽기와 실제 배치 일치, 모든 상태의 쓰기 거부 및 기존 매핑 유지 검증. 동일값/clear 요청 포함.
-- [ ] CPX 매핑 저장 없이 재시작 시 구성에서 재생성, 구성 변경 후 Master 재검색, F030 일치 검증과 재매핑 구분, 미지원 모듈/AP 파라미터·27F1 정상 Abort 검증.
+- [x] CPX 매핑 저장 없이 재시작 시 구성에서 재생성, 슬롯4 DO8 추가·Master 재검색·입출력 크기/F030/F050/assignment 확인 및 원복. 미지원 모듈/AP 파라미터·27F1 정상 Abort는 기존 검증 근거 유지.
 - [x] 자체 .env 장치/모듈/채널/모델 구성 및 오류 검증. 미지원 모듈·잘못된 순서/채널 거부.
 - [x] 프로파일/제품 설명과 어댑터/동작 모델 분리, 모듈·채널·동일 종류의 여러 모델 인스턴스 상태 독립성 검증.
-- [x] BEHAVIOUR_MODELS/BINDINGS 문법·모델 인스턴스 생성·채널 연결 구현, 기존 AXIS_MODELS 유지 회귀.
+- [x] IO_MODELS/BINDINGS 문법·모델 인스턴스 생성·채널 연결 구현, 기존 AXIS_MODELS 유지 회귀.
 - [x] 채널별 binding의 존재/방향/자료형 및 전체 IO 목록에서 채널·모델 신호 각각의 유일성 검증. 동일 행 중복·1:N·N:1 연결을 모두 시작 시 거부.
 - [x] 실린더 DO 2개/DI 2개 연결과 독립 인스턴스 검증, 실린더 AI/AO 연결 설정 거부. AI/AO 지원은 별도 모델로 검증.
 - [x] 미연결 DI=False/AI=raw 0 및 DO/AO 수신값 보관, 자동 loopback 없음, 연결된 모델 오류를 미연결 기본값으로 숨기지 않음 확인.
@@ -485,30 +486,69 @@ Remote I/O에 연결된 동작 모델의 계산 수명주기는 공통 모델 �
 - [x] 실린더 FMU 어댑터·두 DO 입력/두 끝단 DI 출력 연결, 밸브 방향 유지 및 다중 인스턴스 독립성 검증.
 - [x] 두 입력 ON도 진단·우선순위 개입 없이 전달되는지 검증.
 - [x] 계산 시작 시 입력 전체 스냅샷, 계산 중 새 수신값의 다음 주기 적용, 모델당 고정 8ms 한 번 계산 및 station/프레임 수와 모델 시간 독립성 검증. 짧은 펄스 관측 한계를 명시.
-- [ ] 8ms 초과 시 고정 doStep 유지·요청 누적/중첩/따라잡기 없음·제한시간 이내 결과 반영·지연 계측 검증. timeout은 Host 장애/Slave 유지로 분리하고 늦은 응답으로 자동 복구되지 않음 검증.
+- [x] 8ms 초과 시 고정 doStep·중첩/따라잡기 없음·제한시간 이내 결과 반영·지연 계측: 12ms 주입 시험 및 중첩 거부 시험 통과. timeout latch·늦은 결과 폐기는 실행부 시험 완료. 전체 혼합 버스의 Host 지연/Slave 유지 통합은 아래 별도 잔여 항목.
 - [x] 여러 station의 DO/DI 분산 연결과 전역 1:1 검증. 입력 station 중 하나라도 조건 상실 시 해당 모델 일시정지, 모두 회복하고 각 새 유효 입력 확보 후 재개, 중단 시간 따라잡기 없음 검증.
 - [x] 출력 전용 station 이탈 시 모델 계산/다른 정상 출력 갱신 지속, 복귀 시 최신 결과 반영, 입력·출력을 겸한 station에는 입력 의존성 적용 검증.
 - [x] 계산 중 입력 조건 상실 시 새 단계 금지·진행 중 한 단계 정상 완료 반영·내부 상태/IO 일치·일시정지 검증. 처리 중 재연결과 Host timeout 후 늦은 응답 폐기 포함.
-- [ ] 계산 일시정지/모델 장애 때 마지막 DI/AI 값 유지·유효성 구분 및 새 계산 성공 후 정상 전환 검증.
-- [ ] 모델 오류/Host 장애 내부 진단과 영향 범위 기록, 모델 오류만으로 CPX 진단 OD·Error register·이력·Emergency를 변경하지 않음 검증. 별개의 CPX 자체 오류 처리는 유지.
-- [ ] CPX 기본 오류 상태 OD 개별 읽기·정상값/지원 오류 상태·읽기 전용 검증. 진단 PDO 미포함, 진단 이력/관련 설정 요청 Abort, Emergency 미전송 검증. 모델 오류의 외부 전달 및 상위 애플리케이션 연동은 후속 범위로 분리.
+- [x] 계산 일시정지/모델 장애 때 마지막 DI/AI 값 유지·내부 상태 구분 및 새 계산 성공 후 정상 전환 검증. paused/fault/host_failed/busy_since/steps로 판정하며 paused 해제 자체는 새 출력 성공을 뜻하지 않는다.
+- [x] 모델 오류/Host 장애 내부 진단에 모델 ID 또는 Host 범위와 복구 필요 여부 기록. station/모듈/채널 목록은 요구하지 않음. 모델 오류만으로 CPX 진단 OD·Error register를 변경하지 않음, 이력 미지원 Abort 및 Emergency 미전송 확인. Host 전체 물리 영향·복구는 아래 잔여 항목과 구분.
+- [x] CPX 기본 오류 상태 OD 개별 읽기·현재 최소 지원 정상값·읽기 전용 검증. 0x1001/0x6102 쓰기 Abort 0x06010002 및 값 유지, 진단 PDO 미포함, 진단 이력/관련 설정 요청 Abort, 모델 오류 이후 mailbox 100회 관측에서 Emergency 없음 확인. 제조사 하드웨어 고장 모델링은 이 시험 범위가 아님. 모델 오류의 외부 전달 및 상위 애플리케이션 연동은 현행 후속 범위로 분리.
 - [x] 공통 FMI 실행기에 설정을 초기화 완료 전에 전달하고 설정값이 초기 상태/출력에 반영되는지 검증. 기존 Copley 초기화 회귀.
-- [x] 프리셋 JSON과 `.env` INSTANCE_CONFIG 적용, 생략 시 FMU 기본값, 잘못된 설정의 시작 거부, 재시작 초기화 및 `state` 중복 저장 없음 검증.
-- [ ] AI/AO 양방향 모델 연결·자료형/단위 변환·합의한 범위 경계/잘못된 값 처리·채널 독립성 검증.
+- [x] 프리셋 JSON과 `.env` IO_MODEL_INSTANCES 적용, 생략 시 FMU 기본값, 잘못된 설정의 시작 거부, 재시작 초기화 및 `state` 중복 저장 없음 검증.
+- [x] AI/AO 모델 입출력 연결·raw Int16 무변환·범위 경계/잘못된 값 처리·채널 독립성: unit 및 실제 FMU 4개 cross-station 자동 시험으로 검증. 외부 Motion Server의 물리 AO→FMU→AI 왕복은 사용자 결정으로 생략(미검증).
 - [x] 단계 시작 입력 시각/종료 출력 시각을 분리한 0/16/20ms 지연 검증. 첫 입력 t=0의 예상 출력 완료 시각 8/16/24ms 확인.
 - [x] 아날로그 순수 지연 FMU의 raw Int16 값 보존(음수·0·양수·양 끝값), 초기 0, 지연 0/8ms 배수/비배수의 첫 출력 시점 및 여러 입력 변화의 순서 보존 검증.
-- [ ] analog_delay command 필수/feedback 선택 연결, 미연결 초기화 대기, delay_seconds 기본 0.016·범위 0~10초·잘못된 값 시작 오류 검증.
+- [x] analog_delay command 필수/feedback 선택 연결, 미연결 초기화 대기, delay_seconds 기본 0.016·범위 0~10초·잘못된 값 시작 오류 검증. command 미연결 시간/계산 횟수 0, feedback 미연결 계산 지속을 실제 FMU로 직접 확인.
 - [x] 지연 FMU 일시정지 시 버퍼/모델 시간 유지·재개 연속성, 재시작 시 버퍼 초기화·출력 0, 다중 인스턴스 독립성 검증.
 - [x] DI/DO/AI/AO 혼합 모듈 구성의 프로세스 데이터 배치 및 모델 입출력 대응 검증.
 - [x] AIO RxPDO 9바이트·4개 AO Int16·공급 4bit·padding 4bit 및 후속 모듈 offset 검증. 공급 비트 0/1 변경이 raw IO·모델 Enable/계산 조건·진단에 영향을 주지 않으며 공급 비트 binding/전원 제어 설정은 지원하지 않음 확인.
 - [x] EtherCAT 검색·SDO·OP·PDO 및 모듈별 데이터 배치 검증. 명시한 MDP 범위에 대해 근거 기록.
 - [x] 특정 모델 계산 오류·잘못된 출력 시 해당 채널 값 유지/내부 진단, 정상 모델 계산 계속 및 OP 재진입으로 오류가 해제되지 않음 검증.
-- [ ] 공용 Host 종료·응답 지연 시 프로세스 내 전체 모델 영향/Slave 유지, 수동 Docker 재시작 후 초기 조건 복구 검증. 기존 축 RF-018 장애 경계를 유지하고 IO에 AxisFault 투영을 대신 적용하지 않음.
-- [ ] Drive+IO 혼합 구성·저장/재시작·기존 F-KR/Copley/동적 매핑 회귀. 3축+IO는 Demo에서 가져온 시험 사례.
-- [ ] 외부 Master의 일반 IO 명령으로 모델 동작·DI 리드백 확인. 외부 Alignment/Sequence 자체는 제외.
+- [x] 공용 Host SIGSTOP/SIGKILL 시 4개 가상축 Host Fault·마지막 DI/AI·Slave 유지, 각 97개 WKC 표본 24/24, SDO 유지 확인. SIGCONT/축 Reset으로 해제되지 않음. Docker 재시작·버스 재연결·실축 통신 Fault Reset 후 초기 조건 복구 검증. 기존 RF-018 경계를 유지하고 IO에 AxisFault 투영을 대신 적용하지 않음.
+- [x] 현재 Drive+IO 혼합 정상 운전·계측: 가상 F-KR/Copley 4축 및 실린더 2개를 단일 조작권으로 각각 15회 왕복, WKC/시간/주기·최종 복원 확인.
+- [x] 현재 Drive+IO 혼합 저장/재시작 회귀: F-KR/Copley 파라미터 파일 불변 및 SDO 저장값 복원, 현재 PDO 매핑 identity/rx/tx 유지·Master 초기화 재설정 확인. mapping revision/checksum 갱신은 허용한다. 임의 매핑 전체 시험은 기존 RF-014 근거를 재사용한다.
+- [x] 외부 Master의 일반 IO 명령으로 실린더 동작·DI 리드백 확인: 2026-11-26 사용자 수동 시험 완료 보고. 외부 Alignment/Sequence 자체는 제외. 상세 WKC/시간 수치를 보고받은 것은 아님.
+
+## 5단계 최종 결과 및 완료 판정 — 2026-11-26
+
+- 사용자 확인: Motion Server 버스 연결·초기화 완료, 실린더 수동 테스트 완료. 해당 동작을 다시 시험해야 한다는 의미로 미완료 처리하지 않는다.
+- 사용자 결정: 아날로그 수동 시험 생략. 실제 지연 FMU의 Int16 값/경계·지연·독립성·분산 연결·일시정지·재시작 자동 시험을 수용한다. Panel AO UI 추가나 물리 AO→FMU→AI 왕복을 이 RF의 완료 선행 조건으로 두지 않는다.
+- 위 결정은 실제 물리 아날로그 경로 검증 완료를 뜻하지 않으며 최종 검증 범위에 한계로 명시한다.
+
+자동 검증 근거 보완(기존 4번)은 세 묶음 시험을 수행해 완료했다. IO 단위/실제 FMU 35개, 전체 단위 88개 통과(1개 환경 생략), Docker 실제 FMU 12개, KickCAT 두 구성의 mailbox/OP/WKC 시험이 통과했다. [자동 경계 시험 결과](../Validation/RF-013-boundaries-20261126.md)를 참조한다.
+
+혼합 운전·계측(기존 1번)도 완료했다. 60.531초 동안 가상축 4개·실린더 2개가 각각 15회 왕복했고 WKC 조회 1,171회 모두 24/24, Fault/IPC 오류 관측 0이었다. 설정 주기 4ms, 수신 간격 최대 10.036ms(8ms 초과 2건)를 기록했다. 모든 프레임 WKC 캡처나 RT 성능 보증은 아니다. [혼합 운전 결과](../Validation/RF-013-mixed-operation-20261126.md).
+
+Host 장애·복구(기존 2번)도 완료했다. SIGSTOP/SIGKILL 각각 약 5초 동안 97회 WKC 표본 모두 24/24, 마지막 IO·SDO·Slave 유지 및 수동 재시작/초기 조건 복원을 확인했다. 재연결 시 실제 축 통신 오류 0x8188은 Reset으로 해제했다. [장애·복구 결과](../Validation/RF-013-host-recovery-20261126.md).
+
+CPX 재구성·재검색(기존 3번)도 완료했다. io1 슬롯4 DO8 추가로 출력 10→11바이트·F030/F050/assignment·새 DO PDO/SDO 값을 확인하고 원래 구성으로 복원했다. 변경 구성 WKC 조회 69회 모두 24/24. [재구성·원복 결과](../Validation/RF-013-reconfiguration-20261126.md).
+
+합의 범위 미완료 항목 없음. RF-013을 완료로 판정한다. 아날로그 물리 전체 왕복 생략·최소 CPX 지원 범위·비RT 검증 한계는 그대로 유지한다. 후속 기능을 이 RF의 완료 조건에 추가하지 않는다. [5단계 종합 기록](../Validation/RF-013-stage5-20261126.md).
 
 ## 제외·후속 및 근거
 
 IO-Link, IODD/ISDU, 범용 센서 라이브러리, 제조사 실측 기반의 정밀 공압 모델 개발·정량 검증은 이번 구현에 포함하지 않는다. 선택한 공개 FMU가 제공하는 압력·부하 계산은 재사용한다. DI/DO/AI/AO는 모두 1차 구현 범위다. Modular Device Profile 전체 및 모든 CPX 모듈의 적합성을 선언하지 않고 구현한 범위를 명시한다.
 
 RF-005의 실제 CPX 통신 및 RF-011/014/018의 축 검증은 기반 근거이며 가상 Remote I/O 구현 완료를 대신하지 않는다. 해당 RF 완료 상태는 유지한다. 외부 DT/Sync·Pairing·ROS2·Omniverse 구현은 이 RF의 범위가 아니다.
+
+## IO 설정 키 정리 — 2026-11-26
+
+- DEVICE_SIMULATOR_IO_MODELS: 인스턴스 이름과 프리셋 ID 목록. 기존 BEHAVIOUR_MODELS 대체.
+- DEVICE_SIMULATOR_IO_MODEL_INSTANCES: 각 인스턴스의 운전 조건·초기 조건을 모은 단일 목록. 기존 MODEL_<id>_INSTANCE_CONFIG 대체.
+- 인스턴스 선언·설정·IO binding의 역할과 내부 동작 모델 계약은 동일하다. 키 이름 변경만으로 모델을 새로 만들거나 저장 파일을 이관하지 않는다.
+- 미선언/중복 인스턴스 설정, 중복 항목, 구분자 누락, 비유한 숫자·미지원 항목·범위 밖 값은 설정 오류다. 기존 키가 남으면 명시적 오류를 반환한다. 지연 FMU는 인스턴스 설정 없이 프리셋의 delay_seconds를 사용한다.
+
+```ini
+DEVICE_SIMULATOR_IO_MODELS=\
+    cylinder0:cylinder_100mm,\
+    cylinder1:cylinder_100mm,\
+    analog0:analog_delay_16ms,\
+    analog1:analog_delay_16ms
+
+# Per-instance operating and initial conditions; use commas between instance groups.
+DEVICE_SIMULATOR_IO_MODEL_INSTANCES=\
+    cylinder0: supply_gauge_pressure:600000,initial_position:0,\
+    cylinder1: supply_gauge_pressure:600000,initial_position:0
+```
+
+그룹 간 쉼표를 생략하지 않는다. 설정 전체/개별 값 생략 시 FMU 기본값을 쓰며 초기화 전에 적용하는 정책은 유지한다.

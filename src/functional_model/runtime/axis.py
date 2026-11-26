@@ -14,7 +14,7 @@ TYPES = {'uint8': 'USINT', 'int8': 'SINT', 'uint16': 'UINT', 'int16': 'INT',
 class Model:
     def __init__(self, device=None):
         self.device = device or dict(slave_index=0, id="axis-0", type="cia402-drive",
-                                     model=dict(type="f_kr_cmmt", mode="linear"), parameter_set="axis-0")
+                                     model=dict(type="f_kr_cmmt", mode="linear"))
         self.store = None
         self.timing = None
         self.preset = "linear_mm" if self.device["model"]["mode"] == "linear" else "rotary_deg"

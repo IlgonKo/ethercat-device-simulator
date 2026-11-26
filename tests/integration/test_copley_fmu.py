@@ -14,7 +14,7 @@ class CopleyFmuTests(unittest.TestCase):
     def test_runtime_fault_reset_matches_motion_server_sequence(self):
         from functional_model.runtime.axis import Model
         from unittest.mock import patch
-        m = Model(dict(slave_index=0, id='fault-test', type='cia402-drive', parameter_set='temporary',
+        m = Model(dict(slave_index=0, id='fault-test', type='cia402-drive',
                        model=dict(type='copley_drive_sim', mode='linear',
                                   artifact=str(Path(os.environ['COPLEY_TEST_FMU']).resolve()))))
         self.addCleanup(m.close)
@@ -51,7 +51,7 @@ class CopleyFmuTests(unittest.TestCase):
     def test_od_exchange_pp_target_latched_and_reactivation_requires_new_edge(self):
         from functional_model.runtime.axis import Model
         from unittest.mock import patch
-        m = Model(dict(slave_index=0, id='od-pp', type='cia402-drive', parameter_set='temporary',
+        m = Model(dict(slave_index=0, id='od-pp', type='cia402-drive',
                        model=dict(type='copley_drive_sim', mode='linear',
                                   artifact=str(Path(os.environ['COPLEY_TEST_FMU']).resolve()))))
         self.addCleanup(m.close)
@@ -165,10 +165,9 @@ class CopleyFmuTests(unittest.TestCase):
             env = dict(KICKCAT_INTERFACE='enp1s0', DEVICE_SIMULATOR_STATE_DIR=folder,
                        DEVICE_SIMULATOR_FMU_DIR=str(artifact.parent),
                        DEVICE_SIMULATOR_BUS='0:axis:cia402-drive,1:axis:cia402-drive',
-                       DEVICE_SIMULATOR_AXIS_IDS='0:copley0,1:internal1',
+                       DEVICE_SIMULATOR_AXIS_NAMES='0:copley0,1:internal1',
                        DEVICE_SIMULATOR_AXIS_MODELS='0:copley_drive_sim,1:f_kr_cmmt',
-                       DEVICE_SIMULATOR_AXIS_MODES='0:linear,1:rotary',
-                       DEVICE_SIMULATOR_AXIS_PARAMETER_SETS='0:copley0,1:internal1')
+                       DEVICE_SIMULATOR_AXIS_MODES='0:linear,1:rotary')
             config = load_environment(env)
             fleet = ModelFleet(config, store)
             self.addCleanup(fleet.close)

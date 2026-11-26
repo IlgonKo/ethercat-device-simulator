@@ -24,7 +24,7 @@
 | model_sources/ | 장치 종류 → 모델 종류별 원본·출처·재현 정보 | 포함 |
 | model_sources/motor_controller/copley/ | C 소스 포함 원본 FMU의 URL·커밋·체크섬·설명 | 포함 |
 | model_sources/pneumatic_cylinder/double_acting/ | 실린더 Modelica 소스·자동 왕복 데모·원본 정보 | 포함 |
-| model_presets/ | 모델 종류·특성을 담는 재사용 JSON. 운전 조건·초기 조건은 .env INSTANCE_CONFIG로 분리 | 포함 |
+| model_presets/ | 모델 종류·특성을 담는 재사용 JSON. 운전 조건·초기 조건은 .env IO_MODEL_INSTANCES로 분리 | 포함 |
 | model_artifacts/ | 실행용으로 선정한 완전한 FMU 파일. 바이너리와 동반 리소스를 함께 유지 | 설명은 포함, FMU 제외 |
 | protocols/ | 프로세스 간 메시지 계약 문서 | 포함 |
 | third_party/KickCAT/ | 고정된 KickCAT 외부 소스, Git submodule | submodule |

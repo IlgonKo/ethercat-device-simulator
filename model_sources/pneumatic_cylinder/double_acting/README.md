@@ -227,4 +227,4 @@ build/fmi-venv/bin/python scripts/validation/test-pneumatic-fmi3.py \
 
 ### RF-013 실행 연결 — 2026-11-26
 
-위 FMI 3.0 웹 산출물을 Docker의 binary_fmus 입력으로 SHA-256 고정했다. 준비 스크립트가 로컬 파일을 검증하고 이미지에 원본 아카이브 전체를 포함한다. 이전 Windows FMI 2.0 빌드의 upstream.json과 구분한다. `cylinder_100mm` 프리셋 및 `.env` INSTANCE_CONFIG는 FMI 초기화 완료 전에 적용한다. DO 두 입력과 끝단 DI 출력은 remote_io/adapter/fmi.py에서 연결한다. [4단계 검증](../../../Doc/Validation/RF-013-stage4-20261126.md).
+위 FMI 3.0 웹 산출물을 Docker의 binary_fmus 입력으로 SHA-256 고정했다. 준비 스크립트가 로컬 파일을 검증하고 이미지에 원본 아카이브 전체를 포함한다. 이전 Windows FMI 2.0 빌드의 upstream.json과 구분한다. `cylinder_100mm` 프리셋 및 `.env` IO_MODEL_INSTANCES는 FMI 초기화 완료 전에 적용한다. DO 두 입력과 끝단 DI 출력은 remote_io/adapter/fmi.py에서 연결한다. [4단계 검증](../../../Doc/Validation/RF-013-stage4-20261126.md).

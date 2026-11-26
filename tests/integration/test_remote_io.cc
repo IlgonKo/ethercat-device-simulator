@@ -10,6 +10,25 @@
 using namespace kickcat;
 using json=nlohmann::json;
 void require(bool ok,char const* message){if(!ok)throw std::runtime_error(message);}
+std::vector<uint8_t> sdoRequest(sim::SimulatedSlave& sim,uint16_t index,uint8_t sub,uint8_t command,uint32_t value=0) {
+    std::vector<uint8_t> raw(128,0);auto* h=reinterpret_cast<mailbox::Header*>(raw.data());
+    h->len=10;h->type=mailbox::Type::CoE;h->count=1;
+    reinterpret_cast<CoE::Header*>(raw.data()+6)->service=CoE::Service::SDO_REQUEST;
+    raw[8]=command;raw[9]=index&255;raw[10]=index>>8;raw[11]=sub;
+    for(int k=0;k<4;++k)raw[12+k]=value>>(8*k);
+    auto reply=sim.mailbox->processRequest(std::move(raw));
+    for(int retry=0;reply.empty() && retry<100;++retry){sim.mailbox->process();reply=sim.mailbox->popReply();}
+    require(reply.size()==128,"Missing/full-mailbox SDO response");
+    require(reinterpret_cast<mailbox::Header*>(reply.data())->type==mailbox::Type::CoE,"Unexpected mailbox type");
+    // Abort keeps the CoE SDO request service in KickCAT; command/index identify its response.
+    require((reply[8]==0x80 || reinterpret_cast<CoE::Header*>(reply.data()+6)->service==CoE::Service::SDO_RESPONSE),"Unexpected CoE service instead of SDO reply");
+    require(reply[9]==(index&255) && reply[10]==(index>>8) && reply[11]==sub,"Unsolicited/mismatched SDO reply");
+    return reply;
+}
+void requireNoUnsolicitedMailbox(sim::SimulatedSlave& sim) {
+ sim.mailbox->process();
+ require(sim.mailbox->popReply().empty(),"Unsolicited mailbox message (including Emergency) generated");
+}
 int main(int argc,char** argv) {
  try {
   require(argc==3 || argc==4,"manifest, contract, optional model socket required");json manifest,spec;
@@ -40,14 +59,7 @@ int main(int argc,char** argv) {
    fmmu(0,0x10000+n*0x1000,0x1800,io.bytes(true),2);fmmu(1,0x10200+n*0x1000,0x1c00,io.bytes(false),1);
    sim.slave->start();state(State::PRE_OP);require(sim.slave->state()==State::PRE_OP,"PREOP failed");
    auto sdo=[&](uint16_t index,uint8_t sub,uint8_t command,uint32_t value=0) {
-    std::vector<uint8_t> raw(128,0);auto* h=reinterpret_cast<mailbox::Header*>(raw.data());
-    h->len=10;h->type=mailbox::Type::CoE;h->count=1;
-    reinterpret_cast<CoE::Header*>(raw.data()+6)->service=CoE::Service::SDO_REQUEST;
-    raw[8]=command;raw[9]=index&255;raw[10]=index>>8;raw[11]=sub;
-    for(int k=0;k<4;++k)raw[12+k]=value>>(8*k);
-    auto reply=sim.mailbox->processRequest(std::move(raw));
-    for(int retry=0;reply.empty() && retry<100;++retry){sim.mailbox->process();reply=sim.mailbox->popReply();}
-    require(reply.size()==128,"Missing/full-mailbox SDO response");return reply;
+    return sdoRequest(sim,index,sub,command,value);
    };
    auto value=[](auto const& r){uint32_t v=0;for(int k=0;k<4;++k)v|=uint32_t(r[12+k])<<(8*k);return v;};
    auto abort=[&](uint16_t index,uint8_t sub,uint8_t command,uint32_t v,uint32_t expected) {
@@ -59,6 +71,11 @@ int main(int argc,char** argv) {
     auto r=sdo(e["index"],e["subindex"],0x40);require(r[8]!=0x80,"Supported OD read failed");
     if(e["index"]==0xf030)require(sdo(e["index"],e["subindex"],e["bits"]==8?0x2f:0x23,value(r))[8]==0x60,"F030 same config rejected");
     auto index=e["index"].get<uint16_t>();
+    if(index==0x1001 || index==0x6102) {
+     auto cmd=e["bits"]==8?0x2f:e["bits"]==16?0x2b:0x23;
+     abort(index,e["subindex"],cmd,1,0x06010002);
+     require(sdo(index,e["subindex"],0x40)==r,"Rejected write changed CPX diagnostic OD");
+    }
     if(index>=0x1600 && index<=0x1c13) {
      auto cmd=e["bits"]==8?0x2f:e["bits"]==16?0x2b:0x23;
      abort(index,e["subindex"],cmd,0,0x06010002);
@@ -118,13 +135,67 @@ int main(int argc,char** argv) {
     auto result=ios[target]->sdo({{"op","read"},{"index",0x6030},{"subindex",sub}});
     require(!expected.empty() && result["data"]==expected,"Cross-station OD/IPC/model/PDO result differs");
    }
+   // Fail one test-only model through its actual AO snapshot, keep the other running.
+   auto before=host.request({{"op","test_io_status"}});
+   auto held=ios[1]->sdo({{"op","read"},{"index",0x6030},{"subindex",1}});
+   std::vector<std::vector<std::vector<uint8_t>>> diagnosticBefore(slaves.size());
+   for(size_t i=0;i<slaves.size();++i) {
+    requireNoUnsolicitedMailbox(*slaves[i]);
+    for(auto const& e:spec["devices"][i]["contract"]["entries"])
+     if(e["index"]==0x1001 || e["index"]==0x6102)
+      diagnosticBefore[i].push_back(sdoRequest(*slaves[i],e["index"],e["subindex"],0x40));
+   }
+   auto setAnalog=[&](size_t station,unsigned sub,int16_t value) {
+    size_t offset=0;bool found=false;
+    for(auto const& e:spec["devices"][station]["contract"]["rx"]) {
+     unsigned bits=e["bits"];
+     if(e["index"]==0x7030 && e["subindex"]==sub) {
+      require(bits==16,"Test AO must be Int16");found=true;
+      for(unsigned k=0;k<bits;++k) {
+       auto& byte=slaves[station]->output[(offset+k)/8];auto mask=uint8_t(1<<((offset+k)%8));
+       byte=(byte&~mask)|(((uint16_t(value)>>k)&1)?mask:0);
+      }
+     }
+     offset+=bits;
+    }
+    require(found,"Test AO missing");
+   };
+   setAnalog(0,1,-23456);setAnalog(1,2,3210);
+   json status;
+   for(int cycle=25;cycle<125;++cycle) {
+    json updates=json::array();
+    for(size_t i=0;i<ios.size();++i){ios[i]->sample(true);updates.push_back(ios[i]->snapshot(i));}
+    auto response=host.request({{"op","io_exchange"},{"session","test"},{"request_id",cycle},{"stations",updates}});
+    require(!response.at("host_failed").get<bool>(),"One model failure became a Host fault");
+    for(auto const& station:response.at("stations"))ios.at(station.at("slave_index"))->feedback(station.at("values"));
+    status=host.request({{"op","test_io_status"}});
+    for(auto& slave:slaves) {
+     require(slave->slave->state()==State::OPERATIONAL,"Model fault changed EtherCAT state");
+     requireNoUnsolicitedMailbox(*slave);
+    }
+    std::this_thread::sleep_for(std::chrono::milliseconds(8));
+   }
+   require(!status["models"]["a"]["fault"].is_null(),"Model fault was not injected");
+   require(status["models"]["b"]["fault"].is_null(),"Healthy model faulted");
+   require(status["models"]["b"]["steps"]>before["models"]["b"]["steps"],"Healthy model stopped");
+   require(status["diagnostics"].size()==1 && status["diagnostics"][0]["source"]["id"]=="a" && status["diagnostics"][0]["definition"]["code"]=="MODEL_CALCULATION_FAILED","Missing model-local diagnostic");
+   require(ios[1]->sdo({{"op","read"},{"index",0x6030},{"subindex",1}})==held,"Fault replaced retained feedback");
+   require(ios[0]->sdo({{"op","read"},{"index",0x6030},{"subindex",2}})["data"]=="8a0c","Healthy model feedback not updated");
+   for(size_t i=0;i<slaves.size();++i) {
+    size_t j=0;
+    for(auto const& e:spec["devices"][i]["contract"]["entries"])
+     if(e["index"]==0x1001 || e["index"]==0x6102)
+      require(sdoRequest(*slaves[i],e["index"],e["subindex"],0x40)==diagnosticBefore[i][j++],"Model fault altered CPX diagnostic OD");
+    requireNoUnsolicitedMailbox(*slaves[i]);
+   }
+   std::cout<<"CPX fault boundary passed: retained AI, healthy peer, OP, unchanged diagnostic SDO, 100 mailbox polls without Emergency\n";
    std::cout<<"CPX IPC scheduler test passed: two independent test adapters, bidirectional station binding, signed raw values\n";
   }
   EmulatedNetwork network(escs);Frame frame;uint16_t status=0;
   frame.addDatagram(0,Command::BRD,uint32_t(reg::AL_STATUS)<<16,&status,2);frame.finalize();
   require(network.route(frame),"Network route failed");frame.resetContext();auto [h,d,wkc]=frame.peekDatagram();(void)h;(void)d;
   require(wkc && *wkc==slaves.size(),"Multi-station EtherCAT WKC failed");
-  std::cout<<"CPX protocol test passed: stations="<<slaves.size()<<" identity/F030/F050/read-only maps/Abort/OP/bit-PDO/WKC\n";
+  std::cout<<"CPX protocol test passed: stations="<<slaves.size()<<" identity/F030/F050/read-only maps+diagnostics/Abort/OP/bit-PDO/WKC\n";
   return 0;
  }catch(std::exception const& e){std::cerr<<e.what()<<'\n';return 1;}
 }

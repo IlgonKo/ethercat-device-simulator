@@ -48,10 +48,10 @@ IO 모듈 구성과 동작 모델 생성/채널 binding은 별도 설정이다. 
 
 ## 모델 인스턴스·채널 binding 문법 — 2026-11-25 채택·구현
 
-모듈 구성, 동작 모델 생성, 채널 연결을 별도 선언한다. IO 연결 모델의 인스턴스 목록은 `DEVICE_SIMULATOR_BEHAVIOUR_MODELS`, IO별 연결 목록은 `DEVICE_SIMULATOR_IO_<io_id>_BINDINGS`를 사용한다.
+모듈 구성, 동작 모델 생성, 채널 연결을 별도 선언한다. IO 연결 모델의 인스턴스 목록은 `DEVICE_SIMULATOR_IO_MODELS`, IO별 연결 목록은 `DEVICE_SIMULATOR_IO_<io_id>_BINDINGS`를 사용한다.
 
 ```ini
-DEVICE_SIMULATOR_BEHAVIOUR_MODELS=\
+DEVICE_SIMULATOR_IO_MODELS=\
     loader0: cylinder_100mm, \
     analog0: analog_test_preset
 
@@ -66,7 +66,7 @@ DEVICE_SIMULATOR_IO_io0_BINDINGS=\
 
 2026-11-26 결정으로 모델 선언의 오른쪽 값은 모델 종류 대신 프리셋 ID다. cylinder_100mm는 model_presets/pneumatic_cylinder/double_acting/cylinder_100mm.json의 ID이며 model=pneumatic_double_acting을 선택한다. analog_test_preset은 초기 논의의 자리표시자다. 구현에서는 analog_delay_16ms를 등록했으며 model_presets/signal_processing/delay/analog_delay_16ms.json으로 선택한다. command/feedback은 signed 16-bit raw 정수의 지연 입출력으로 확정했다. 프리셋 로더와 실린더/지연 모델 등록은 RF-013 4단계까지 구현했다.
 
-모델 특성은 프리셋 JSON의 config, 인스턴스별 운전 조건·초기 조건은 `.env`의 `DEVICE_SIMULATOR_MODEL_<id>_INSTANCE_CONFIG`에 둔다. 예: `supply_gauge_pressure:600000,opposing_force:0,initial_position:0`. 기존 CONFIG/CONDITIONS/INITIAL 분리 제안은 대체한다. 프리셋 특성의 `.env` 덮어쓰기는 제공하지 않으며 미지정 값은 FMU 기본값, 변경은 재시작 때 적용한다. 자세한 형식·검증은 [RF-013](../RF/RF-013-virtual-io.md)을 따른다.
+모델 특성은 프리셋 JSON의 config, 인스턴스별 운전 조건·초기 조건은 `.env`의 `DEVICE_SIMULATOR_IO_MODEL_INSTANCES`에 둔다. 예: `cylinder0: supply_gauge_pressure:600000,opposing_force:0,initial_position:0,cylinder1: supply_gauge_pressure:600000,initial_position:0`. 그룹 사이에도 쉼표가 필요하다. 기존 CONFIG/CONDITIONS/INITIAL 분리 제안은 대체한다. 프리셋 특성의 `.env` 덮어쓰기는 제공하지 않으며 미지정 값은 FMU 기본값, 변경은 재시작 때 적용한다. 자세한 형식·검증은 [RF-013](../RF/RF-013-virtual-io.md)을 따른다.
 
 | 항목 | 확정 문법/의미 |
 | --- | --- |
@@ -82,7 +82,7 @@ DEVICE_SIMULATOR_IO_io0_BINDINGS=\
 
 입출력명은 모델 어댑터가 연결하는 계약이다. FMU 내부 변수명·단위 변환은 모델별 매핑에서 처리하며 IO binding에 FMU 내부 구조를 직접 요구하지 않는다. 모델 종류와 인스턴스 ID를 구분하여 같은 모델 종류를 여러 독립 인스턴스로 생성할 수 있다.
 
-문법 적용 범위는 우선 IO 연결이다. 기존 `DEVICE_SIMULATOR_AXIS_MODELS`는 유지하며 이 목록으로 통합하거나 기존 축 설정을 이관하지 않는다. 프리셋/INSTANCE_CONFIG는 위 결정으로 채택했으며 FMU artifact 선택·패키징의 세부 구현은 후속이다.
+문법 적용 범위는 우선 IO 연결이다. 기존 `DEVICE_SIMULATOR_AXIS_MODELS`는 유지하며 이 목록으로 통합하거나 기존 축 설정을 이관하지 않는다. 프리셋/IO_MODEL_INSTANCES는 위 결정으로 채택했으며 FMU artifact 선택·패키징의 세부 구현은 후속이다.
 
 ## 축 설정
 
@@ -90,16 +90,15 @@ DEVICE_SIMULATOR_IO_io0_BINDINGS=\
 KICKCAT_INTERFACE=enp1s0
 DEVICE_SIMULATOR_STATE_DIR=./state
 DEVICE_SIMULATOR_BUS=0:axis:cia402-drive,1:axis:cia402-drive
-DEVICE_SIMULATOR_AXIS_IDS=0:virtual-axis-0,1:virtual-axis-1
+DEVICE_SIMULATOR_AXIS_NAMES=0:virtual-axis-0,1:virtual-axis-1
 DEVICE_SIMULATOR_AXIS_MODELS=0:f_kr_cmmt,1:f_kr_cmmt
 DEVICE_SIMULATOR_AXIS_MODES=0:linear,1:rotary
-DEVICE_SIMULATOR_AXIS_PARAMETER_SETS=0:axis-0,1:axis-1
 ```
 
 - BUS의 명시적 숫자는 로컬 Slave 번호다. 입력 나열 순서와 무관하게 정렬하고 중복·누락·음수·비정수를 거부한다.
-- AXIS_IDS/MODELS/MODES/PARAMETER_SETS 목록은 필수다. 각 목록의 번호 집합은 BUS와 정확히 같아야 하며 중복 번호와 누락을 거부한다. ID는 순서와 독립적인 영구 식별자다.
+- AXIS_NAMES/MODELS/MODES 목록은 필수다. 각 목록의 번호 집합은 BUS의 축 번호 집합과 정확히 같아야 하며 중복 번호와 누락을 거부한다. ID는 순서와 독립적인 영구 식별자다.
 - 현재 축 타입은 cia402-drive이며 F-KR CMMT와 Copley 모델을 지원한다(RF-016/017). Demo는 f_kr_cmmt의 linear 3축 X1/Y/Z를 우선 사용한다. X2 Drive는 추가하지 않는다. IO의 .env 스키마는 RF-013에서 하드웨어 대조 후 확정한다.
-- PARAMETER_SET은 저장 공간의 논리 이름이며 파일 경로가 아니다. 공간이 없으면 기본값으로 만들고 있으면 호환성을 검증한다. 기본 모델 preset은 linear_mm/rotary_deg다.
+- 축 ID 하나로 state/<ID>.json 파라미터와 PDO 매핑 저장소를 연결한다. 별도 PARAMETER_SETS 설정은 지원하지 않는다. 공간이 없으면 기본값으로 만들고 있으면 호환성을 검증한다. 기본 모델 preset은 linear_mm/rotary_deg다.
 - PDO 매핑 선택·counts_per_unit·scale은 추가하지 않는다. 단위·스케일은 장치 파라미터 기준이고 동적 PDO는 RF-014다.
 - 값은 한 줄의 리터럴로 작성한다. 따옴표와 주석은 지원한다. 제품 설정에 셸 명령·변수 치환을 사용하지 않는다. native 로더는 중복 키를 거부한다. Compose env_file의 문법 처리는 Compose가 담당한다.
 
@@ -131,14 +130,14 @@ DEVICE_SIMULATOR_AXIS_PARAMETER_SETS=0:axis-0,1:axis-1
 
 Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트와 DEVICE_SIMULATOR_CONFIG_FILE은 제거한다. 어댑터는 환경 변수에서 구성 객체를 만들고 모델에 전달한다. 임시 장치 구성 JSON도 생성하지 않는다. 호스트 DEVICE_SIMULATOR_STATE_DIR를 /state로 마운트하고 컨테이너에서는 같은 변수의 값을 /state로 고정해 /state에 저장한다. native 실행의 상대 STATE_DIR는 .env 파일 디렉터리를 기준으로 한다. [ADR-006](ADR-006-docker-deployment.md)을 참조한다.
 
-명시적 번호 원칙은 유지한다. DEVICE_SIMULATOR_BUS의 숫자가 slave_index이며 0부터 연속이어야 한다. 순서를 바꿀 때 해당 네 가지 AXIS 목록의 번호도 함께 옮기되 ID와 PARAMETER_SET은 유지한다.
+명시적 번호 원칙은 유지한다. DEVICE_SIMULATOR_BUS의 숫자가 slave_index이며 0부터 연속이어야 한다. 순서를 바꿀 때 해당 세 가지 AXIS 목록의 번호도 함께 옮기되 ID는 유지한다.
 
 ## 시작·복원 규칙 (2026-09-22 확정)
 
 - Docker는 .env 환경 변수를 사용한다. native 진단은 --env-file로 지정한다. 필수 축 설정 누락, 중복 ID/저장 공간, 미지원 장치·모델, 잘못된 번호 및 버스에 없는 AXIS 목록 항목을 거부한다. PDO/scale/preset 별도 설정은 지원하지 않는다.
 - 전체 구성을 검증한 뒤 slave_index 순서로 축별 모델·OD·PDO를 생성한다. 실행 중 설정 재읽기·핫플러그는 지원하지 않는다. 변경은 정지·수정·재시작 후 Master 재검색으로 적용한다.
-- parameter_set과 id는 1~64자의 영문·숫자·밑줄·하이픈이며 첫 문자는 영문 또는 숫자다. 각각 중복을 거부한다. 저장 공간 이름은 경로로 해석하지 않는다.
-- 없는 저장 공간은 기본값으로 생성한다. 기존 공간은 마지막 저장값을 복원한다. 저장된 장치 타입·모델 타입·linear/rotary가 다르면 시작을 거부하며 자동 변환·초기화하지 않는다. mode를 바꾸려면 새 공간을 지정한다.
+- id는 1~64자의 영문·숫자·밑줄·하이픈이며 첫 문자는 영문 또는 숫자다. 전체 장치 사이의 ID 중복을 거부한다. 저장 공간 이름은 경로로 해석하지 않는다.
+- 없는 저장 공간은 기본값으로 생성한다. 기존 공간은 마지막 저장값을 복원한다. 저장된 장치 타입·모델 타입·linear/rotary가 다르면 시작을 거부하며 자동 변환·초기화하지 않는다. 새 장치로 시작하려면 새 ID를 지정하며 파라미터와 PDO 매핑 모두 새 저장소를 사용한다. 기존 장치를 유지하는 비호환 변경은 정지 후 별도로 처리한다.
 - 저장 데이터 손상·누락된 파라미터·스키마/단위 불일치도 전체 시작 오류다. 기존 데이터는 덮어쓰지 않는다.
 - 위치·속도·Controlword·Enable·Homing 완료 상태·진행 중 명령은 복원하지 않는다. 새 모델의 초기 정지 상태에서 시작한다. DT 위치 동기화는 RF-007의 별도 절차다.
 - RF-011은 다중 구성·분리에 집중한다. 기존 모델의 제한 처리와 회전 경로 계산은 변경하지 않고 [RF-015](../RF/RF-015-axis-model-semantics.md)에서 논의한다.
@@ -149,7 +148,7 @@ Compose가 루트 .env를 env_file로 전달한다. 장치 JSON 파일 마운트
 - RF-016에서 자체 모델을 src/functional_model/cia402_drive/behaviour_model/f_kr_cmmt로 이관했다. --model-root와 외부 Motion Server 스냅샷 런타임 의존은 제거했고, 기존 .env 및 영구 파라미터 identity는 유지한다.
 - 파라미터 저장 대상은 현재 모델의 NON_PDO_CONFIGURATION_OD_ROLES 20개다. PDO 목표값·운전 상태·명령/상태 객체는 저장하지 않는다. 전체 OD 영구화와 동일하지 않다.
 - 저장은 기존 CMMT SDO 0x2005:03=1, 0x2005:01=1 요청으로 수행하고 완료 후 명령을 0으로 해제한다. 선택값 1만 지원한다. PRE-OP에서도 PDO 진행 없이 저장한다. 파일 fsync·원자적 교체 후 성공 상태를 반환한다. 실패는 성공으로 응답하지 않으며 기존 fail-closed IPC 정책을 따른다. 정상 SDO Abort 오류 응답은 TD-001에서 해결한다.
-- 저장 루트에 프로세스 단독 잠금을 걸고, 각 parameter_set.json에 스키마·호환 메타데이터·값·체크섬을 기록한다. 백업/이관/관리 API 및 실제↔가상 동기화의 완료 검증은 RF-010/009에 남긴다.
+- 저장 루트에 프로세스 단독 잠금을 걸고, 각 축 ID.json에 스키마·호환 메타데이터·값·체크섬을 기록한다. 백업/이관/관리 API 및 실제↔가상 동기화의 완료 검증은 RF-010/009에 남긴다.
 - 실행 및 검증 절차: [RF-011](../RF/RF-011-device-configuration.md).
 
 ## 축별 설정 구조화 (2026-10-26)
@@ -166,4 +165,15 @@ BUS의 axis:cia402-drive는 기능 프로파일을 선택하고 AXIS_MODELS의 f
 
 ## 2026-11-26 RF-013 구현 상태
 
-축/IO 혼합 BUS, IO 모듈·프리셋·INSTANCE_CONFIG·전역 1:1 binding 파서를 구현했다. 축 목록은 축 slave_index에만 대응한다. CPX 모듈 OD 간격은 ESI AP-Slot의 0x10, PDO 번호 간격은 1이며 별도 사용자 매핑 설정은 없다. Motion Server는 독립 설정의 MODULE_PDO_INDEX_STRIDE=0x10을 사용한다. 4단계에서 실제 IO FMU 어댑터를 연결했다. cylinder_100mm와 analog_delay_16ms 프리셋으로 모델을 생성하며 artifact 누락·계약 불일치는 시작 오류로 처리한다. [4단계 검증](../Validation/RF-013-stage4-20261126.md). [구현·검증](../Validation/RF-013-stage1-3-20261126.md).
+축/IO 혼합 BUS, IO 모듈·프리셋·IO_MODEL_INSTANCES·전역 1:1 binding 파서를 구현했다. 축 목록은 축 slave_index에만 대응한다. CPX 모듈 OD 간격은 ESI AP-Slot의 0x10, PDO 번호 간격은 1이며 별도 사용자 매핑 설정은 없다. Motion Server는 독립 설정의 MODULE_PDO_INDEX_STRIDE=0x10을 사용한다. 4단계에서 실제 IO FMU 어댑터를 연결했다. cylinder_100mm와 analog_delay_16ms 프리셋으로 모델을 생성하며 artifact 누락·계약 불일치는 시작 오류로 처리한다. [4단계 검증](../Validation/RF-013-stage4-20261126.md). [구현·검증](../Validation/RF-013-stage1-3-20261126.md).
+
+## 축 ID로 영구 저장 키 통일 — 2026-11-26
+
+- AXIS_PARAMETER_SETS 및 내부 장치 구성의 parameter_set 필드를 제거한다. 이전 키/필드를 무시하거나 자동 변환하지 않고 설정 오류로 반환한다.
+- 기능 모델은 state/<axis ID>.json에서 파라미터를 저장·복원한다. parameters 하위 폴더를 만들지 않는다.
+- Slave는 동일 ID로 기존 state/pdo-mappings/<ID의 UTF-8 hex>.json을 선택한다. 파일 형식·키 인코딩·저장 책임은 변경하지 않는다.
+- 버스 번호 변경은 ID를 유지하면 두 저장소 모두 유지한다. ID 변경은 두 저장소 관점에서 새 장치다. 기존 ID 파일을 자동 복사/삭제하지 않는다.
+- 기존 운영 파일은 이번 작업에서 정지·백업·충돌 검사·strict loader 검증 후 일회성 이름 이관한다. 저장 값·schema·checksum은 변경하지 않는다. 모델/모드/스키마 비호환 자동 이관은 제품 기능에 추가하지 않는다.
+- [이관 및 검증](../Validation/Axis-ID-Storage-20261126.md).
+
+2026-11-26 설정 이름을 AXIS_IDS에서 AXIS_NAMES로 변경했다. 고유 이름 값과 내부 id, 파라미터·PDO 저장 경로는 유지한다. 예전 AXIS_IDS 키는 명확한 설정 오류로 반환한다. `.env` 설정 바로 위에 저장소 연결 및 이름 변경의 의미를 주석으로 명시한다.

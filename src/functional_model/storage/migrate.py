@@ -60,21 +60,20 @@ def migrate_profile_velocity(store, model, value):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--store', required=True, type=Path)
-    parser.add_argument('--parameter-set', required=True)
+    parser.add_argument('--axis-id', required=True)
     parser.add_argument('--mode', choices=('linear', 'rotary'), required=True)
     parser.add_argument('--profile-velocity', required=True, type=int,
                         help='Explicit raw 0x6081 value; old snapshots do not contain it')
     args = parser.parse_args()
-    import re
-    if not re.fullmatch(r'[A-Za-z0-9_-]+', args.parameter_set):
-        parser.error('Invalid parameter-set name')
-    model = Model(dict(slave_index=0, id='migration', type='cia402-drive',
-                       parameter_set=args.parameter_set,
+    from functional_model.configuration import name
+    try: name(args.axis_id, 'axis id')
+    except ValueError as error: parser.error(str(error))
+    model = Model(dict(slave_index=0, id=args.axis_id, type='cia402-drive',
                        model=dict(type='f_kr_cmmt', mode=args.mode)))
     try:
         with ParameterStore(args.store) as store:
             changed = migrate_profile_velocity(store, model, args.profile_velocity)
-        print(json.dumps(dict(parameter_set=args.parameter_set, migrated=changed)))
+        print(json.dumps(dict(axis_id=args.axis_id, migrated=changed)))
     finally:
         model.close()
 

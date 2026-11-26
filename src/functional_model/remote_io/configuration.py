@@ -63,9 +63,37 @@ def validate_preset(preset):
         if cfg.get('rod_diameter',.008)>=cfg.get('piston_diameter',.02):raise ValueError('rod must be smaller than piston')
         if cfg.get('sensor_width',.001)>cfg.get('stroke',.1):raise ValueError('sensor_width exceeds stroke')
 
+def instance_settings_from_environment(env):
+    """Parse instance:key:value,key:value,other_instance:key:value groups."""
+    raw = env.get('DEVICE_SIMULATOR_IO_MODEL_INSTANCES', '').strip()
+    if not raw:
+        return {}
+    result = {}
+    current = None
+    for item in raw.split(','):
+        parts = [part.strip() for part in item.split(':')]
+        if len(parts) == 3:
+            identifier, key, value = parts
+            name(identifier, 'IO model instance')
+            if identifier in result:
+                raise ValueError('Duplicate IO model instance settings: ' + identifier)
+            current = result[identifier] = {}
+        elif len(parts) == 2 and current is not None:
+            key, value = parts
+        else:
+            raise ValueError('IO_MODEL_INSTANCES: expected instance:key:value,key:value; separate instances with commas')
+        if not key or key in current:
+            raise ValueError('IO_MODEL_INSTANCES: duplicate or empty setting: ' + key)
+        current[key] = numeric(float(value), key)
+    return result
+
 def models_from_environment(env, devices, preset_root=None, base_directory=None):
+    legacy = {key for key in env if key.startswith(('DEVICE_SIMULATOR_BEHAVIOUR_', 'DEVICE_SIMULATOR_MODEL_')) and key != 'DEVICE_SIMULATOR_MODEL_TIMEOUT_MS'}
+    if legacy:
+        raise ValueError('Retired IO model settings; use IO_MODELS and IO_MODEL_INSTANCES: ' + str(sorted(legacy)))
+    instance_settings = instance_settings_from_environment(env)
     root=Path(preset_root) if preset_root is not None else Path(__file__).resolve().parents[3]/'model_presets'
-    declarations=list(filter(str.strip,env.get('DEVICE_SIMULATOR_BEHAVIOUR_MODELS','').split(',')))
+    declarations=list(filter(str.strip,env.get('DEVICE_SIMULATOR_IO_MODELS','').split(',')))
     presets={}
     if declarations:
         for file in sorted(root.rglob('*.json')):
@@ -75,28 +103,24 @@ def models_from_environment(env, devices, preset_root=None, base_directory=None)
     folder=env.get('DEVICE_SIMULATOR_FMU_DIR','./model_artifacts').strip()
     if not folder:raise ValueError('DEVICE_SIMULATOR_FMU_DIR: nonempty path required')
     artifact_directory=str((Path(base_directory or Path.cwd())/folder).resolve())
-    result=[];ids=set();allowed=set()
+    result=[];ids=set()
     for declaration in declarations:
         parts=[v.strip() for v in declaration.split(':')]
-        if len(parts)!=2:raise ValueError('BEHAVIOUR_MODELS: expected instance:preset')
+        if len(parts)!=2:raise ValueError('IO_MODELS: expected instance:preset')
         identifier,preset_id=parts;name(identifier,'model id')
         if identifier in ids:raise ValueError('Duplicate behaviour instance')
         ids.add(identifier)
         if preset_id not in presets:raise ValueError('Unknown model preset: '+preset_id)
-        preset=presets[preset_id];values={};key=f'DEVICE_SIMULATOR_MODEL_{identifier}_INSTANCE_CONFIG';allowed.add(key)
-        for item in filter(str.strip,env.get(key,'').split(',')):
-            parts=[x.strip() for x in item.split(':')]
-            if len(parts)!=2 or parts[0] in values:raise ValueError('INSTANCE_CONFIG: expected unique name:value')
-            values[parts[0]]=numeric(float(parts[1]),parts[0])
-        if preset['model']=='analog_delay' and key in env:raise ValueError('analog_delay has no INSTANCE_CONFIG')
+        preset=presets[preset_id];values=instance_settings.get(identifier,{})
+        if preset['model']=='analog_delay' and identifier in instance_settings:raise ValueError('analog_delay has no instance settings')
         if set(values)-{'supply_gauge_pressure','opposing_force','initial_position'}:raise ValueError('Unsupported instance setting')
         if values.get('supply_gauge_pressure',0)<0:raise ValueError('supply pressure must be nonnegative')
         if not 0<=values.get('initial_position',0)<=preset['config'].get('stroke',.1):raise ValueError('initial_position outside stroke')
         result.append(dict(id=identifier,preset=preset,instance_config=values,artifact_directory=artifact_directory))
-    unknown={k for k in env if k.startswith('DEVICE_SIMULATOR_MODEL_') and k!='DEVICE_SIMULATOR_MODEL_TIMEOUT_MS'}-allowed
-    if unknown:raise ValueError('Unknown model settings: '+str(sorted(unknown)))
+    unknown=set(instance_settings)-ids
+    if unknown:raise ValueError('Settings for undeclared IO model instances: '+str(sorted(unknown)))
     station_keys={f"DEVICE_SIMULATOR_IO_{d['id']}_{suffix}" for d in devices if d['type']=='cpx-ap-i-ec' for suffix in ['MODULES','BINDINGS']}
-    unknown={k for k in env if k.startswith('DEVICE_SIMULATOR_IO_')}-station_keys
+    unknown={k for k in env if k.startswith('DEVICE_SIMULATOR_IO_')}-station_keys-{'DEVICE_SIMULATOR_IO_MODELS','DEVICE_SIMULATOR_IO_MODEL_INSTANCES'}
     if unknown:raise ValueError('Unknown IO settings: '+str(sorted(unknown)))
     validate_bindings(devices,result)
     return result

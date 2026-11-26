@@ -68,7 +68,7 @@ class RemoteIOTests(unittest.TestCase):
         self.assertEqual(len(c['channels']),32) # DI8 + DO8 + AIO8 + DO8, supply bits excluded
     def test_mixed_bus_axis_indices(self):
         env=dict(BASE);env.update(DEVICE_SIMULATOR_BUS=BASE['DEVICE_SIMULATOR_BUS']+',2:axis:cia402-drive',
-            DEVICE_SIMULATOR_AXIS_IDS='2:axis2',DEVICE_SIMULATOR_AXIS_MODELS='2:f_kr_cmmt',DEVICE_SIMULATOR_AXIS_MODES='2:linear',DEVICE_SIMULATOR_AXIS_PARAMETER_SETS='2:p2')
+            DEVICE_SIMULATOR_AXIS_NAMES='2:axis2',DEVICE_SIMULATOR_AXIS_MODELS='2:f_kr_cmmt',DEVICE_SIMULATOR_AXIS_MODES='2:linear')
         c=load_environment(env);self.assertEqual(c['devices'][2]['id'],'axis2')
     def test_invalid_module_and_unknown_settings(self):
         for modules in ['1:IOL:4','0:DI:8','2:DI:8','1:DI:8,1:DO:8','1:AIO:8:8']:
@@ -164,7 +164,7 @@ class RemoteIOTests(unittest.TestCase):
         import json
         with tempfile.TemporaryDirectory() as tmp:
             root=Path(tmp);p=cylinder()['preset'];p['id']='one';(root/'one.json').write_text(json.dumps(p))
-            env=dict(BASE,DEVICE_SIMULATOR_BEHAVIOUR_MODELS='c:one',DEVICE_SIMULATOR_MODEL_c_INSTANCE_CONFIG='supply_gauge_pressure:600000,initial_position:0')
+            env=dict(BASE,DEVICE_SIMULATOR_IO_MODELS='c:one',DEVICE_SIMULATOR_IO_MODEL_INSTANCES='c: supply_gauge_pressure:600000,initial_position:0')
             result=models_from_environment(env,self.config()['devices'],root)
             self.assertEqual(result[0]['instance_config']['supply_gauge_pressure'],600000)
             (root/'duplicate.json').write_text(json.dumps(p))
@@ -178,3 +178,71 @@ class RemoteIOTests(unittest.TestCase):
             self.assertEqual(coe.get('CompleteAccess'),'false')
             first=(Path(tmp)/'cmmt.xml').read_bytes();s.generate_fixture(tmp)
             self.assertEqual(first,(Path(tmp)/'cmmt.xml').read_bytes())
+
+    def test_pause_retains_feedback_until_new_calculation_completes(self):
+        r,m=self.runtime();self.snapshot(r,1,values={(0,0x7020,1):1})
+        r.step_once('c');before=copy.deepcopy(r.outputs);item=r.instances['c']
+        self.snapshot(r,2,(False,True));self.assertTrue(item['paused'])
+        self.assertIsNone(item['fault']);self.assertFalse(r.host_failed);self.assertEqual(r.diagnostics,[])
+        self.assertFalse(r.step_once('c'));self.assertEqual(r.outputs,before)
+        self.snapshot(r,(3,2));self.assertFalse(r.step_once('c'))
+        self.assertTrue(item['paused']);self.assertEqual(r.outputs,before)
+        self.snapshot(r,(3,3));self.assertEqual(r.outputs,before)
+        m.enter=threading.Event();m.release=threading.Event()
+        worker=threading.Thread(target=r.step_once,args=('c',));worker.start()
+        try:
+            self.assertTrue(m.enter.wait(1))
+            self.assertIsNotNone(item['busy_since']);self.assertEqual(item['steps'],1)
+            self.assertEqual(r.outputs,before) # Ready to run is not a new completed sample.
+        finally:m.release.set();worker.join(1)
+        self.assertFalse(worker.is_alive());self.assertEqual(item['steps'],2)
+        self.assertFalse(item['paused']);self.assertIsNone(item['busy_since'])
+        self.assertEqual(r.outputs[0][0x6010,1],'00');self.assertEqual(r.diagnostics,[])
+
+    def test_model_fault_survives_input_recovery_while_other_model_advances(self):
+        cfg=self.config();devices=cfg['devices'];specs=[delay('a'),delay('b')];models={}
+        for channel,ident in enumerate(['a','b']):
+            bind(devices[0],3,'AO',channel,ident,'command');bind(devices[1],3,'AI',channel,ident,'feedback')
+        def factory(spec):models[spec['id']]=FixtureModel(spec);return models[spec['id']]
+        r=IORuntime([Station(d) for d in devices],specs,factory,autostart=False);self.addCleanup(r.close)
+        self.snapshot(r,1,values={(0,0x7030,1):123,(0,0x7030,2):456})
+        r.step_once('a');r.step_once('b');held=r.outputs[1][0x6030,1]
+        models['a'].fail=True;r.step_once('a');diagnostic=r.diagnostics[0]
+        self.assertEqual(diagnostic['source'],{'type':'behaviour_model','id':'a'})
+        self.assertEqual(diagnostic['definition']['code'],'MODEL_CALCULATION_FAILED')
+        self.assertFalse(diagnostic['context']['feedback_valid']);self.assertTrue(diagnostic['context']['restart_required'])
+        self.assertIsNone(diagnostic['history']['resolved_at'])
+        models['a'].fail=False
+        self.snapshot(r,2,(False,True));self.snapshot(r,3,values={(0,0x7030,1):999,(0,0x7030,2):789})
+        self.assertFalse(r.step_once('a'));self.assertTrue(r.step_once('b'))
+        self.assertEqual(r.outputs[1][0x6030,1],held)
+        self.assertEqual(r.outputs[1][0x6030,2],(789).to_bytes(2,'little',signed=True).hex())
+        self.assertEqual(len(models['a'].calls),2);self.assertEqual(len(r.diagnostics),1)
+        self.assertIsNotNone(r.instances['a']['fault']);self.assertIsNone(r.instances['b']['fault']);self.assertFalse(r.host_failed)
+
+    def test_host_timeout_latches_all_models_and_discards_changed_late_result(self):
+        from unittest.mock import patch
+        cfg=self.config();devices=cfg['devices'];specs=[delay('a'),delay('b')];models={}
+        for channel,ident in enumerate(['a','b']):
+            bind(devices[0],3,'AO',channel,ident,'command');bind(devices[1],3,'AI',channel,ident,'feedback')
+        def factory(spec):models[spec['id']]=FixtureModel(spec);return models[spec['id']]
+        r=IORuntime([Station(d) for d in devices],specs,factory,timeout=.1,autostart=False);self.addCleanup(r.close)
+        self.snapshot(r,1,values={(0,0x7030,1):123,(0,0x7030,2):456});r.step_once('a');r.step_once('b')
+        before=copy.deepcopy(r.outputs);self.snapshot(r,2,values={(0,0x7030,1):999,(0,0x7030,2):888})
+        models['a'].enter=threading.Event();models['a'].release=threading.Event()
+        worker=threading.Thread(target=r.step_once,args=('a',));worker.start()
+        try:
+            self.assertTrue(models['a'].enter.wait(1))
+            with patch('functional_model.remote_io.runtime.time.monotonic',return_value=r.instances['a']['busy_since']+.101):
+                response=self.snapshot(r,3)
+            self.assertTrue(response['host_failed']);self.assertFalse(r.step_once('b'))
+        finally:models['a'].release.set();worker.join(1)
+        self.assertFalse(worker.is_alive());self.assertEqual(r.outputs,before)
+        self.assertEqual(r.instances['a']['steps'],1);self.assertEqual(r.instances['b']['steps'],1)
+        self.snapshot(r,4,(False,True));self.snapshot(r,5)
+        self.assertFalse(r.step_once('a'));self.assertFalse(r.step_once('b'))
+        self.assertEqual(len(r.diagnostics),1);d=r.diagnostics[0]
+        self.assertEqual(d['source'],{'type':'model_host','index':0})
+        self.assertEqual(d['definition']['code'],'MODEL_RESPONSE_TIMEOUT')
+        self.assertFalse(d['context']['feedback_valid']);self.assertTrue(d['context']['restart_required'])
+        self.assertIsNone(d['history']['resolved_at']);self.assertEqual(r.outputs,before)

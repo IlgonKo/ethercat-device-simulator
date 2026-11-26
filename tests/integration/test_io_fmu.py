@@ -69,9 +69,11 @@ class IOFmuTests(unittest.TestCase):
         for n in range(50):a.step(dict(extend=True,retract=True),n*.008,.008)
         self.assertTrue(a.runner.get('extend_command'));self.assertTrue(a.runner.get('retract_command'))
         self.assertAlmostEqual(a.runner.get('position'),.025,delta=.001)
-    def runtime(self,autostart=False):
+    def runtime(self,autostart=False,drop_links=()):
         settings=read_env(ROOT/'tests/fixtures/cpx-fmu.env');settings['DEVICE_SIMULATOR_FMU_DIR']=os.environ['IO_TEST_FMU_DIR']
         config=load_environment(settings,ROOT)
+        for device in config['devices']:
+            device['bindings']=[b for b in device['bindings'] if (b['instance'],b['signal']) not in drop_links]
         r=IORuntime([Station(d) for d in config['devices']],config['io_models'],autostart=autostart)
         self.addCleanup(r.close);return r
     def update(self,r,sequence,active=(True,True),values=None):
@@ -121,3 +123,29 @@ class IOFmuTests(unittest.TestCase):
         r=IORuntime([Station(d) for d in c['devices']],c['io_models'],autostart=False);self.addCleanup(r.close)
         self.update(r,1)
         self.assertFalse(r.step_once('cylinder0'));self.assertEqual(r.instances['cylinder0']['adapter'].runner.time,0)
+
+    def test_actual_delay_without_command_initializes_but_never_advances(self):
+        r=self.runtime(drop_links={('analog0','command')})
+        model=r.instances['analog0'];adapter=model['adapter']
+        for sequence in range(1,6):
+            self.update(r,sequence,values={(0,0x7030,1):1234,(1,0x7030,2):-4321})
+            self.assertFalse(r.step_once('analog0'))
+            self.assertTrue(r.step_once('analog1'))
+        self.assertFalse(model['complete']);self.assertTrue(model['paused'])
+        self.assertEqual(model['steps'],0);self.assertEqual(adapter.runner.time,0)
+        self.assertEqual(adapter.initial_outputs(),{'feedback':0})
+        self.assertEqual(r.outputs[1][0x6030,1],'0000')
+        self.assertEqual(r.outputs[0][0x6030,2],(-4321).to_bytes(2,'little',signed=True).hex())
+        self.assertIsNone(model['fault']);self.assertFalse(r.host_failed);self.assertEqual(r.diagnostics,[])
+
+    def test_actual_delay_without_feedback_computes_without_publishing_channel(self):
+        r=self.runtime(drop_links={('analog0','feedback')})
+        model=r.instances['analog0'];adapter=model['adapter']
+        self.assertTrue(model['complete']);self.assertNotIn('feedback',model['links'])
+        for sequence in range(1,4):
+            self.update(r,sequence,values={(0,0x7030,1):-32768})
+            self.assertTrue(r.step_once('analog0'))
+        self.assertEqual(model['steps'],3);self.assertAlmostEqual(adapter.runner.time,.024)
+        self.assertEqual(adapter.initial_outputs(),{'feedback':-32768})
+        self.assertEqual(r.outputs[1][0x6030,1],'0000')
+        self.assertIsNone(model['fault']);self.assertFalse(r.host_failed);self.assertEqual(r.diagnostics,[])
