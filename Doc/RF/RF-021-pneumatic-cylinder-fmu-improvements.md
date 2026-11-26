@@ -1,9 +1,13 @@
 # RF-021 — 공압 실린더 FMU 개선
 
-- 현재 상태: **예정**
+- 현재 상태: **보류**
 - 상태 상세: 정격 유량의 동작 모델 설정 노출을 후속 개선으로 등록. 기존 FMU를 사용하는 RF-013 IO 연동의 선행 조건이 아니다. 구현·재Export는 미착수.
 - 등록일: 2026-11-26
 - 연계: [RF-013](RF-013-virtual-io.md), [모델 소스·Export](../../model_sources/pneumatic_cylinder/double_acting/README.md)
+
+## v1.0 유지보수 경계 — 2026-11-26
+
+사용자 결정으로 DT Demo 완료 이후에 논의·구현한다. 기존 FMU로 v1.0을 유지하며 정격 유량 설정 노출을 지금 추가하지 않는다. [ADR-011](../Design/ADR-011-v1-maintenance-policy.md)을 따른다.
 
 ## 목적과 확정 범위
 

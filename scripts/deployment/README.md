@@ -41,7 +41,9 @@ docker build --network none --pull=false \
 
 ## 내장 FMU와 외부 FMU
 
-기본 FMU는 이미지 안의 `/model_artifacts/CopleyDriveSim-linux.fmu`이다. 신규 `.env.example`에는 외부 FMU 경로가 주석 처리되어 있다. F-KR 모델 및 축/파라미터 저장 방식은 그대로다.
+v1.0 기본 FMU는 이미지 안의 `/model_artifacts/`에 있다. F-KR 직선/회전 FMU, Copley, 아날로그 지연 FMU를 빌드하고 고정 실린더 FMU를 포함한다. `.env.example`의 외부 FMU 경로는 선택적 override다. 외부 폴더를 사용하면 해당 구성에서 필요한 모든 FMU가 있어야 한다.
+
+v1.0 버전 고정 이미지 이름은 `ethercat-device-simulator:1.0.0`이며 현재 검증한 이미지를 가리킨다. 공개 registry에는 게시하지 않는다. save/load 또는 오프라인 묶음으로 옮긴 다음 기존 실행 스크립트용으로 `docker tag ethercat-device-simulator:1.0.0 ethercat-device-simulator:dev`를 수행한다. [릴리즈 기록](../../Doc/Releases/v1.0.0.md).
 
 기존 `.env`에 `DEVICE_SIMULATOR_FMU_DIR=./model_artifacts`가 있으면 scripts/docker가 `compose.external-fmu.yaml`을 추가하여 외부 FMU를 계속 사용한다. 새 이미지에서 빌드한 내장 FMU를 쓰려면 다음 수동 전환 시 그 설정을 삭제/주석 처리한다. 기존 `.env`를 자동 변경하지 않는다. 직접 Compose를 호출하면서 외부 FMU를 사용하려면 `-f compose.yaml -f compose.external-fmu.yaml`을 명시해야 한다.
 

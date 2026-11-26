@@ -1,149 +1,219 @@
-# Soft ESC — EtherCAT Device Simulator
+# Soft ESC
 
-Soft ESC는 **FMU 또는 다른 형식의 동작 모델을 EtherCAT 장치 프로파일에 연결하여, EtherCAT Master가 제어할 수 있는 가상 장치를 제공하는 독립 실행 패키지**입니다. **CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O**를 지원 대상으로 합니다.
+**Connect behaviour models to a real EtherCAT bus as virtual drives and remote I/O.**
 
-장치 프로파일·제품별 장치 설명·모델 어댑터·동작 모델을 분리합니다. DT Demo, Motion Server, Orchestrator, ROS2/Omniverse는 외부 사용 시스템이며 실행 의존성이 아닙니다. 저장소·이미지·설정 키 이름은 기존 `ethercat-device-simulator`/`DEVICE_SIMULATOR_*`를 유지합니다.
+Soft ESC turns FMUs and other supported behaviour models into virtual EtherCAT
+slaves. An EtherCAT master can configure and operate these devices through SDO
+and PDO communication, alongside physical equipment on the same bus.
 
-## 제품 범위와 구현 상태 — 2026-11-26
+The package runs independently of Motion Server, DT Demo, ROS 2 and Omniverse.
+Motion Server and its Axis/I/O Control Panels are the validated integration
+clients; device pairing, application sequences and DT visualization belong to
+the applications using Soft ESC.
 
-| 영역 | 현재 상태 |
-| --- | --- |
-| KickCAT 기반 EtherCAT·SDO/PDO·실제/가상 혼합 버스 | 기존 합의 범위 검증 완료 |
-| CiA402 Drive·F-KR CMMT·Copley FMI3 Co-Simulation | 모델별 지원 범위 구현·검증 완료 |
-| 독립 .env·영구 파라미터·동적 PDO 저장·축 Fault/Host 장애 격리 | 기존 축 범위 검증 완료 |
-| Modular Device Profile 기반 Remote I/O | CPX-AP-I 고정 PDO·최소 SDO·DI/DO/AI/AO 및 재구성/재검색 합의 범위 완료 |
-| IO 어댑터·동작 모델 | 복동 실린더·아날로그 지연 FMI3 연결 및 혼합 운전·Host 장애 복구 완료. 아날로그 수동/물리 전체 왕복은 생략, IO-Link 제외 |
-| Linux Docker | 현재 벤치 축+IO·FMU·복구 검증 완료. 새 PC/OS 및 Demo 최종 구성 배포 확인 잔여 |
+## What you can do
 
-실린더 모델의 출처·소스·Export·재검증 절차는 [모델 README](model_sources/pneumatic_cylinder/double_acting/README.md), 결과는 [Linux FMU 검증 보고서](Doc/Validation/Pneumatic-Cylinder-Web-FMU-20261125.md)를 참조합니다.
-
-지원 대상 정의가 모든 모델·모듈·Master에 대한 적합성 검증 완료를 의미하지는 않습니다. 현재 Copley의 기능 제약과 모델별 지원표는 각 RF를 따릅니다.
-
-DT Demo의 X1/Y/Z 3축과 Loader는 요구 대조·시험 사례입니다. 제품 축 수를 3으로 제한하거나 Remote I/O를 Loader 전용으로 만들지 않습니다. 제품 구조는 [ADR-001](Doc/Design/ADR-001-system-architecture.md), 현재 구현과 다음 작업은 [프로젝트 계획](Doc/project-plan.md)를 기준으로 합니다.
-
-## 프로젝트 문서
-
-- [아키텍처 결정 기록(ADR)](Doc/Design/README.md): 결정·근거·책임 경계
-- [작업 일지](Doc/Work_log.md): 진행 결과, 결정 사항 및 후속 작업
-- [RF 항목 목록](Doc/RF/README.md): Soft ESC 구현 상태·잔여 작업과 외부 구상 이력
-- [TD 항목 목록](Doc/TD/README.md): 보류한 기술 문제와 해결 기준
-- [설계 및 진행 계획](Doc/project-plan.md): 목적, 실행 구성 및 모듈 책임
-- [프로젝트 계획](Doc/project-plan.md) · [Demo 입력 분석 자료](Doc/DT-demo-gap-analysis.md)
-
-## 초기 타당성 검증 이력 — 현재 제품 범위와 구분
-
-기본 타당성 검증에 사용한 실행 구성은 **Windows PC의 Motion Server/PySOEM ↔ 실제 EtherCAT 케이블 ↔ 별도 Linux PC의 KickCAT 시뮬레이터**입니다. Linux 빌드 및 enp1s0에서 기본 Slave 실행·정상 종료를 검증했습니다. Windows PySOEM과의 물리 PDO 교환 1,000회를 검증했습니다. 테스트용 ESI에 0x1C00 정렬 보정이 필요하며, SDO 시험은 2-1단계로 분리했습니다.
-
-진행 순서 (2026-09-14 합의):
-
-1. Linux에서 KickCAT 빌드 및 기본 Slave 시뮬레이션 실행.
-2. Windows PySOEM에서 Slave 검색 → OP 전환 → PDO 왕복 검증. 명시적 SDO 시험은 별도 2-1단계.
-3. 기존 `VirtualOdBridge`와 가상 서보 모델을 연결해 CMMT 동작 구현.
-4. Motion Server와 Axis Panel로 통합 테스트.
-
-**첫 목표는 물리 케이블을 통한 PySOEM과 KickCAT의 기본 통신 확인**입니다. MockMaster는 비교·회귀 테스트용으로 유지합니다. acontis EC-Simulator 검토는 보류합니다.
-
-2-1단계 기본 SDO 읽기·쓰기·복원 및 PDO 회귀를 검증했습니다. SDO Abort 응답 호환성은 [TD-001](Doc/TD/TD-001-sdo-abort-response.md)로 등록하고 구현을 보류합니다.
-
-RF-003 기본 1축 연결을 검증했습니다: CMMT-AS / 기본 PDO, 별도 Python 모델 + Unix 소켓, SDO·CiA 402·Homing·이동·PDO 1,000회 및 SDO/PDO 위치 일치 확인. [구현 및 실행 방법](Doc/RF/RF-003-cmmt-model-integration.md). Motion Server·Axis Panel 통합은 RF-004입니다.
-
-## Motion Server / Axis Panel 수동 테스트
-
-### Linux Docker 실행 (2026-10-26)
-
-실행 인자는 [.env.example](.env.example)을 복사한 `.env`에서 지정합니다. 축 ID·모델·모드까지 모두 같은 `.env`에서 지정합니다. Linux 바이너리와 저장소의 `src/functional_model`·`device_descriptions`를 이미지에 포함합니다. 외부 Motion Server 모델 스냅샷이나 `--model-root`는 사용하지 않습니다.
-
-```bash
-test -e .env || cp .env.example .env
-nano .env
-bash scripts/docker/build.sh
-bash scripts/docker/validate.sh
-# 기존 native Simulator/Master 세션을 정리한 뒤 실행
-bash scripts/docker/start.sh
-bash scripts/docker/logs.sh
-# 종료: bash scripts/docker/stop.sh
-```
-
-Docker의 NIC는 KICKCAT_INTERFACE, 영구 데이터 위치는 DEVICE_SIMULATOR_STATE_DIR에서 설정합니다. 장치는 DEVICE_SIMULATOR_BUS와 DEVICE_SIMULATOR_AXIS_NAMES / MODELS / MODES로 정의합니다. 최초 Docker 저장소에는 기존 native 파라미터가 자동 복사되지 않습니다. [RF-012 실행 절차와 검증 범위](Doc/RF/RF-012-docker-deployment.md)를 확인하세요. 기존 축의 이미지 빌드·물리 PDO·Host 장애 격리는 검증했으며 신규 IO는 별도 회귀 대상입니다.
-
-### Docker 운영 스크립트
-
-Motion Server의 start/stop 패턴을 참고해 [scripts/docker](scripts/README.md)에 실행 도구를 모았습니다.
-
-```bash
-bash scripts/docker/start.sh --build
-bash scripts/docker/status.sh
-bash scripts/docker/logs.sh
-bash scripts/docker/stop.sh
-```
-
-별도 이미지 빌드: `bash scripts/docker/build.sh`. NIC 없는 설정·저장값 검증: `bash scripts/docker/validate.sh` (서비스 정지 상태). 이미지를 다시 만들 필요가 없으면 start.sh의 --build를 생략합니다. start는 기존 컨테이너를 재생성하므로 운전 중 사용하지 않습니다. Motion Server와 Axis Panel은 각 패키지의 실행 도구로 별도 실행합니다.
-
-기존 native/Board/Windows 통합 실행 진입점 11개는 제거했습니다. 빌드 입력 생성·오프라인 검증·로그 분석·SDO 복원 테스트 의존 도구는 유지합니다. [유지·삭제 판단](scripts/README.md)을 참조하세요.
-
-## 독립 패키지의 구조와 외부 사용 경계
-
-KickCAT Slave와 Functional Model Host는 별도 프로세스이며 어댑터/동작 모델은 Host 안에서 실행합니다. 모델 Host 장애 중 Slave 유지와 수동 복구는 RF-018 범위로 검증했습니다. 자체 모델과 Copley FMU의 지원 범위는 RF-016/017을 따릅니다.
-
-CiA402 Drive와 Modular Remote I/O는 장치 프로파일 영역으로 구분합니다. Remote I/O의 모듈/채널은 장치 인터페이스, 밸브/실린더 등 동작은 어댑터와 동작 모델의 책임입니다. RF-013에서 공통 실행부의 축 전용 가정을 분리하고 IO를 연결했습니다.
-
-외부 모드 라우팅·Pairing·정렬·시퀀스·ROS2/Omniverse는 Soft ESC 기능에 포함하지 않습니다. 과거 RF-006~009는 외부 구상 이력으로 보존합니다. 현재 구현은 일반 SDO/PDO·장치 명령·피드백과 독립 저장/실행을 제공합니다.
-
-- [제품 구조](Doc/Design/ADR-001-system-architecture.md) · [모델 실행](Doc/Design/ADR-003-model-interface.md) · [프로파일/어댑터](Doc/Design/ADR-007-cia402-profile-adapters.md)
-- [장치 구성](Doc/Design/ADR-005-device-configuration.md) · [영구 저장](Doc/Design/ADR-004-parameter-sync-persistence.md) · [독립 Docker](Doc/Design/ADR-006-docker-deployment.md)
-
-## .env 4축 구성
-
-장치 구성은 루트 `.env`에서 설정하며 [.env.example](.env.example)을 참고합니다. 개발용 검증 도구도 기본적으로 루트 `.env`를 읽습니다. 별도 파일은 `--env-file`로 지정할 수 있습니다. `config/` 예제 폴더는 제거했습니다.
-
-[RF-011 실행 절차](Doc/RF/RF-011-device-configuration.md#정지-후-재구성-절차)에 신규 빌드 실행·NIC 없는 검증·물리 시험 순서를 기록했습니다. RF-022부터 `f_kr_cmmt`는 `model_sources/motor_controller/f_kr_cmmt`의 C++ 코어로 빌드한 직선/회전 FMU를 호출합니다. Python 기준은 `tests/reference`에 보존합니다. [전환 검증](Doc/Validation/RF-022/stage1-4-20261126.md). [RF-015](Doc/RF/RF-015-axis-model-semantics.md)는 직선축 운전 정책·Motion Server 호환성·회귀의 합의 범위를 완료했습니다. RF-022에서 기존 회전 동작도 FMU로 이식·검증했으며, modulo/최단 경로 등 추가 기능은 제외합니다.
-
-## 2026-09-22 성능 계측 결과와 다음 작업
-
-2축은 120초 관측에서 정상 동작했으나 4축은 PDO 처리 지연 및 버스 Fault가 재현됐습니다. [프레임·IPC 계측](Doc/Validation/RF-011/RF-011-timing-20260922.md)과 [Python 세부 계측](Doc/Validation/RF-011/RF-011-python-timing-20260922.md)에 시험 조건과 한계를 기록했습니다. IPC 시간의 약 90%가 모델 계산이며, 별도 오프라인 프로파일에서는 OD role 전체 검색이 모델 시간의 약 97.57%를 차지했습니다.
-
-2026-10-20 OD role 조회 인덱스 최적화를 적용했습니다. [2축/4축 재검증](Doc/Validation/RF-011/RF-011-role-index-20261020.md)은 각각 8 ms·120초 정지 상태에서 Fault 없이 통과했습니다. PDO 처리 평균은 0.223/0.395 ms입니다. 현재 구조의 정량 성능·이동 부하 검증은 RF-016/017에서 추적합니다. 이 수치는 당시 정지 시험 결과입니다.
-
-2026-10-26 사용자가 **최적화 적용 후 4축 동작 테스트 정상**을 확인했습니다. 수동 시험의 상세 시간·모드·WKC 수치는 별도 보고되지 않았으며, RF-011은 기존 구성·독립성 및 RF-010/018 근거를 종합하여 2026-10-28 완료 처리했습니다.
-
-## RF-016 구현 구조 (2026-10-26)
+- **Simulate drives:** use F-KR CMMT linear and rotary FMUs through a CiA402 Drive
+  profile, or select the existing Copley DriveSim adapter within its supported scope.
+- **Simulate remote I/O:** configure CPX-AP-I-EC DI/DO/AI/AO modules and connect
+  individual channels to double-acting cylinder or analog-delay FMUs.
+- **Use real EtherCAT communication:** discover slaves, access device parameters,
+  exchange PDOs and combine virtual devices with physical devices.
+- **Keep device settings:** persist axis parameters and the last accepted PDO
+  mapping across container recreation, using stable device names.
+- **Test fault handling:** retain the EtherCAT slave process when the model host
+  fails or stops responding, with defined manual recovery behaviour.
 
 ```text
-src/ethercat_slave/                 # C++: EtherCAT Slave + IPC
-src/functional_model/
-  cia402_drive/
-    profile/                       # 공통 OD·PDO 정의
-    adapter/                       # F-KR Internal 연결·계약·등록
-    behaviour_model/f_kr_cmmt/  # 기존 Python 코드·OD role 도구(제품 운동 계산은 FMU)
-  runtime/                         # 축 인스턴스와 서비스
-  ipc/ storage/ diagnostics/
-device_descriptions/cmmt_as/        # 기존 identity·ESI·확장·저장 명령
-protocols/ipc/                      # 메시지 계약
+Application / Control Panels
+            |
+     Motion Server / EtherCAT master
+            |
+     Physical EtherCAT devices (optional)
+            |
+     Soft ESC — Linux Docker, end of the line
+       EtherCAT Slave Interface (KickCAT)
+            |
+           IPC
+            |
+       Functional Model Host
+       +-- CiA402 Drive profile -> model adapter -> drive FMU
+       +-- Remote I/O profile  -> I/O adapter   -> cylinder / delay FMU
 ```
 
-기존 `.env`, `f_kr_cmmt` 모델 ID 및 저장 파라미터 형식은 유지한다. 내부 프로파일은 cia402-drive지만 BUS 설정은 cia402-drive, 모델 ID는 f_kr_cmmt이며 EtherCAT identity/PDO는 기존 CMMT 호환 값이다. 어댑터는 미지원 운전 모드를 거부한다. 실제 모델 알고리즘은 유지했다. [RF-016](Doc/RF/RF-016-cia402-profile-adapter.md)에 기존 구조와 완료된 물리 검증 근거를 기록한다.
+The slave interface and functional model host are separate processes. FMUs run
+as libraries inside the model host. One logical device OD is shared by the
+profile and adapter; the behaviour model calculates motion or physical response.
+
+## Platforms and release status
+
+- **Soft ESC 1.0.0:** the released baseline for current internal and DT Demo work.
+- **Runtime:** Linux x86-64 with Docker Engine and Docker Compose. Docker uses host
+  networking and the configured EtherCAT NIC. Windows is a validated master/client
+  host, not the supported Soft ESC runtime.
+- **Validated:** F-KR/Copley axes, CPX and cylinder mixed operation, parameter and
+  mapping restoration, and model-host fault isolation on the existing physical bench.
+- **Deferred acceptance:** final Demo device configuration and deployment on a new
+  Edge PC will be checked together when the Demo equipment is configured.
+- **Maintenance policy:** until DT Demo is complete, only TD work fixing bugs or
+  deficiencies in implemented features is undertaken. New RF feature implementation
+  is frozen. RF-021 follows DT Demo; RF-019/020 are outside the v1.0/Demo scope.
+
+See the [v1.0 release notes](Doc/Releases/v1.0.0.md) and
+[maintenance policy](Doc/Design/ADR-011-v1-maintenance-policy.md).
+
+## Getting started
+
+1. Prepare a Linux host, Docker Engine/Compose, Python 3, Git and a dedicated
+   EtherCAT NIC. Use a separate engineering network for SSH and management.
+2. Clone the release with its KickCAT submodule:
+
+   ```bash
+   git clone --branch v1.0.0 --recurse-submodules https://github.com/IlgonKo/ethercat-device-simulator.git
+   cd ethercat-device-simulator
+   cp .env.example .env
+   nano .env
+   ```
+
+3. Set the NIC and device layout in `.env`. The supplied example defines four
+   F-KR axes; the commented I/O example shows CPX modules and model bindings.
+4. Load the prepared release image/offline bundle, or build from the release
+   source using the [deployment guide](scripts/deployment/README.md).
+   Source builds require the pinned wheels, dependency sources, base/builder
+   images and cylinder FMU input described there. A source clone alone does not
+   include those binary inputs.
+5. Start Soft ESC, then connect and initialize the EtherCAT bus from the master.
+
+The scripts use the local image name `ethercat-device-simulator:dev`. To select
+the loaded v1.0 image for these existing scripts:
 
 ```bash
-bash scripts/linux/build-cmmt.sh     # C++ 변경 시
-bash scripts/docker/build.sh
-bash scripts/docker/validate.sh
+docker tag ethercat-device-simulator:1.0.0 ethercat-device-simulator:dev
 bash scripts/docker/start.sh
+bash scripts/docker/status.sh
+bash scripts/docker/logs.sh
 ```
 
-### Copley FMU 오프라인 검증
+The versioned image is a local Docker/save-load artifact, not a published registry
+image. The GitHub release provides source and the F-KR FMU artifacts; it does not
+provide the complete offline Docker bundle. Follow the deployment guide for source
+builds or a prepared offline bundle. No image is pulled by the commands above.
 
-FMI3 CS 기반 PP 어댑터와 Linux FMU 빌드 도구의 실행 방법은 [RF-017](Doc/RF/RF-017-copley-fmu.md)을 따른다. `.env`에서 `copley_drive_sim` 선택, FMU 폴더 마운트 및 지원 파라미터 저장을 제공한다. 혼합 물리 PP·저장·Fault/Reset 및 RF-018 IPC 장애 격리를 확인했다. 세부 물리 이동·파라미터 효과와 정량 성능 근거는 RF-017에 남는다.
+## Runtime configuration
 
-폴더 역할과 생성물 보관 정책: [ADR-010](Doc/Design/ADR-010-project-layout.md).
+All bus and device settings live in the Simulator's own `.env`. It does not read
+Motion Server configuration. This example replaces the axis layout in that file:
 
-축 ID는 파라미터와 PDO 매핑의 공통 영구 식별자입니다. 파라미터는 `state/<축 ID>.json`에 저장하며 `AXIS_PARAMETER_SETS`는 사용하지 않습니다. 기존 구성의 이름 이관 및 호환 정책은 [검증 기록](Doc/Validation/Axis-ID-Storage-20261126.md)을 참조하세요.
+```ini
+KICKCAT_INTERFACE=enp1s0
+DEVICE_SIMULATOR_STATE_DIR=./state
+DEVICE_SIMULATOR_BUS=0:axis:cia402-drive,1:axis:cia402-drive
+DEVICE_SIMULATOR_AXIS_NAMES=0:virtual-axis-0,1:virtual-axis-1
+DEVICE_SIMULATOR_AXIS_MODELS=0:f_kr_cmmt,1:f_kr_cmmt
+DEVICE_SIMULATOR_AXIS_MODES=0:linear,1:rotary
+DEVICE_SIMULATOR_SESSION_TIMEOUT=0
+```
 
-### F-KR FMU 빌드와 선택 (RF-022)
+- Bus indices are explicit, contiguous Simulator-local indices. The master's
+  absolute slave indices also include physical devices earlier in the line.
+- Axis names identify `state/<name>.json` and the corresponding mapping file in
+  `state/pdo-mappings/`. Keep names stable when reordering devices.
+- Changing an axis model/mode does not convert an existing parameter file.
+  Incompatible stored data is rejected; it is not silently reset or migrated.
+- `SESSION_TIMEOUT=0` runs continuously. A positive value is for diagnostics.
+- FMUs are included in the built image. An explicit `DEVICE_SIMULATOR_FMU_DIR`
+  overrides that folder and must contain every FMU required by the configuration.
 
-기존 `DEVICE_SIMULATOR_AXIS_MODELS=f_kr_cmmt`와 `DEVICE_SIMULATOR_AXIS_MODES=linear/rotary`를 유지합니다.
-Docker Builder가 `FKrCmmtLinear-linux.fmu`(m 계열)와 `FKrCmmtRotary-linux.fmu`(rad 계열)를 생성합니다.
-FMU는 FMI 3.0 Co-Simulation / Linux x86-64이며 Python 인터프리터를 포함하지 않습니다.
-소스·독립 실행 계약은 [모델 설명](model_sources/motor_controller/f_kr_cmmt/README.md)을 참조합니다.
-외부 FMU 폴더를 명시적으로 마운트하면 해당 구성에서 사용하는 F-KR/Copley/IO FMU를 모두 넣어야 합니다.
-필요한 FMU 누락이나 축 mode와 다른 파일은 시작 오류이며 Python으로 자동 대체하지 않습니다.
-RF-022 5단계의 [물리 통합·저장·복구 검증](Doc/Validation/RF-022/stage5-20261126.md)을 완료했고, 원래 혼합 구성에서 새 이미지를 실행 중입니다.
+For Remote I/O, use `DEVICE_SIMULATOR_IO_<id>_MODULES`, `IO_MODELS`,
+`IO_MODEL_INSTANCES` and station `BINDINGS` as shown in [.env.example](.env.example).
+Geometry/delay presets are stored in [model_presets](model_presets/README.md);
+operating and initial conditions belong to each configured instance.
+
+## Operation and updates
+
+Run from the repository root:
+
+```bash
+bash scripts/docker/start.sh          # Start/recreate with the existing image
+bash scripts/docker/status.sh
+bash scripts/docker/logs.sh           # Ctrl+C stops log viewing only
+bash scripts/docker/stop.sh           # Stop; preserve persistent state
+```
+
+After preparing the pinned build inputs, build without starting a container:
+
+```bash
+bash scripts/docker/build.sh
+```
+
+`start.sh --build` builds and then recreates the container. Ordinary startup does
+not rebuild. Before replacing a running simulator, stop motion and disconnect the
+master bus, then back up `.env` and the configured state directory. Reconnect and
+initialize the master after startup. See the [backup and recovery procedure](scripts/deployment/README.md).
+
+`validate.sh` checks configuration, models and stored data without opening the
+EtherCAT NIC; stop the service using that store first. Container health indicates
+process readiness, not successful EtherCAT OP state, WKC or motion completion.
+
+## Models and supported boundaries
+
+| Model / device | v1.0 support |
+| --- | --- |
+| F-KR CMMT | FMI 3.0 Co-Simulation, separate linear/rotary FMUs; PP/PV/Jog, virtual Homing, Stop/Halt/Quick Stop, Disable and Fault Reset policies |
+| Copley DriveSim | Existing PP/parameter/Reset integration; no PV/Jog/Homing expansion. Referenced is projected by the adapter; Halt is ignored and Moving B8 differs from F-KR |
+| CPX-AP-I-EC | DI/DO/AI/AO, configuration-derived fixed PDOs, mapping/assignment reads and the agreed minimal OD access; no IO-Link |
+| Double-acting cylinder | Two DO commands and two end-position DI signals; instance presets and operating/initial conditions |
+| Analog delay | Signed Int16 AO-to-AI delay model; no connection to the cylinder's AI/AO channels |
+
+Axis PDO remapping is allowed through individual SDO writes in PRE-OP and is
+persisted after acceptance. Duplicate OD mapping and Complete Access are not
+supported. CPX mapping is fixed by module configuration and is not writable.
+
+F-KR models reproduce the agreed drive behaviour, not a complete CMMT product or
+electrical/torque/load model. Rotary modulo/shortest-path and coordinated-motion
+extensions are outside v1.0. Existing CSP behaviour was regression-tested offline;
+this release does not claim real-time performance or complete EtherCAT/CiA402
+conformance. Analog FMU tests passed offline; the manual/physical end-to-end
+analog test was explicitly omitted from the agreed acceptance scope.
+
+## Fault handling and recovery
+
+Correct the cause of a supported axis fault before requesting Fault Reset through
+the master. Fault Reset does not recreate a failed FMU or recover a stopped model
+host. Model-host timeout/failure requires manual container restart and master
+reinitialization; operation does not resume automatically. F-KR axes require
+Homing again after model recreation.
+
+I/O model execution errors remain internal diagnostics. They are not translated
+into CPX device errors. Application timeouts, interlocks and process fault policy
+belong to the application using the I/O.
+
+## Documentation
+
+- [Release scope and validation](Doc/Releases/v1.0.0.md)
+- [Docker/offline deployment](scripts/deployment/README.md) and [script guide](scripts/README.md)
+- [Architecture decisions](Doc/Design/README.md) and [project layout](Doc/Design/ADR-010-project-layout.md)
+- [RF status](Doc/RF/README.md), [TD tracking](Doc/TD/README.md), [work log](Doc/Work_log.md)
+- [Project plan](Doc/project-plan.md) and [DT Demo requirements](Doc/DT-demo-gap-analysis.md)
+- [Axis policies](Doc/RF/RF-015-axis-model-semantics.md), [I/O contract](Doc/RF/RF-013-virtual-io.md)
+- [F-KR FMU source/build](model_sources/motor_controller/f_kr_cmmt/README.md),
+  [Copley](model_sources/motor_controller/copley/README.md),
+  [cylinder](model_sources/pneumatic_cylinder/double_acting/README.md)
+
+## Folder guide
+
+```text
+src/ethercat_slave/    KickCAT interface, mailbox, PDO mapping and model IPC
+src/functional_model/ Device profiles, adapters, FMI execution, storage and diagnostics
+device_descriptions/  Product identity, ESI and device-specific OD metadata
+model_sources/        Behaviour-model sources and reproducible build inputs/metadata
+model_presets/        Reusable model settings
+model_artifacts/      Generated or supplied FMUs (not committed)
+protocols/            Cross-process contracts
+scripts/              Docker operation, deployment, model builds and validation
+state/                Local persistent device data (not committed)
+tests/                Unit, native and integration tests; frozen comparison model
+Doc/                  Requirements, decisions, validation records and release notes
+third_party/KickCAT/   Pinned upstream submodule
+build/ .cache/ results/ Local build, download and test outputs (not release source)
+```

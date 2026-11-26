@@ -1,5 +1,9 @@
 # RF 항목 목록
 
+## v1.0 유지보수 방침 — 2026-11-26
+
+현재 구현을 **Soft ESC v1.0.0**으로 릴리즈한다. **DT Demo 완료 전 신규 RF 구현은 진행하지 않는다.** 버그와 기구현 기능의 미비점은 TD로만 보완한다. RF-021은 Demo 이후, RF-019/020은 v1.0/Demo 범위 밖이며 장기 구상만 보존한다. RF-012 배포 검증은 Demo 장비 설정 시 함께 진행한다. [릴리즈 기록](../Releases/v1.0.0.md), [ADR-011](../Design/ADR-011-v1-maintenance-policy.md).
+
 ## 현재 상태 요약
 
 설계 결정은 [ADR 목록](../Design/README.md), 전체 작업 순서는 [프로젝트 계획](../project-plan.md)을 따른다.
@@ -23,9 +27,9 @@
 | [RF-016](RF-016-cia402-profile-adapter.md) | CiA402 Drive 프로파일 및 F-KR CMMT 어댑터 | **완료** |
 | [RF-017](RF-017-copley-fmu.md) | Copley FMU 초기 연동 | **완료** |
 | [RF-018](RF-018-diagnostic-fault.md) | 공통 Diagnostic 및 모델 장애 격리 | **완료** |
-| [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **예정** |
-| [RF-020](RF-020-parameter-history.md) | 파라미터 revision 및 변경 이력 관리 | **예정** |
-| [RF-021](RF-021-pneumatic-cylinder-fmu-improvements.md) | 공압 실린더 FMU 개선·정격 유량 설정 노출 | **예정** |
+| [RF-019](RF-019-parameter-management-api.md) | 가상장치 파라미터 관리 API | **보류** |
+| [RF-020](RF-020-parameter-history.md) | 파라미터 revision 및 변경 이력 관리 | **보류** |
+| [RF-021](RF-021-pneumatic-cylinder-fmu-improvements.md) | 공압 실린더 FMU 개선·정격 유량 설정 노출 | **보류** |
 | [RF-022](RF-022-f-kr-cmmt-fmu.md) | F-KR CMMT 동작 모델 FMU 전환 | **완료** |
 
 ## 외부 연동 구상 — Soft ESC 범위 외 참고 이력
@@ -41,14 +45,14 @@
 
 ## 2026-11-26 제품 범위 요약
 
-총 23개 요구 항목 중 **제품 범위 19개: 완료 15 / 진행 중 0 / 보류 1 / 예정 3**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
+총 23개 요구 항목 중 **제품 범위 19개: 완료 15 / 진행 중 0 / 보류 4 / 예정 0**, 외부 구상 이력 4개다. Soft ESC는 CiA402 Drive와 EtherCAT Modular Device Profile 기반 Remote I/O를 동작 모델에 연결하는 독립 패키지다.
 
 - RF-013: CPX-AP-I DI/DO/AI/AO·실제 FMU 연결·혼합 운전·Host 장애/복구·재구성/재검색 합의 범위 완료. 아날로그 수동/물리 FMU 왕복은 사용자 결정으로 생략. IO-Link·진단 PDO/이력/Emergency·외부 DT 연동은 제외.
 - RF-015: 사용자 동의로 완료. 세부 경계 자동 시험·3축/혼합 물리 운전·저장 및 RF-022 FMU 회귀 근거를 인정하고 추가 물리 반복을 요구하지 않는다. Copley B8/Halt 등 기존 제한은 유지.
 - RF-022: C++ 직선/회전 FMU·어댑터·Docker 및 1~5단계 검증 완료. 기존 혼합 구성, 직선/회전 4축, 저장/재시작·Host 장애/복구 통과. [물리 검증](../Validation/RF-022/stage5-20261126.md).
 - RF-012: 보류. Demo 최종 3직선축·CPX/Loader 설정과 새 Linux PC/OS(Edge #2) 배포·재부팅 복원은 사용자 결정에 따라 추후 Demo 사양 장비 설정 시 함께 확인한다. 현재 벤치의 축+IO·저장/장애 복구 근거를 유지한다.
-- RF-019/020: 후속 제품 기능. 이번 IO 지원의 필수 조건으로 확대하지 않음.
-- RF-021: 정격 유량의 FMU 외부 설정 지원. RF-013은 기존 FMU로 계속 진행하며 개선 완료를 기다리지 않음.
+- RF-019/020: v1.0/DT Demo 범위 외 장기 구상. 구현 보류.
+- RF-021: 정격 유량의 FMU 외부 설정은 DT Demo 완료 이후. v1.0은 현재 FMU를 사용한다.
 
 DT/Sync·Pairing·정렬 절차·ROS2/Omniverse는 제품 실행 의존성이 아니다. IO-Link·회전 modulo/최단 경로 등 추가 확장·NIC 추가 시험은 기존 후속/보류 경계를 유지한다. 기존 완료 검증을 보존하고 변경 영향만 회귀한다. [제품 정의](../Design/ADR-001-system-architecture.md), [프로젝트 계획](../project-plan.md)를 따른다.
 
