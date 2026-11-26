@@ -27,5 +27,13 @@
     "gcc": "13.3.0",
     "conan": "2.10.2",
     "conan_cache_sha256": "ab59c10916a1c91cbf4879f017e0758a0dd7cb54b4de2e76cca35d9d06e958bf"
-  }
+  },
+  "binary_fmus": [
+    {
+      "file": "SoftESCDoubleActingCylinder-fmi3-web.fmu",
+      "sha256": "34b14a7967042fe3abaabab4de6086e8a29324faeb3a2ab29f569c590e2cac42",
+      "local_source": "model_artifacts/SoftESCDoubleActingCylinder-fmi3-web.fmu",
+      "origin": "User-provided OpenModelica Playground FMI 3.0 export, 2026-11-25"
+    }
+  ]
 }

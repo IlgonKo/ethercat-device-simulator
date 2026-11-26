@@ -91,7 +91,7 @@ def export(args):
     run(['git', '-C', root, 'bundle', 'create', destination / 'repository.bundle', 'HEAD'])
     run(['git', '-C', kickcat, 'bundle', 'create', destination / 'kickcat.bundle', 'HEAD'])
     copy_locked_wheels(root/'docker/requirements-fmi.txt', args.wheels, destination/'wheels/fmi')
-    for item in locked['native_sources']+[dict(file='CopleyDriveSim-source.fmu',sha256=locked['source_fmu_sha256'])]:
+    for item in locked['native_sources']+[dict(file='CopleyDriveSim-source.fmu',sha256=locked['source_fmu_sha256'])]+locked.get('binary_fmus',[]):
         source=args.inputs/item['file']
         if digest(source)!=item['sha256']:raise ValueError('Build input checksum mismatch: '+item['file'])
         copy_file(source,destination/'inputs'/item['file'])

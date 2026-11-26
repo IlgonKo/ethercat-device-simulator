@@ -5,14 +5,14 @@ interrupt a hanging doStep; EtherCAT fault isolation is a separate work item.
 """
 import math
 import tempfile
-from numbers import Integral
+from numbers import Integral, Real
 
 
 class Fmi3Runner:
-    def __init__(self, artifact, signature, instance_name='drive'):
+    def __init__(self, artifact, signature, instance_name='drive', *, initial_values=None):
         from fmpy import extract, read_model_description
         from fmpy.fmi3 import FMU3Slave
-        self._folder = tempfile.TemporaryDirectory(prefix='drive-fmu-')
+        self._folder = tempfile.TemporaryDirectory(prefix='softesc-fmu-')
         self._fmu = None
         self._initialized = False
         self.failed = False
@@ -29,8 +29,10 @@ class Fmi3Runner:
             extract(str(artifact), unzipdir=self._folder.name)
             self._fmu = FMU3Slave(guid=md.guid, modelIdentifier=md.coSimulation.modelIdentifier,
                                  unzipDirectory=self._folder.name, instanceName=instance_name)
-            self._fmu.instantiate()
+            self._fmu.instantiate(eventModeUsed=False, earlyReturnAllowed=False)
             self._fmu.enterInitializationMode(startTime=0.0)
+            for name, value in (initial_values or {}).items():
+                self._write(name, value, initializing=True)
             self._fmu.exitInitializationMode()
             self._initialized = True
         except Exception:
@@ -43,19 +45,33 @@ class Fmi3Runner:
 
     def set(self, name, value):
         self._check()
+        self._write(name, value, initializing=False)
+
+    def _write(self, name, value, *, initializing):
+        if name not in self.variables:
+            raise ValueError(f'Unknown FMU setting: {name}')
         v = self.variables[name]
         if v.causality not in ('input', 'parameter'):
             raise ValueError(f'Not writable: {name}')
-        if isinstance(value, float) and not math.isfinite(value):
-            raise ValueError(f'Nonfinite FMU value: {name}')
-        if v.type.startswith(('Int', 'UInt')):
+        if v.causality == 'parameter' and not initializing and getattr(v, 'variability', 'fixed') != 'tunable':
+            raise ValueError(f'FMU parameter is initialization-only in this runner: {name}')
+        if v.type.startswith('Float'):
+            if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value):
+                raise ValueError(f'Finite FMU real required: {name}')
+        elif v.type.startswith(('Int', 'UInt')):
             bits = int(v.type.lstrip('UInt'))
             signed = v.type.startswith('Int')
             low, high = (-(1 << (bits-1)), (1 << (bits-1))-1) if signed else (0, (1 << bits)-1)
-            if not isinstance(value, Integral) or not low <= value <= high:
+            if isinstance(value, bool) or not isinstance(value, Integral) or not low <= value <= high:
                 raise ValueError(f'FMU integer out of range: {name}')
-        if v.type == 'Boolean' and not isinstance(value, bool):
-            raise ValueError(f'FMU Boolean required: {name}')
+        elif v.type == 'Boolean':
+            if not isinstance(value, bool):raise ValueError(f'FMU Boolean required: {name}')
+        else:
+            raise ValueError(f'Unsupported scalar FMU type: {v.type}')
+        for attribute, comparison in [('min', lambda a,b:a<b), ('max', lambda a,b:a>b)]:
+            bound = getattr(v, attribute, None)
+            if bound is not None and comparison(value, float(bound)):
+                raise ValueError(f'FMU value violates {attribute}: {name}')
         try:
             getattr(self._fmu, 'set' + v.type)([v.valueReference], [value])
         except Exception:

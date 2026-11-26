@@ -62,5 +62,12 @@ python3 scripts/validation/validate-fleet.py --binary build/timing/cmmt_simulato
 - `validation/test-pneumatic-fmi3.py`: Playground에서 내보낸 FMI 3.0 파일의 Linux 왕복·파라미터·
   무공압·Event Mode 검증. NIC와 운영 Docker를 사용하지 않는다.
 
-선택한 IO 연결용 산출물은 FMI 3.0 Linux FMU이며, 운영 모델 등록/IO 연결은 아직 없다.
+선택한 IO 연결용 산출물은 FMI 3.0 Linux FMU이며, RF-013 4단계에서 모델 등록/IO 어댑터와 Docker 포함을 완료했다. 전체 혼합 물리 검증은 5단계다.
 자세한 사용법은 [모델 README](../model_sources/pneumatic_cylinder/double_acting/README.md)를 따른다.
+
+## IO FMU 빌드·패키징
+
+- `models/build-analog-delay-fmu.py`: raw Int16 순수 지연 FMI 3.0 FMU를 Linux x86-64에서 빌드·검증한다. Docker builder에서 실행하므로 호스트 컴파일러가 필요 없다.
+- `models/package-io-fmus.py`: dependency-inputs.json의 SHA-256과 대조해 사용자 제공 실린더 FMU를 원형 그대로 이미지에 포함한다.
+- `docker/prepare-inputs.py`: 선택한 실린더 FMU를 model_artifacts 또는 docker/inputs에서 확보한다. 검증한 파일이 없으면 실패하며 웹 재Export를 자동 수행하지 않는다. 오프라인 배포 묶음도 이 입력을 포함한다.
+- `tests/integration/test_io_fmu.py`: IO_TEST_FMU_DIR를 지정하면 실제 실린더/지연 FMU를 시험한다.

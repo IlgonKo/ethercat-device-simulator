@@ -3,8 +3,7 @@
 One worker per behaviour instance; no queued steps, no catch-up and no overlap
 within an instance. The IO lock is never held while a behaviour model computes.
 The factory receives a validated preset and instance settings, and returns an
-adapter with initial_outputs(), step(inputs, time, dt), close(). Actual FMU
-adapters are supplied by the next implementation stage; tests inject fixtures.
+adapter with initial_outputs(), step(inputs, time, dt), close(). FMI adapters run the selected behaviour model; tests may inject fixture adapters.
 """
 import json
 import os
@@ -16,7 +15,10 @@ from .configuration import REQUIRED, SIGNALS
 DT=.008
 
 def create_adapter(spec):
-    raise ValueError(f"IO FMU adapter not installed yet: {spec['preset']['model']}; RF-013 stage 4 required")
+    from .adapter.fmi import FmiIOAdapter
+    from pathlib import Path
+    folder=spec.get('artifact_directory') or os.environ.get('DEVICE_SIMULATOR_FMU_DIR') or str(Path(__file__).resolve().parents[3]/'model_artifacts')
+    return FmiIOAdapter(spec,folder)
 
 def validate_value(kind, value):
     if kind in ('DI','DO'):

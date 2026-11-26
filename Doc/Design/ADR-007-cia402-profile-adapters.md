@@ -42,12 +42,12 @@ MDP 지원을 CPX라는 이름이나 DI/DO 바이트 복사만으로 정의하�
 
 IO 모델은 고정 8ms 주기로 계산한다. 계산 시작 시 필요한 station의 최신 유효 입력 전체를 스냅샷으로 취하고, 계산 중 도착한 값은 다음 주기에 사용한다. 모델당 한 번 계산하며 프레임/연결 수에 비례해 모델 시간을 진행시키지 않는다. 같은 Master 주기 입력이나 모든 짧은 펄스 포착을 보장하는 계약은 아니다. 계산 지연에도 8ms 단계를 유지하고 요청을 누적/중첩하거나 몰아서 계산하지 않는다. 일시 초과는 계측하고 응답 제한시간 초과는 Host 장애로 구분한다. 상세 정책은 RF-013을 따른다. 기존 축 주기는 변경하지 않는다.
 
-아날로그 연결 시험은 실린더와 별도의 순수 지연 FMU로 수행한다. command/feedback은 signed 16-bit raw 정수이며 스케일/물리 단위 변환 없이 각 입력 스냅샷을 모델 시간 기준 지연 후 출력한다. 지연은 프리셋 설정이고 초기 출력은 0이다. 입력은 단계 시작 t에 적용하고 출력은 단계 종료 t+8ms에서 평가·게시한다. 0 지연은 같은 요청 완료 결과이며 추가 버퍼 지연은 없다. 8ms 계산 시점 양자화, 버퍼 유지/재시작 초기화 등은 RF-013 계약을 따른다. FMU 제작/모델 등록은 아직 미수행이다.
+아날로그 연결 시험은 실린더와 별도의 순수 지연 FMU로 수행한다. command/feedback은 signed 16-bit raw 정수이며 스케일/물리 단위 변환 없이 각 입력 스냅샷을 모델 시간 기준 지연 후 출력한다. 지연은 프리셋 설정이고 초기 출력은 0이다. 입력은 단계 시작 t에 적용하고 출력은 단계 종료 t+8ms에서 평가·게시한다. 0 지연은 같은 요청 완료 결과이며 추가 버퍼 지연은 없다. 8ms 계산 시점 양자화, 버퍼 유지/재시작 초기화 등은 RF-013 계약을 따른다. RF-013 4단계에서 C99 기반 FMI 3.0 지연 FMU와 analog_delay_16ms 프리셋을 등록·검증했다.
 
 ## 실린더 동작 모델 재사용 — 2026-11-25
 
 RF-013의 IO 연결 대상으로 `SoftESCDoubleActingCylinder` FMI 3.0 Co-Simulation
-FMU를 사용한다. Linux 오프라인 검증은 완료했으며 IO 어댑터·등록·채널 연결은 미구현이다.
+FMU를 사용한다. Linux 오프라인 검증에 이어 RF-013 4단계에서 IO 어댑터·등록·채널 연결과 Docker 배포 이미지 시험을 완료했다. 전체 물리 통합 시험은 5단계다.
 프로파일은 공압 계산을 포함하지 않고, 어댑터가 DO/DI의 논리 신호를 FMU의
 extend_command/retract_command 및 끝단 센서 변수로 연결한다. 실린더는 DO 명령 2개·DI 센서 2개만 연결 대상으로 제공하며 AI/AO binding은 지원하지 않는다. 두 DO 명령 입력 모두 필수 연결이다. 하나만 연결하거나 모두 미연결이면 초기화 후 실행 대기하며 계산하지 않는다. 미연결 명령을 OFF로 보충하지 않는다. 센서 DI 연결은 선택 사항이다. AI/AO 지원은 별도 모델 계약으로 유지한다.
 
@@ -55,8 +55,8 @@ extend_command/retract_command 및 끝단 센서 변수로 연결한다. 실린�
 의미를 이름 변환만으로 덧씌우지 않는다. 전진·후진 입력은 모두 ON인 경우까지 그대로
 전달한다. 상충 판단·진단·인터록은 상위 애플리케이션 책임이다. 모델 설정·지원 기능과
 실행/연결 장애 정책은 별도 계약으로 드러낸다. 정격 유량 설정 노출은
-[RF-021](../RF/RF-021-pneumatic-cylinder-fmu-improvements.md) 후속이며 현재 IO는 기존 FMU로 진행한다. 공통 FMI 실행기를 재사용하기 전에 이 FMU의 입력
-자료형·Event Mode/시간 진행 조건과 대조한다. [검증 근거](../Validation/Pneumatic-Cylinder-Web-FMU-20261125.md).
+[RF-021](../RF/RF-021-pneumatic-cylinder-fmu-improvements.md) 후속이며 현재 IO는 기존 FMU로 진행한다. 공통 FMI 실행기의 입력
+자료형·Event Mode/시간 진행 조건을 대조하고 4단계 실제 FMU 시험으로 검증했다. [검증 근거](../Validation/Pneumatic-Cylinder-Web-FMU-20261125.md).
 
 선택 AIO 모듈(CPX-AP-I-4AI4AO-U-I-M12)의 RxPDO는 AO 4채널 8바이트와 공급 출력 4비트/padding 4비트를 포함한 총 9바이트를 유지한다. 공급 전원 제어는 모델링하지 않으며 공급 비트를 binding·모델 Enable·raw IO 차단·진단 조건으로 사용하지 않는다. 상세 배치/검증은 RF-013을 따른다.
 
@@ -104,4 +104,4 @@ Copley의 현재 어댑터는 PP/Enable/피드백/Fault Reset 등을 지원하�
 
 ## 2026-11-26 RF-013 1~3단계 구현
 
-IO 프로파일 영역은 `functional_model/remote_io`로 추가했다. `station.py`는 장치 계약, `configuration.py`는 모듈/모델 연결 검증, `runtime.py`는 독립 동작 모델의 8ms 실행/스냅샷/장애 범위를 맡는다. CPX 제품별 정의는 `device_descriptions/cpx_ap_i_ec`, Slave의 로컬 OD·고정 bit PDO/SDO는 `ethercat_slave/process_data/fixed_io.h`에 둔다. IO IPC에 매핑 제어를 넣지 않는다. 어댑터의 초기 출력/step/close 경계는 주입형 시험으로 검증했으며 실제 FMU adapter 구현은 4단계에서 진행한다. [검증 보고서](../Validation/RF-013-stage1-3-20261126.md).
+IO 프로파일 영역은 `functional_model/remote_io`로 추가했다. `station.py`는 장치 계약, `configuration.py`는 모듈/모델 연결 검증, `runtime.py`는 독립 동작 모델의 8ms 실행/스냅샷/장애 범위를 맡는다. CPX 제품별 정의는 `device_descriptions/cpx_ap_i_ec`, Slave의 로컬 OD·고정 bit PDO/SDO는 `ethercat_slave/process_data/fixed_io.h`에 둔다. IO IPC에 매핑 제어를 넣지 않는다. 어댑터의 초기 출력/step/close 경계는 주입형 시험으로 검증했으며 실제 FMU adapter는 4단계에서 remote_io/adapter/fmi.py로 구현했다. 어댑터는 신호명·설정·FMI 호출을 연결하고 공압 계산/지연 버퍼는 각 FMU 내부에서 수행한다. [4단계 검증](../Validation/RF-013-stage4-20261126.md). [검증 보고서](../Validation/RF-013-stage1-3-20261126.md).

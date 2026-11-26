@@ -20,14 +20,19 @@ def main():
  args=p.parse_args()
  lock=json.loads((ROOT/'docker/dependency-inputs.json').read_text())
  inputs=ROOT/'docker/inputs';inputs.mkdir(exist_ok=True)
- items=lock['native_sources']+[dict(file='CopleyDriveSim-source.fmu',url=lock['source_fmu_url'],sha256=lock['source_fmu_sha256'])]
+ items=lock['native_sources']+[dict(file='CopleyDriveSim-source.fmu',url=lock['source_fmu_url'],sha256=lock['source_fmu_sha256'])]+lock.get('binary_fmus',[])
  for item in items:
   path=inputs/item['file']
-  if not path.exists() and args.download:
+  if not path.exists() and item.get('local_source'):
+   source=ROOT/item['local_source']
+   if source.is_file():
+    if hashlib.sha256(source.read_bytes()).hexdigest()!=item['sha256']:raise ValueError('Local FMU checksum mismatch: '+str(source))
+    shutil.copy2(source,path)
+  if not path.exists() and args.download and item.get('url'):
    raw=urllib.request.urlopen(item['url'],timeout=120).read()
    if hashlib.sha256(raw).hexdigest()!=item['sha256']:raise ValueError('Downloaded checksum mismatch: '+item['file'])
    path.write_bytes(raw)
-  if not path.exists():raise FileNotFoundError(f'{path}: supply offline inputs or use --download')
+  if not path.exists():raise FileNotFoundError(f'{path}: supply the hash-matched input; user-exported binary FMUs are not downloaded or rebuilt implicitly')
   if hashlib.sha256(path.read_bytes()).hexdigest()!=item['sha256']:raise ValueError('Checksum mismatch: '+item['file'])
  wheels=ROOT/'docker/wheels';wheels.mkdir(exist_ok=True)
  required=set(re.findall(r'--hash=sha256:([a-f0-9]{64})',(ROOT/'docker/requirements-fmi.txt').read_text()))

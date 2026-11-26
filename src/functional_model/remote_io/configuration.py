@@ -57,12 +57,13 @@ def validate_preset(preset):
         cfg.setdefault('delay_seconds',.016)
         if not 0<=cfg['delay_seconds']<=10:raise ValueError('delay_seconds: expected 0..10 seconds')
     else:
+        minimum={'stroke':.001,'piston_diameter':.001,'rod_diameter':0,'moving_mass':.001,'sensor_width':.00001}
         for k,v in cfg.items():
-            if v<=0:raise ValueError(f'{k}: positive value required')
+            if v<minimum[k]:raise ValueError(f'{k}: below FMU minimum {minimum[k]}')
         if cfg.get('rod_diameter',.008)>=cfg.get('piston_diameter',.02):raise ValueError('rod must be smaller than piston')
         if cfg.get('sensor_width',.001)>cfg.get('stroke',.1):raise ValueError('sensor_width exceeds stroke')
 
-def models_from_environment(env, devices, preset_root=None):
+def models_from_environment(env, devices, preset_root=None, base_directory=None):
     root=Path(preset_root) if preset_root is not None else Path(__file__).resolve().parents[3]/'model_presets'
     declarations=list(filter(str.strip,env.get('DEVICE_SIMULATOR_BEHAVIOUR_MODELS','').split(',')))
     presets={}
@@ -71,6 +72,9 @@ def models_from_environment(env, devices, preset_root=None):
             preset=read_json(file);validate_preset(preset)
             if preset['id'] in presets:raise ValueError('Duplicate preset ID: '+preset['id'])
             presets[preset['id']]=preset
+    folder=env.get('DEVICE_SIMULATOR_FMU_DIR','./model_artifacts').strip()
+    if not folder:raise ValueError('DEVICE_SIMULATOR_FMU_DIR: nonempty path required')
+    artifact_directory=str((Path(base_directory or Path.cwd())/folder).resolve())
     result=[];ids=set();allowed=set()
     for declaration in declarations:
         parts=[v.strip() for v in declaration.split(':')]
@@ -88,7 +92,7 @@ def models_from_environment(env, devices, preset_root=None):
         if set(values)-{'supply_gauge_pressure','opposing_force','initial_position'}:raise ValueError('Unsupported instance setting')
         if values.get('supply_gauge_pressure',0)<0:raise ValueError('supply pressure must be nonnegative')
         if not 0<=values.get('initial_position',0)<=preset['config'].get('stroke',.1):raise ValueError('initial_position outside stroke')
-        result.append(dict(id=identifier,preset=preset,instance_config=values))
+        result.append(dict(id=identifier,preset=preset,instance_config=values,artifact_directory=artifact_directory))
     unknown={k for k in env if k.startswith('DEVICE_SIMULATOR_MODEL_') and k!='DEVICE_SIMULATOR_MODEL_TIMEOUT_MS'}-allowed
     if unknown:raise ValueError('Unknown model settings: '+str(sorted(unknown)))
     station_keys={f"DEVICE_SIMULATOR_IO_{d['id']}_{suffix}" for d in devices if d['type']=='cpx-ap-i-ec' for suffix in ['MODULES','BINDINGS']}

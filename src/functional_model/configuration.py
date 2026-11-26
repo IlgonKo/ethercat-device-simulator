@@ -178,7 +178,7 @@ def load_environment(env, base_directory=None):
                 storage=dict(directory=str(Path(state))), devices=devices)
     if any(d['type']=='cpx-ap-i-ec' for d in devices) or any(k.startswith(('DEVICE_SIMULATOR_IO_','DEVICE_SIMULATOR_BEHAVIOUR_','DEVICE_SIMULATOR_MODEL_')) and k!='DEVICE_SIMULATOR_MODEL_TIMEOUT_MS' for k in env):
         from functional_model.remote_io.configuration import models_from_environment
-        data['io_models']=models_from_environment(env, devices)
+        data['io_models']=models_from_environment(env, devices, base_directory=base_directory)
     return validate_config(data, base_directory or Path.cwd())
 
 

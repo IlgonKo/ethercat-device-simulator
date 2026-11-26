@@ -1047,3 +1047,10 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - 실제 CMMT/CPX 뒤의 가상 CPX 2 station을 OP로 시험했다. 최종 이미지 5초 570회 WKC 6/6, Model Host SIGKILL 후 3초 340회 WKC 6/6. signed AO와 9byte AIO 배치·기본 오류 OD 유지 확인. 실축 Enable/이동 없음.
 - 시험용 컨테이너 제거 후 기존 Simulator 세션을 재시작했다. 원래 .env·state·운영 이미지 태그는 유지했으며 신규 이미지는 ethercat-device-simulator:rf013이다. Motion Server는 미실행 상태였고 시험 master는 PRE-OP로 종료했다.
 - 세부 근거/재현/남은 범위는 [검증 보고서](Validation/RF-013-stage1-3-20261126.md). RF-013 전체 완료 처리 및 커밋/푸시는 이번 요청에 포함하지 않았다.
+
+## 2026-11-26 — RF-013 1~3단계 push 및 4단계 완료
+
+- 1~3단계를 c729f04 (Implement RF-013 CPX slave and independent IO runtime)로 커밋하고 GitHub main에 push했다. Linux의 GitHub DNS 문제로 동일 커밋을 bundle로 Windows에 전달해 push하고 원격 SHA를 확인했다.
+- 공통 FMI 초기화 설정, 실제 실린더 어댑터, raw Int16 순수 지연 FMU, 프리셋·artifact 등록·Docker 패키징을 구현했다.
+- 단위 78개(1 skip), CTest 6개, 실제 IO FMU 10개, 실제 Copley 8개 및 4축 매핑/IPC 회귀를 통과했다. 배포용 runtime 이미지에서도 실제 IO FMU 10개와 4모델 초기화 검증을 통과했다.
+- [4단계 검증 결과](Validation/RF-013-stage4-20261126.md)에 산출물·hash·재현 명령·한계를 기록했다. RF-013은 진행 중이며 전체 혼합 물리 검증은 5단계다.

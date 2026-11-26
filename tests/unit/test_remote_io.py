@@ -155,9 +155,11 @@ class RemoteIOTests(unittest.TestCase):
         r,m=self.runtime();m.enter=threading.Event();m.release=threading.Event();self.snapshot(r)
         worker=threading.Thread(target=r.step_once,args=('c',));worker.start();self.assertTrue(m.enter.wait(.1))
         self.assertFalse(r.step_once('c'));m.release.set();worker.join(.2);self.assertEqual(len(m.calls),1)
-    def test_declared_fmu_fails_clearly_until_stage4(self):
+    def test_missing_fmu_fails_clearly(self):
+        from unittest.mock import patch
         from functional_model.remote_io.runtime import create_adapter
-        with self.assertRaisesRegex(ValueError,'stage 4 required'):create_adapter(cylinder())
+        with tempfile.TemporaryDirectory() as tmp, patch.dict('os.environ',{'DEVICE_SIMULATOR_FMU_DIR':tmp}):
+            with self.assertRaisesRegex(FileNotFoundError,'IO FMU missing'):create_adapter(cylinder())
     def test_preset_lookup_and_instance_config(self):
         import json
         with tempfile.TemporaryDirectory() as tmp:

@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "id": "analog_delay_16ms",
+  "model": "analog_delay",
+  "config": {"delay_seconds": 0.016}
+}

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<fmiModelDescription fmiVersion="3.0" modelName="SoftESCAnalogDelay" instantiationToken="{f42d8c6a-1be6-4ad1-876f-aeb827aa0130}" generationTool="Soft ESC deterministic native build" variableNamingConvention="flat">
+  <CoSimulation modelIdentifier="SoftESCAnalogDelay" canHandleVariableCommunicationStepSize="true" canBeInstantiatedOnlyOncePerProcess="false" hasEventMode="false" mightReturnEarlyFromDoStep="false"/>
+  <UnitDefinitions><Unit name="s"><BaseUnit s="1"/></Unit></UnitDefinitions>
+  <ModelVariables>
+    <Int16 name="command" valueReference="1" causality="input" variability="discrete" start="0"/>
+    <Int16 name="feedback" valueReference="2" causality="output" variability="discrete" initial="calculated"/>
+    <Float64 name="delay_seconds" valueReference="3" causality="parameter" variability="fixed" initial="exact" start="0.016" min="0" max="10" unit="s"/>
+    <Float64 name="time" valueReference="4" causality="independent" variability="continuous" unit="s"/>
+  </ModelVariables>
+  <ModelStructure><Output valueReference="2"/><InitialUnknown valueReference="2"/></ModelStructure>
+</fmiModelDescription>

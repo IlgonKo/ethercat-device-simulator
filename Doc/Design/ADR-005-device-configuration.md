@@ -29,7 +29,7 @@ Motion Server는 독립 패키지다. 명명 규칙은 유사하게 사용하지
 | 장치 영구 파라미터 | 별도 저장소; 안정적인 ID와 PARAMETER_SET 기준 |
 | 실제/가상/논리 장치/DT 대응 | Orchestrator의 독립 Pairing 설정 |
 
-## IO 모듈 선언 — 2026-11-25 채택, 파서 구현 전
+## IO 모듈 선언 — 2026-11-25 채택·파서 구현
 
 모듈 값의 문법은 Motion Server와 동일한 `슬롯: 모듈` 쉼표 목록으로 한다. 환경 변수 접두어만 패키지에 맞게 사용하며 Motion Server 설정 파일이나 파서에 런타임 의존하지 않는다.
 
@@ -46,7 +46,7 @@ Linux Motion Server의 실제 parser 및 ESI layout 검증으로 위 축약형�
 
 IO 모듈 구성과 동작 모델 생성/채널 binding은 별도 설정이다. 모델 인스턴스별 독립성과 연결 검증 원칙은 ADR-007을 따르며 모델 선언/binding 문법은 다음 절의 채택 내용을 적용한다.
 
-## 모델 인스턴스·채널 binding 문법 — 2026-11-25 채택, 구현 전
+## 모델 인스턴스·채널 binding 문법 — 2026-11-25 채택·구현
 
 모듈 구성, 동작 모델 생성, 채널 연결을 별도 선언한다. IO 연결 모델의 인스턴스 목록은 `DEVICE_SIMULATOR_BEHAVIOUR_MODELS`, IO별 연결 목록은 `DEVICE_SIMULATOR_IO_<io_id>_BINDINGS`를 사용한다.
 
@@ -64,7 +64,7 @@ DEVICE_SIMULATOR_IO_io0_BINDINGS=\
     3:AI:0=analog0.feedback
 ```
 
-2026-11-26 결정으로 모델 선언의 오른쪽 값은 모델 종류 대신 프리셋 ID다. cylinder_100mm는 model_presets/pneumatic_cylinder/double_acting/cylinder_100mm.json의 ID이며 model=pneumatic_double_acting을 선택한다. analog_test_preset은 순수 지연 FMU용 프리셋 자리표시자이며 실제 파일/식별자로 등록하지 않았다. command/feedback은 signed 16-bit raw 정수의 지연 입출력으로 확정했다. 로더/모델 등록은 미구현이다.
+2026-11-26 결정으로 모델 선언의 오른쪽 값은 모델 종류 대신 프리셋 ID다. cylinder_100mm는 model_presets/pneumatic_cylinder/double_acting/cylinder_100mm.json의 ID이며 model=pneumatic_double_acting을 선택한다. analog_test_preset은 초기 논의의 자리표시자다. 구현에서는 analog_delay_16ms를 등록했으며 model_presets/signal_processing/delay/analog_delay_16ms.json으로 선택한다. command/feedback은 signed 16-bit raw 정수의 지연 입출력으로 확정했다. 프리셋 로더와 실린더/지연 모델 등록은 RF-013 4단계까지 구현했다.
 
 모델 특성은 프리셋 JSON의 config, 인스턴스별 운전 조건·초기 조건은 `.env`의 `DEVICE_SIMULATOR_MODEL_<id>_INSTANCE_CONFIG`에 둔다. 예: `supply_gauge_pressure:600000,opposing_force:0,initial_position:0`. 기존 CONFIG/CONDITIONS/INITIAL 분리 제안은 대체한다. 프리셋 특성의 `.env` 덮어쓰기는 제공하지 않으며 미지정 값은 FMU 기본값, 변경은 재시작 때 적용한다. 자세한 형식·검증은 [RF-013](../RF/RF-013-virtual-io.md)을 따른다.
 
@@ -78,7 +78,7 @@ DEVICE_SIMULATOR_IO_io0_BINDINGS=\
 | station 분산 | 같은 모델의 서로 다른 신호를 여러 io_id의 BINDINGS에서 연결 가능. 같은 station으로 제한하지 않음 |
 | 미연결 채널 | 해당 채널 항목 생략. 기본값/보관 정책은 ADR-007 적용 |
 
-실린더는 DO의 extend/retract와 DI의 extended/retracted만 지원한다. 실린더 AI/AO 연결은 지원하지 않으며 위 analog0는 별도 순수 지연 모델의 연결 예시이며 제작/등록은 아직 수행하지 않았다.
+실린더는 DO의 extend/retract와 DI의 extended/retracted만 지원한다. 실린더 AI/AO 연결은 지원하지 않으며 위 analog0는 별도 순수 지연 모델의 연결 예시다. RF-013 4단계에서 analog_delay_16ms 프리셋으로 제작/등록을 완료했다.
 
 입출력명은 모델 어댑터가 연결하는 계약이다. FMU 내부 변수명·단위 변환은 모델별 매핑에서 처리하며 IO binding에 FMU 내부 구조를 직접 요구하지 않는다. 모델 종류와 인스턴스 ID를 구분하여 같은 모델 종류를 여러 독립 인스턴스로 생성할 수 있다.
 
@@ -166,4 +166,4 @@ BUS의 axis:cia402-drive는 기능 프로파일을 선택하고 AXIS_MODELS의 f
 
 ## 2026-11-26 RF-013 구현 상태
 
-축/IO 혼합 BUS, IO 모듈·프리셋·INSTANCE_CONFIG·전역 1:1 binding 파서를 구현했다. 축 목록은 축 slave_index에만 대응한다. CPX 모듈 OD 간격은 ESI AP-Slot의 0x10, PDO 번호 간격은 1이며 별도 사용자 매핑 설정은 없다. Motion Server는 독립 설정의 MODULE_PDO_INDEX_STRIDE=0x10을 사용한다. 프리셋과 모델 선언 검증은 구현했지만 실제 IO FMU 어댑터 생성은 4단계다. IO FMU 선언을 활성화하면 아직 명확한 시작 오류를 반환하며 대체 echo를 실행하지 않는다. [구현·검증](../Validation/RF-013-stage1-3-20261126.md).
+축/IO 혼합 BUS, IO 모듈·프리셋·INSTANCE_CONFIG·전역 1:1 binding 파서를 구현했다. 축 목록은 축 slave_index에만 대응한다. CPX 모듈 OD 간격은 ESI AP-Slot의 0x10, PDO 번호 간격은 1이며 별도 사용자 매핑 설정은 없다. Motion Server는 독립 설정의 MODULE_PDO_INDEX_STRIDE=0x10을 사용한다. 4단계에서 실제 IO FMU 어댑터를 연결했다. cylinder_100mm와 analog_delay_16ms 프리셋으로 모델을 생성하며 artifact 누락·계약 불일치는 시작 오류로 처리한다. [4단계 검증](../Validation/RF-013-stage4-20261126.md). [구현·검증](../Validation/RF-013-stage1-3-20261126.md).
