@@ -95,9 +95,14 @@ bash scripts/docker/logs.sh
 ```
 
 The versioned image is a local Docker/save-load artifact, not a published registry
-image. The GitHub release provides source and the F-KR FMU artifacts; it does not
+image. The GitHub release provides source, F-KR FMUs and the cylinder FMU; it does not
 provide the complete offline Docker bundle. Follow the deployment guide for source
 builds or a prepared offline bundle. No image is pulled by the commands above.
+
+The [cylinder FMU download](https://github.com/IlgonKo/ethercat-device-simulator/releases/download/v1.0.0/SoftESCDoubleActingCylinder-fmi3-web.fmu)
+is the unchanged binary validated with v1.0. Download its companion notices and
+`SHA256SUMS-cylinder` from the release assets. Place it in `model_artifacts/` when
+preparing source-build inputs; the validated target is Linux x86-64 / FMI 3.0 CS.
 
 ## Runtime configuration
 

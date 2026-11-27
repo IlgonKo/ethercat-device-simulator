@@ -1293,3 +1293,10 @@ Halt bit8 거부 예외 제거, FMU 전달 시에만 bit8 마스킹. OD 원본 �
 - DT Demo 완료 전에는 버그와 기구현 기능의 미비점을 TD로만 보완한다. RF-021은 Demo 이후, RF-019/020은 v1.0/Demo 범위 외 장기 구상, RF-012 최종 설정·새 PC 배포는 Demo 장비 설정 때 수행한다. 제품 RF는 완료 15/보류 4다.
 - README를 최신 Windows Motion Server README의 기능 소개/플랫폼/시작/운영/문서/폴더 안내 흐름에 맞춰 영문으로 재작성했다. Linux Motion Server README는 과거 구조여서 최신 Windows 문서를 기준으로 했다.
 - v1.0 런타임은 물리 검증한 RF-022 이미지와 동일하다. 버전 고정 태그 및 로컬 오프라인 배포 묶음, 공개 GitHub 소스 릴리즈와 F-KR FMU/체크섬 산출물을 준비한다. 기존 운영 컨테이너·설정·state는 변경하지 않는다.
+
+## 2026-11-27 — v1.0 실린더 FMU 다운로드 추가
+
+- 사용자 요청으로 기존 v1.0 Docker에 포함된 실린더 FMU를 GitHub 릴리즈의 개별 다운로드 자산으로 추가한다. model_artifacts 전체 Git 등록 요청은 취소 상태를 유지한다.
+- 기존 검증 SHA-256 `34b14a7967042fe3abaabab4de6086e8a29324faeb3a2ab29f569c590e2cac42` 및 ZIP CRC를 확인했다. 바이너리 수정·재빌드·재배포 없이 원본 파일을 사용한다.
+- 원본 모델 MIT 라이선스/고정 출처 안내, 별도 cylinder-manifest.json/SHA256SUMS-cylinder를 제공한다. 기존 태그·이미지·F-KR 자산·기존 체크섬은 유지한다.
+- README와 릴리즈 문서에 다운로드 경로·보충 자산·Linux 검증 범위를 반영했다. 신규 RF 기능 구현이 아니다.
